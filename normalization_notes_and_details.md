@@ -317,7 +317,8 @@ A **functional dependency** (FD) exists when the value of one attribute (or set 
 2. `emp_id → dept_id` (Employee ID determines which department)
 3. `emp_id → salary` (Employee ID determines salary)
 4. `dept_id → dept_name` (Department ID determines department name)
-5. `dept_id → manager_id` (Department ID determines who the manager is)
+5. `dept_id → manager_id` (Department ID determines who the manager is)  
+   — Assumes each department has exactly one manager at a time
 
 ### Types of Dependencies:
 
@@ -432,6 +433,8 @@ A **transitive dependency** occurs when a non-key attribute depends on another n
 **Transitive Dependency Identified:**
 - In COURSE table: `CourseID → Instructor` and `Instructor → Department`
 - This creates: `CourseID → Department` (transitive through Instructor)
+- **Why it's transitive**: Department depends on CourseID indirectly through the non-key attribute Instructor  
+  — Assumes each course has exactly one primary instructor assigned to a single department
 
 **3NF Result:**
 
@@ -479,4 +482,4 @@ A **transitive dependency** occurs when a non-key attribute depends on another n
 - `StudentID → StudentName`
 - `InstructorID → InstructorName, Department`
 - `CourseID → InstructorID`
-- `(StudentID, CourseID) → ∅` (Enrollment relationship)
+- `(StudentID, CourseID) → {}` (Enrollment row has no non-key attributes in this minimal example)
