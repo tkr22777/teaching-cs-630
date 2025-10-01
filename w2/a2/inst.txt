@@ -1,0 +1,21 @@
+DB W2 Assignment:
+
+I am creating an assignment for graduate DB class.
+
+Create an assignment's problem statement:
+
+Instructions should include:
+
+1. Create ERD that includes:
+    - including hierarchy diagram
+    - include 
+    - highlighting the subtype discriminator
+    - completeness constraint
+    - disjoint and overlapping constraint
+
+2. Create tables example data based on the ERD
+
+The problem should include:
+    - multiple subtypes of supertype
+    - there should be two supertype
+    - both supertype and some subtype should have relationship and corresponding tables

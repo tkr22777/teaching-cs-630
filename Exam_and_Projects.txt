@@ -1,0 +1,15 @@
+Exam:
+
+Objective knowledge
+Explaingin something
+Explaining process
+
+Project:
+    - Software Project with UI
+    - Software Project with DB
+    - PL-SQL (included?)
+
+    - Can they install docker? 
+        - Can they run simple docker based application?
+        - Is it possible to creae
+    - Do they have docker compose?

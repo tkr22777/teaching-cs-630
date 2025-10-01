@@ -1,0 +1,49 @@
+0. Check 
+
+1. Join the video class session
+
+2. My intro
+
+    - Hello everyone. Hope you all are having a great begining of the winter semeter.
+        I am going to teach you CS-360
+    
+    - I grew up in Bangladesh. Dhaka
+        - I came to US for my master's in Computer Science.
+        - Have been a Software Engineer
+    
+    - Engineering:
+        - Capital One (Lead Software Engineer) (awaiting to join)
+        - Qualtrics, Outreach (West coast), Dataminr, Gro Intelligence, Pepper (East coast)
+    
+    - Location: Currently in NY, Futurue idk
+        - I worked in 4 cities, Chapel Hill, Salt Lake City, Seattle, 
+            - I also lived on AirBnb for a year
+    
+    - Travelling ()
+        - Software Engineering, Architecture, Cloud-Infrastructure, Products, AI native development
+        - Environment, flew a lot, so idk maybe I will eventually work on a system that reengineers the world for more reversion of the atrocities we have done implicitly or explicitly.. 
+    
+    - New to MonroeC and new to adjunct, new to teaching and termnilogies. i might ask for help, feel free to offer help
+    
+    - Since I have exp with Prod dev, i would emphasize on things that would be useful if you are a software engineer later. I would also try to learn a few things.
+    - I would try to incorporate hands on experiments and explorations that some courses would not cover.
+
+3. Introduction:
+    - Verbal:
+        - Name:
+        - Program:
+        - Major:
+        - If they are in graduate/master's program, what was their undergradate on?
+            - Have they used any DB?
+            - Linux?
+            - Docker?
+            - Data Structure Class?
+            - Runtime complexity?
+        - What do they aspire to at end of their program? I don't know yet is an acceptable answer.
+
+    - Common:
+        - Is this a required course?
+    
+4. Course Content:
+    - the doc link to syllabus
+    - we might look into using github for running assignments
