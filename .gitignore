@@ -6,6 +6,10 @@
 !README.md
 !normalization_notes_and_details.md
 
+# Keep week_04 notes
+!week_04/
+!week_04/notes.md
+
 # Keep these patterns ignored
 .cursorrules
 .env
