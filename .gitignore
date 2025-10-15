@@ -1,0 +1,12 @@
+# Ignore everything by default
+*
+
+# But keep these files
+!.gitignore
+!README.md
+!normalization_notes_and_details.md
+
+# Keep these patterns ignored
+.cursorrules
+.env
+.DS_Store
