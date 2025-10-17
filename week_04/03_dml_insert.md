@@ -154,31 +154,19 @@ FROM temp_new_hires;
 <details>
 <summary>Database-Specific Features: RETURNING and UPSERT</summary>
 
-## INSERT ... RETURNING (PostgreSQL, SQL Server)
+## INSERT ... RETURNING (PostgreSQL primary)
 
-Some databases allow you to return data from inserted rows.
+PostgreSQL supports returning data from inserted rows:
 
-### Example: RETURNING Clause
-
-**PostgreSQL:**
 ```sql
 INSERT INTO employees (first_name, last_name, email, department, salary)
 VALUES ('Isabel', 'Garcia', 'isabel.garcia@company.com', 'Sales', 71000.00)
 RETURNING employee_id, first_name, last_name, hire_date;
 ```
 
-**SQL Server:**
-```sql
-INSERT INTO employees (first_name, last_name, email, department, salary)
-OUTPUT INSERTED.employee_id, INSERTED.first_name, INSERTED.last_name, INSERTED.hire_date
-VALUES ('Isabel', 'Garcia', 'isabel.garcia@company.com', 'Sales', 71000.00);
-```
-
 ## INSERT with UPSERT (Handling Conflicts)
 
-Different databases have different syntax for handling duplicate key conflicts:
-
-**PostgreSQL - ON CONFLICT:**
+### PostgreSQL - ON CONFLICT
 ```sql
 -- Ignore conflicts
 INSERT INTO employees (first_name, last_name, email, department, salary)
@@ -192,7 +180,7 @@ ON CONFLICT (email)
 DO UPDATE SET department = EXCLUDED.department, salary = EXCLUDED.salary;
 ```
 
-**MySQL - INSERT IGNORE / ON DUPLICATE KEY:**
+### MySQL (note)
 ```sql
 -- Ignore conflicts
 INSERT IGNORE INTO employees (first_name, last_name, email, department, salary)
@@ -202,16 +190,6 @@ VALUES ('John', 'Duplicate', 'john.doe@company.com', 'Sales', 70000.00);
 INSERT INTO employees (first_name, last_name, email, department, salary)
 VALUES ('John', 'Doe', 'john.doe@company.com', 'Management', 90000.00)
 ON DUPLICATE KEY UPDATE department = VALUES(department), salary = VALUES(salary);
-```
-
-**SQL Server - MERGE:**
-```sql
-MERGE employees AS target
-USING (SELECT 'John' AS first_name, 'Doe' AS last_name, 'john.doe@company.com' AS email) AS source
-ON target.email = source.email
-WHEN MATCHED THEN UPDATE SET department = 'Management', salary = 90000.00
-WHEN NOT MATCHED THEN INSERT (first_name, last_name, email, department, salary) 
-VALUES ('John', 'Doe', 'john.doe@company.com', 'Management', 90000.00);
 ```
 
 </details>

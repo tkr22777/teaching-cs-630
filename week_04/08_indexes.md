@@ -393,39 +393,27 @@ DROP INDEX IF EXISTS idx_products_old1,
 <details>
 <summary>Advanced: Concurrent Operations and Reindexing</summary>
 
-## Concurrent Index Operations
+## Concurrent Index Operations (PostgreSQL primary)
 
-Some databases (PostgreSQL, Oracle) support creating/dropping indexes without blocking writes.
+PostgreSQL supports creating/dropping indexes without blocking writes.
 
-**PostgreSQL Example:**
 ```sql
 -- Doesn't lock the table
 CREATE INDEX CONCURRENTLY idx_products_name ON products (product_name);
 DROP INDEX CONCURRENTLY idx_products_old;
 ```
 
-**Benefit:** Table remains available for writes during index creation.
-
 ## Reindexing
 
 Over time, indexes can become fragmented. Reindexing rebuilds them for better performance.
 
-**PostgreSQL:**
 ```sql
 REINDEX INDEX idx_products_category;
 REINDEX TABLE products;
 REINDEX INDEX CONCURRENTLY idx_products_category;  -- PostgreSQL 12+
 ```
 
-**MySQL:**
-```sql
-ALTER TABLE products DROP INDEX idx_products_category, ADD INDEX idx_products_category (category);
-```
-
-**SQL Server:**
-```sql
-ALTER INDEX idx_products_category ON products REBUILD;
-```
+MySQL note: emulate concurrent behavior via online DDL (depends on storage engine and version).
 
 </details>
 

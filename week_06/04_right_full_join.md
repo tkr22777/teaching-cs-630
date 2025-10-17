@@ -329,7 +329,7 @@ WHERE s.student_id IS NULL OR c.course_id IS NULL OR (s.student_id IS NOT NULL A
 
 ### Simulating FULL OUTER JOIN (MySQL)
 
-Since MySQL doesn't support FULL OUTER JOIN, use UNION:
+Since MySQL doesn't support FULL OUTER JOIN, use UNION of LEFT and RIGHT results (with NULL filters) to emulate it:
 
 ```sql
 -- Left side (all students)

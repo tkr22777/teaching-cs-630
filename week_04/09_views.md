@@ -412,20 +412,28 @@ SELECT * FROM mv_department_summary;
 
 ### Refreshing Materialized Views
 
-**SQL Statement:**
+<details>
+<summary>PostgreSQL (primary) and MySQL note</summary>
+
+PostgreSQL supports materialized views and concurrent refresh when a unique index exists.
+
 ```sql
--- Refresh data (blocks reads)
+-- PostgreSQL: Refresh data (blocks reads)
 REFRESH MATERIALIZED VIEW mv_department_summary;
 
--- Refresh without blocking reads (requires unique index)
+-- PostgreSQL: Refresh without blocking reads (requires unique index)
 REFRESH MATERIALIZED VIEW CONCURRENTLY mv_department_summary;
 ```
+
+MySQL does not have native materialized views; emulate with tables + scheduled refresh.
+
+</details>
 
 ### Example 14: Materialized View with Index
 
 **SQL Statement:**
 ```sql
--- Create materialized view
+-- PostgreSQL: Create materialized view
 CREATE MATERIALIZED VIEW mv_employee_stats AS
 SELECT department,
        EXTRACT(YEAR FROM hire_date) AS hire_year,
@@ -434,11 +442,11 @@ SELECT department,
 FROM employees
 GROUP BY department, EXTRACT(YEAR FROM hire_date);
 
--- Create unique index for concurrent refresh
+-- PostgreSQL: Create unique index for concurrent refresh
 CREATE UNIQUE INDEX idx_mv_emp_stats 
 ON mv_employee_stats (department, hire_year);
 
--- Now can refresh concurrently
+-- PostgreSQL: Refresh concurrently
 REFRESH MATERIALIZED VIEW CONCURRENTLY mv_employee_stats;
 ```
 
