@@ -315,26 +315,3 @@ ADD CONSTRAINT fk_courses_dept
     FOREIGN KEY (dept_id) REFERENCES departments(dept_id);
 ```
 
-## Quick Reference
-
-```sql
--- CREATE with constraints
-CREATE TABLE table_name (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    category_id INTEGER REFERENCES categories(id),
-    price NUMERIC(10,2) CHECK (price > 0),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ALTER operations
-ALTER TABLE table_name ADD COLUMN column_name datatype;
-ALTER TABLE table_name ALTER COLUMN column_name TYPE new_datatype;
-ALTER TABLE table_name ALTER COLUMN column_name SET NOT NULL;
-ALTER TABLE table_name DROP COLUMN column_name;
-ALTER TABLE table_name ADD CONSTRAINT name CHECK (condition);
-ALTER TABLE table_name DROP CONSTRAINT constraint_name;
-ALTER TABLE table_name RENAME COLUMN old_name TO new_name;
-ALTER TABLE table_name RENAME TO new_table_name;
-```
-

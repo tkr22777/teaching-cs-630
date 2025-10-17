@@ -469,29 +469,3 @@ ON products (category)
 WHERE category IS NULL;
 ```
 
-## Quick Reference
-
-```sql
--- CREATE INDEX
-CREATE INDEX idx_name ON table_name (column);
-CREATE INDEX idx_name ON table_name (col1, col2);  -- Composite index
-CREATE UNIQUE INDEX idx_name ON table_name (column);
-CREATE INDEX idx_name ON table_name (column) WHERE condition;  -- Partial index
-
--- DROP INDEX
-DROP INDEX idx_name;
-DROP INDEX IF EXISTS idx_name;
-DROP INDEX CONCURRENTLY idx_name;  -- Won't block reads/writes
-
--- REINDEX
-REINDEX INDEX idx_name;
-REINDEX TABLE table_name;
-
--- Naming convention
--- idx_{table}_{column(s)}
--- Example: idx_orders_customer_id, idx_products_category_price
-
--- Check index usage
-SELECT indexname, idx_scan FROM pg_stat_user_indexes WHERE schemaname = 'public';
-```
-

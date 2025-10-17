@@ -266,26 +266,3 @@ INSERT INTO staff (staff_name, dept_id)
 VALUES ('John Smith', 1);  -- References valid dept_id
 ```
 
-## Quick Reference
-
-```sql
--- Basic INSERT
-INSERT INTO table_name (col1, col2) VALUES (val1, val2);
-
--- Multiple rows
-INSERT INTO table_name (col1, col2) VALUES (val1, val2), (val3, val4);
-
--- Using DEFAULT
-INSERT INTO table_name (col1, col2) VALUES ('value', DEFAULT);
-
--- INSERT ... SELECT
-INSERT INTO target_table (col1, col2) SELECT col1, col2 FROM source_table WHERE condition;
-
--- INSERT ... RETURNING
-INSERT INTO table_name (col1) VALUES (val1) RETURNING id, created_at;
-
--- INSERT ... ON CONFLICT (UPSERT)
-INSERT INTO table_name (id, name) VALUES (1, 'New') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
-INSERT INTO table_name (id, name) VALUES (1, 'New') ON CONFLICT (id) DO NOTHING;
-```
-

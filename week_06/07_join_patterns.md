@@ -359,32 +359,3 @@ JOIN courses c ON e.course_id = c.course_id
 WHERE s.major = 'Computer Science';  -- Filter before joining when possible
 ```
 
-## Quick Reference
-
-```sql
--- Multiple table joins (3-way)
-SELECT s.name, c.course_name, i.instructor_name
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id
-JOIN instructors i ON c.instructor_id = i.instructor_id;
-
--- Composite joins (multi-column)
-SELECT *
-FROM table1 t1
-JOIN table2 t2 ON t1.col1 = t2.col1 AND t1.col2 = t2.col2;
-
--- Mixed join types
-SELECT s.name, c.course_name, i.instructor_name
-FROM students s
-LEFT JOIN enrollments e ON s.student_id = e.student_id
-INNER JOIN courses c ON e.course_id = c.course_id
-LEFT JOIN instructors i ON c.instructor_id = i.instructor_id;
-
--- NULL-safe aggregates with LEFT JOIN
-SELECT s.first_name, COUNT(e.enrollment_id)  -- Use specific column, not *
-FROM students s
-LEFT JOIN enrollments e ON s.student_id = e.student_id
-GROUP BY s.student_id, s.first_name;
-```
-

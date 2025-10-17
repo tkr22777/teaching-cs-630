@@ -512,31 +512,3 @@ LIMIT 3;
 | 1984 | George Orwell | Science Fiction | 13.99 | 4.7 |
 | The Great Gatsby | F. Scott Fitzgerald | Fiction | 12.99 | 4.5 |
 
-## Quick Reference
-
-```sql
--- Basic SELECT
-SELECT column1, column2 FROM table_name;
-SELECT * FROM table_name;
-
--- WHERE clause
-SELECT * FROM table WHERE condition;
-SELECT * FROM table WHERE col1 = value AND col2 > value;
-SELECT * FROM table WHERE col IN (val1, val2, val3);
-SELECT * FROM table WHERE col BETWEEN val1 AND val2;
-SELECT * FROM table WHERE col LIKE 'pattern%';
-SELECT * FROM table WHERE col IS NULL;
-
--- ORDER BY
-SELECT * FROM table ORDER BY column ASC;
-SELECT * FROM table ORDER BY col1 DESC, col2 ASC;
-
--- DISTINCT
-SELECT DISTINCT column FROM table;
-
--- LIMIT and OFFSET
-SELECT * FROM table LIMIT 10;
-SELECT * FROM table LIMIT 10 OFFSET 20;
-SELECT * FROM table ORDER BY col LIMIT 5;  -- Always use ORDER BY with LIMIT
-```
-

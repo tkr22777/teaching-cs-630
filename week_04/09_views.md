@@ -522,30 +522,3 @@ ORDER BY table_name;
 SELECT pg_get_viewdef('employee_summary', true);
 ```
 
-## Quick Reference
-
-```sql
--- CREATE VIEW
-CREATE VIEW view_name AS SELECT ...;
-CREATE OR REPLACE VIEW view_name AS SELECT ...;
-
--- DROP VIEW
-DROP VIEW view_name;
-DROP VIEW IF EXISTS view_name;
-DROP VIEW view_name CASCADE;  -- Drop dependent views too
-
--- Query views (like regular tables)
-SELECT * FROM view_name;
-SELECT * FROM view_name WHERE condition;
-
--- Materialized views (PostgreSQL)
-CREATE MATERIALIZED VIEW mv_name AS SELECT ...;
-REFRESH MATERIALIZED VIEW mv_name;
-REFRESH MATERIALIZED VIEW CONCURRENTLY mv_name;
-DROP MATERIALIZED VIEW mv_name;
-
--- Check view definition
-SELECT definition FROM pg_views WHERE viewname = 'view_name';
-\d+ view_name  -- PostgreSQL psql command
-```
-

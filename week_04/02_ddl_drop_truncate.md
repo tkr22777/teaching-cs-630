@@ -416,23 +416,3 @@ CREATE TABLE courses (...);
 CREATE TABLE enrollments (...);
 ```
 
-## Quick Reference
-
-```sql
--- DROP TABLE
-DROP TABLE table_name;
-DROP TABLE IF EXISTS table_name;
-DROP TABLE table_name CASCADE;                    -- Drop with all dependencies
-DROP TABLE table1, table2, table3;                -- Drop multiple tables
-
--- TRUNCATE TABLE  
-TRUNCATE TABLE table_name;
-TRUNCATE TABLE table_name RESTART IDENTITY;       -- Reset auto-increment
-TRUNCATE TABLE table_name CASCADE;                -- Truncate referencing tables
-TRUNCATE TABLE table1, table2;                    -- Truncate multiple tables
-
--- DELETE (for comparison)
-DELETE FROM table_name;
-DELETE FROM table_name WHERE condition;
-```
-

@@ -384,18 +384,3 @@ BEGIN;
 COMMIT;  -- or ROLLBACK if incorrect
 ```
 
-## Quick Reference
-
-```sql
--- UPDATE
-UPDATE table_name SET column = value WHERE condition;
-UPDATE table_name SET col1 = val1, col2 = val2 WHERE condition;
-UPDATE table_name SET column = column + 10 WHERE condition;
-UPDATE table_name SET column = value WHERE condition RETURNING *;
-
--- DELETE
-DELETE FROM table_name WHERE condition;
-DELETE FROM table_name WHERE condition RETURNING *;
-DELETE FROM table_name;  -- Deletes all rows (use with caution)
-```
-

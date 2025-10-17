@@ -454,34 +454,3 @@ GROUP BY category;
 | Electronics | 8.83 | 6.65 | 44.17 |
 | Furniture | 7.50 | 3.70 | 13.67 |
 
-## Quick Reference
-
-```sql
--- Aggregate functions
-SELECT COUNT(*) FROM table;
-SELECT COUNT(column) FROM table;  -- Excludes NULLs
-SELECT SUM(column) FROM table;
-SELECT AVG(column) FROM table;
-SELECT MAX(column) FROM table;
-SELECT MIN(column) FROM table;
-
--- GROUP BY
-SELECT column, COUNT(*) FROM table GROUP BY column;
-SELECT col1, col2, SUM(col3) FROM table GROUP BY col1, col2;
-
--- HAVING (filter on aggregates)
-SELECT category, COUNT(*) FROM sales GROUP BY category HAVING COUNT(*) > 5;
-SELECT category, AVG(price) FROM products GROUP BY category HAVING AVG(price) > 100;
-
--- Combined query
-SELECT category, 
-       COUNT(*) AS total_sales,
-       SUM(quantity) AS units_sold,
-       AVG(unit_price) AS avg_price
-FROM sales
-WHERE sale_date >= '2024-01-01'  -- Row-level filter (before grouping)
-GROUP BY category
-HAVING COUNT(*) > 10              -- Group-level filter (after grouping)
-ORDER BY total_sales DESC;
-```
-

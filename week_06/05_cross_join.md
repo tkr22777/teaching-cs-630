@@ -368,22 +368,3 @@ ORDER BY p.product, d.discount_pct;
 3. **You forget the join condition**
    - Accidental Cartesian product is a common mistake
 
-## Quick Reference
-
-```sql
--- CROSS JOIN (explicit syntax)
-SELECT * FROM table1 CROSS JOIN table2;
-
--- CROSS JOIN (implicit syntax with comma)
-SELECT * FROM table1, table2;
-
--- CROSS JOIN with WHERE filter
-SELECT * FROM table1 CROSS JOIN table2 WHERE condition;
-
--- Calculate Cartesian product size
-SELECT (SELECT COUNT(*) FROM table1) * (SELECT COUNT(*) FROM table2) AS total_rows;
-
--- Use LIMIT for testing
-SELECT * FROM table1 CROSS JOIN table2 LIMIT 10;
-```
-
