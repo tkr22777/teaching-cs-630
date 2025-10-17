@@ -557,27 +557,6 @@ WHERE salary > 80000;
 -- (Better to create multiple simpler views or use CTEs)
 ```
 
-### 4. Use Materialized Views for Heavy Queries
-
-```sql
--- Heavy query run often? Use materialized view
-CREATE MATERIALIZED VIEW monthly_report AS
-SELECT ... (complex query with multiple joins and aggregations)
-
--- Refresh daily
-REFRESH MATERIALIZED VIEW monthly_report;
-```
-
-### 5. Grant Appropriate Permissions
-
-```sql
--- Grant SELECT on view, not base table
-GRANT SELECT ON public_employee_directory TO public_users;
-
--- Base table remains protected
-REVOKE ALL ON employees FROM public_users;
-```
-
 ## Common Errors
 
 ### Error 1: View Already Exists
@@ -609,46 +588,5 @@ CREATE VIEW summary AS
 SELECT COUNT(*) AS employee_count, department
 FROM employees
 GROUP BY department;
-```
-
-## Summary
-
-### Key Takeaways:
-- **Views** are virtual tables based on SELECT queries
-- Use views for **simplification**, **security**, and **abstraction**
-- Views can be queried like tables
-- Simple views can be **updatable** (INSERT, UPDATE, DELETE)
-- **Materialized views** store data physically for better performance
-- Use **CREATE OR REPLACE** to modify existing views
-- Drop views with **DROP VIEW**
-- Refresh materialized views with **REFRESH MATERIALIZED VIEW**
-
-### Quick Reference:
-
-```sql
--- Create view
-CREATE VIEW view_name AS SELECT ...;
-
--- Replace view
-CREATE OR REPLACE VIEW view_name AS SELECT ...;
-
--- Drop view
-DROP VIEW view_name;
-
--- Create materialized view
-CREATE MATERIALIZED VIEW mv_name AS SELECT ...;
-
--- Refresh materialized view
-REFRESH MATERIALIZED VIEW mv_name;
-
--- Concurrent refresh (needs unique index)
-REFRESH MATERIALIZED VIEW CONCURRENTLY mv_name;
-
--- List all views
-SELECT table_name FROM information_schema.views 
-WHERE table_schema = 'public';
-
--- Get view definition
-SELECT pg_get_viewdef('view_name', true);
 ```
 

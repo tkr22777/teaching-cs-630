@@ -449,44 +449,6 @@ GROUP BY category;
 | Electronics | 8.83 | 6.65 | 44.17 |
 | Furniture | 7.50 | 3.70 | 13.67 |
 
-## Query Execution Order
-
-Understanding execution order:
-
-```
-1. FROM       - Identify table
-2. WHERE      - Filter rows
-3. GROUP BY   - Group rows
-4. HAVING     - Filter groups
-5. SELECT     - Select columns & calculate aggregates
-6. ORDER BY   - Sort results
-7. LIMIT      - Limit results
-```
-
-### Example 23: Complete Query Flow
-
-**SQL Statement:**
-```sql
-SELECT category,
-       region,
-       COUNT(*) AS sales_count,
-       SUM(quantity * unit_price) AS revenue
-FROM sales
-WHERE sale_date >= '2024-10-02'  -- 1. Filter rows
-GROUP BY category, region         -- 2. Group
-HAVING SUM(quantity * unit_price) > 2000  -- 3. Filter groups
-ORDER BY revenue DESC             -- 4. Sort
-LIMIT 5;                          -- 5. Limit results
-```
-
-**Result:**
-| category | region | sales_count | revenue |
-|----------|--------|-------------|---------|
-| Electronics | East | 2 | 5399.85 |
-| Furniture | East | 1 | 2399.88 |
-| Furniture | South | 1 | 2349.90 |
-| Furniture | West | 1 | 2250.00 |
-
 ## Best Practices
 
 ### 1. Use Meaningful Aliases
@@ -527,20 +489,6 @@ GROUP BY category
 HAVING COUNT(*) > 2;        -- Group-level filter
 ```
 
-### 4. Include All Non-Aggregated Columns in GROUP BY
-
-```sql
--- Correct: category is in GROUP BY
-SELECT category, COUNT(*)
-FROM sales
-GROUP BY category;
-
--- Error: region not in GROUP BY
-SELECT category, region, COUNT(*)
-FROM sales
-GROUP BY category;  -- Missing region!
-```
-
 ## Common Errors
 
 ### Error 1: Column Not in GROUP BY
@@ -576,41 +524,5 @@ SELECT category, COUNT(*)
 FROM sales
 GROUP BY category
 HAVING COUNT(*) > 2;  -- Use HAVING for aggregates
-```
-
-## Summary
-
-### Key Takeaways:
-- **Aggregate Functions**: COUNT, SUM, AVG, MAX, MIN
-- **GROUP BY**: Groups rows for aggregation
-- **HAVING**: Filters groups (use after GROUP BY)
-- **WHERE**: Filters rows (use before GROUP BY)
-- All non-aggregated columns in SELECT must be in GROUP BY
-- Use ROUND() for decimal precision in results
-
-### Quick Reference:
-
-```sql
--- Basic aggregates
-SELECT COUNT(*), SUM(column), AVG(column), MAX(column), MIN(column)
-FROM table;
-
--- GROUP BY
-SELECT column1, COUNT(*)
-FROM table
-GROUP BY column1;
-
--- GROUP BY with HAVING
-SELECT column1, COUNT(*)
-FROM table
-WHERE condition
-GROUP BY column1
-HAVING COUNT(*) > value
-ORDER BY COUNT(*) DESC;
-
--- Multiple grouping columns
-SELECT col1, col2, SUM(col3)
-FROM table
-GROUP BY col1, col2;
 ```
 

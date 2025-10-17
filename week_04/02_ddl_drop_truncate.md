@@ -467,17 +467,6 @@ DROP TABLE products;
 CREATE TABLE products AS SELECT * FROM products_backup;
 ```
 
-### 4. Check Dependencies First
-
-```sql
--- Check what depends on a table before dropping
-SELECT 
-    conname AS constraint_name,
-    conrelid::regclass AS table_name
-FROM pg_constraint
-WHERE confrelid = 'your_table'::regclass;
-```
-
 ## Common Errors and Solutions
 
 ### Error 1: Cannot DROP due to Dependencies
@@ -516,33 +505,5 @@ TRUNCATE TABLE categories, items RESTART IDENTITY;
 
 -- Option 2: Use CASCADE
 TRUNCATE TABLE categories CASCADE;
-```
-
-## Summary
-
-### Key Takeaways:
-- **DROP TABLE** permanently removes the entire table and all its data
-- **TRUNCATE TABLE** removes all rows but keeps the table structure
-- **TRUNCATE** is much faster than **DELETE** for removing all rows
-- Use **CASCADE** carefully - it removes dependent objects too
-- Use **RESTART IDENTITY** to reset auto-increment sequences
-- Always backup important data before dropping or truncating
-- Use **IF EXISTS** to avoid errors when tables might not exist
-
-### Quick Reference:
-
-```sql
--- DROP table
-DROP TABLE table_name;
-DROP TABLE IF EXISTS table_name;
-DROP TABLE table_name CASCADE;
-
--- TRUNCATE table
-TRUNCATE TABLE table_name;
-TRUNCATE TABLE table_name RESTART IDENTITY;
-TRUNCATE TABLE table_name CASCADE;
-
--- Truncate multiple tables
-TRUNCATE TABLE table1, table2, table3 RESTART IDENTITY CASCADE;
 ```
 

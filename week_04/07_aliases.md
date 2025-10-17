@@ -449,34 +449,6 @@ SELECT COUNT(*) AS orderCount,
 FROM orders;
 ```
 
-### 4. Avoid Reserved Keywords as Aliases
-
-```sql
--- Avoid: Reserved keywords
-SELECT customer_id AS select,  -- Bad: 'select' is reserved
-       order_date AS from       -- Bad: 'from' is reserved
-FROM orders;
-
--- Good: Non-reserved words
-SELECT customer_id AS cust_id,
-       order_date AS order_dt
-FROM orders;
-```
-
-### 5. Always Use Aliases in Joins
-
-```sql
--- Good: Clear which table each column comes from
-SELECT c.name, o.date, o.amount
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
-
--- Avoid: Ambiguous without aliases (especially if columns have same names)
-SELECT name, date, amount
-FROM customers
-JOIN orders ON customers.customer_id = orders.customer_id;
-```
-
 ## Common Patterns
 
 ### Pattern 1: Aggregate with Descriptive Aliases
@@ -519,42 +491,5 @@ JOIN order_items oi ON o.order_id = oi.order_id
 JOIN products p ON oi.product_id = p.product_id
 WHERE o.status = 'completed'
 ORDER BY o.order_date DESC;
-```
-
-## Summary
-
-### Key Takeaways:
-- **Column Aliases** rename columns in output (use AS keyword or omit it)
-- **Table Aliases** provide shorthand for table names
-- Table aliases are REQUIRED for self-joins
-- Use aliases to improve query readability
-- Always use table aliases when joining multiple tables
-- Choose meaningful, consistent alias names
-- Avoid reserved keywords as aliases
-
-### Quick Reference:
-
-```sql
--- Column alias
-SELECT column1 AS alias1, column2 alias2
-FROM table;
-
--- Table alias
-SELECT t.column1, t.column2
-FROM table_name t;
-
--- Join with aliases
-SELECT c.name, o.date
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
-
--- Calculated field with alias
-SELECT quantity * price AS total
-FROM items;
-
--- Aggregate with alias
-SELECT COUNT(*) AS count, SUM(amount) AS total
-FROM orders
-GROUP BY category;
 ```
 

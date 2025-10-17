@@ -458,30 +458,6 @@ BEGIN;
 COMMIT;
 ```
 
-### 4. Use RETURNING for Audit Logs
-
-```sql
--- Log what was changed
-UPDATE inventory
-SET price = 799.99
-WHERE product_id = 1
-RETURNING product_id, product_name, price, CURRENT_TIMESTAMP AS updated_at;
-```
-
-### 5. Backup Before Bulk Operations
-
-```sql
--- Create backup
-CREATE TABLE inventory_backup AS SELECT * FROM inventory;
-
--- Perform risky operation
-DELETE FROM inventory WHERE stock_quantity < 5;
-
--- Restore if needed
-TRUNCATE inventory;
-INSERT INTO inventory SELECT * FROM inventory_backup;
-```
-
 ## Practical Examples
 
 ### Example 15: Bulk Price Update with Conditions
@@ -525,47 +501,5 @@ SET category = 'Tech'
 WHERE category = 'Electronics';
 
 -- This affects all related queries/reports automatically
-```
-
-## Summary
-
-### Key Takeaways:
-- **UPDATE** modifies existing row data
-- **DELETE** removes entire rows
-- **Always use WHERE clause** to target specific rows
-- Use **RETURNING** to see affected rows
-- **Test with SELECT** before UPDATE/DELETE
-- Use **transactions** for safety
-- **Backup data** before bulk operations
-
-### Quick Reference:
-
-```sql
--- UPDATE single column
-UPDATE table SET column = value WHERE condition;
-
--- UPDATE multiple columns
-UPDATE table SET col1 = val1, col2 = val2 WHERE condition;
-
--- UPDATE with calculation
-UPDATE table SET price = price * 1.10 WHERE category = 'X';
-
--- UPDATE with RETURNING
-UPDATE table SET column = value WHERE id = 1 RETURNING *;
-
--- DELETE single row
-DELETE FROM table WHERE id = 1;
-
--- DELETE multiple rows
-DELETE FROM table WHERE condition;
-
--- DELETE with RETURNING
-DELETE FROM table WHERE condition RETURNING *;
-
--- Safe pattern with transaction
-BEGIN;
-SELECT * FROM table WHERE condition;  -- Preview
-UPDATE/DELETE FROM table WHERE condition;
-COMMIT;  -- or ROLLBACK
 ```
 

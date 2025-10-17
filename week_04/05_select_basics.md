@@ -509,19 +509,6 @@ LIMIT 3;
 | 1984 | George Orwell | Science Fiction | 13.99 | 4.7 |
 | The Great Gatsby | F. Scott Fitzgerald | Fiction | 12.99 | 4.5 |
 
-## Query Execution Order
-
-Understanding SQL execution order helps write better queries:
-
-```
-1. FROM       - Identify table
-2. WHERE      - Filter rows
-3. SELECT     - Select columns
-4. DISTINCT   - Remove duplicates
-5. ORDER BY   - Sort results
-6. LIMIT      - Limit results
-```
-
 ## Best Practices
 
 ### 1. Specify Column Names
@@ -557,52 +544,5 @@ LIMIT 5;
 SELECT title, price
 FROM books
 LIMIT 5;
-```
-
-### 4. Use DISTINCT Judiciously
-
-```sql
--- Only use DISTINCT when you actually have duplicates
--- It adds processing overhead
-SELECT DISTINCT genre FROM books;  -- Necessary
-SELECT DISTINCT title FROM books;  -- Unnecessary (title is likely unique)
-```
-
-## Summary
-
-### Key Takeaways:
-- **SELECT** retrieves data from tables
-- **WHERE** filters rows based on conditions
-- **ORDER BY** sorts results (ASC or DESC)
-- **DISTINCT** removes duplicate values
-- **LIMIT** controls how many rows to return
-- **OFFSET** skips rows (useful for pagination)
-- Operators: `=, <>, >, <, >=, <=, BETWEEN, IN, LIKE, IS NULL`
-- Combine clauses for powerful queries
-
-### Quick Reference:
-
-```sql
--- Basic SELECT
-SELECT column1, column2 FROM table;
-
--- With WHERE
-SELECT * FROM table WHERE condition;
-
--- With ORDER BY
-SELECT * FROM table ORDER BY column DESC;
-
--- With DISTINCT
-SELECT DISTINCT column FROM table;
-
--- With LIMIT
-SELECT * FROM table LIMIT 10;
-
--- Complete example
-SELECT column1, column2
-FROM table
-WHERE condition1 AND condition2
-ORDER BY column1 DESC
-LIMIT 10 OFFSET 5;
 ```
 

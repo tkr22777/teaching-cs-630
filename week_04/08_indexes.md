@@ -495,13 +495,6 @@ CREATE INDEX idx1 ON products (category);
 CREATE INDEX idx2 ON products (category, price);  -- idx1 is redundant
 ```
 
-### 4. Use EXPLAIN to Verify
-
-```sql
-EXPLAIN (ANALYZE, BUFFERS)
-SELECT * FROM products WHERE category = 'Electronics';
-```
-
 ## Common Mistakes
 
 ### Mistake 1: Creating Redundant Indexes
@@ -525,64 +518,5 @@ CREATE INDEX idx_users_active ON users (is_active);  -- Low benefit
 **Solution:** Only index if queries are very selective or use partial index:
 ```sql
 CREATE INDEX idx_users_active ON users (is_active) WHERE is_active = true;
-```
-
-### Mistake 3: Forgetting Foreign Keys
-
-**Problem:** No index on foreign key column:
-```sql
-CREATE TABLE orders (
-    order_id SERIAL PRIMARY KEY,
-    customer_id INTEGER  -- No index!
-);
-```
-
-**Solution:**
-```sql
-CREATE INDEX idx_orders_customer_id ON orders (customer_id);
-```
-
-## Summary
-
-### Key Takeaways:
-- **Indexes** dramatically improve read performance
-- **B-Tree** is the default and most common index type
-- Index **foreign keys** and **WHERE/ORDER BY columns**
-- Indexes have **overhead** on INSERT/UPDATE/DELETE
-- Use **EXPLAIN ANALYZE** to verify index usage
-- **Monitor** index usage and drop unused indexes
-- Use **CREATE INDEX CONCURRENTLY** in production
-
-### Quick Reference:
-
-```sql
--- Create index
-CREATE INDEX index_name ON table (column);
-
--- Composite index
-CREATE INDEX index_name ON table (col1, col2);
-
--- Unique index
-CREATE UNIQUE INDEX index_name ON table (column);
-
--- Partial index
-CREATE INDEX index_name ON table (column) WHERE condition;
-
--- Expression index
-CREATE INDEX index_name ON table (LOWER(column));
-
--- Drop index
-DROP INDEX index_name;
-
--- Create without blocking
-CREATE INDEX CONCURRENTLY index_name ON table (column);
-
--- View indexes
-SELECT * FROM pg_indexes WHERE tablename = 'table_name';
-
--- Check index usage
-SELECT indexname, idx_scan 
-FROM pg_stat_user_indexes 
-WHERE tablename = 'table_name';
 ```
 

@@ -401,26 +401,6 @@ CROSS JOIN another_table_with_thousand_rows;
 
 **Solution:** Always consider result size before using CROSS JOIN
 
-### Mistake 3: When You Meant LEFT JOIN
-
-**Problem:**
-```sql
--- Wrong: Creates unwanted combinations
-SELECT s.*, c.*
-FROM students s
-CROSS JOIN courses c
-WHERE s.major = 'Computer Science';
-```
-
-**Better:** Use appropriate join
-```sql
-SELECT s.*, c.*
-FROM students s
-LEFT JOIN enrollments e ON s.student_id = e.student_id
-LEFT JOIN courses c ON e.course_id = c.course_id
-WHERE s.major = 'Computer Science';
-```
-
 ## Performance Considerations
 
 ### Size Matters
@@ -462,52 +442,4 @@ WITH RECURSIVE numbers AS (
 )
 SELECT * FROM numbers;
 ```
-
-## Summary
-
-### Key Takeaways:
-- **CROSS JOIN** creates Cartesian product (all combinations)
-- No join condition needed
-- Result size = table1_rows × table2_rows
-- Useful for generating combinations, test data, schedules
-- Can create very large result sets - use with caution
-- Different from accidental Cartesian product (which is an error)
-- Filter with WHERE when needed
-
-### Quick Reference:
-
-```sql
--- Basic CROSS JOIN
-SELECT *
-FROM table1
-CROSS JOIN table2;
-
--- With WHERE filter
-SELECT *
-FROM table1
-CROSS JOIN table2
-WHERE condition;
-
--- Multiple CROSS JOINs
-SELECT *
-FROM table1
-CROSS JOIN table2
-CROSS JOIN table3;
--- Result size: table1 × table2 × table3 rows
-
--- Check result size first
-SELECT 
-    (SELECT COUNT(*) FROM table1) * 
-    (SELECT COUNT(*) FROM table2) 
-    AS expected_rows;
-```
-
-### Use Cases Summary:
-- ✅ Product variants (size × color)
-- ✅ Appointment slots (dates × times)
-- ✅ Price matrices
-- ✅ Test data generation
-- ✅ Finding missing combinations
-- ❌ Tables with relationships (use proper JOIN)
-- ❌ Large tables without filtering
 
