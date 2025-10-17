@@ -14,6 +14,9 @@ A view is a virtual table based on a SELECT query. It doesn't store data itself 
 
 ## Sample Data
 
+<details>
+<summary>Click to expand: Database setup script</summary>
+
 ```sql
 CREATE TABLE employees (
     employee_id SERIAL PRIMARY KEY,
@@ -49,6 +52,8 @@ INSERT INTO employees (first_name, last_name, email, department, salary, hire_da
 ('Eve', 'Miller', 'eve.m@company.com', 'Engineering', 90000, '2022-07-01', 1),
 ('Frank', 'Wilson', 'frank.w@company.com', 'Sales', 72000, '2023-02-14', 3);
 ```
+
+</details>
 
 **Employees Table:**
 | employee_id | first_name | last_name | email | department | salary | hire_date | manager_id |

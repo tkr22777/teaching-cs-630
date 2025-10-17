@@ -6,7 +6,8 @@ The SELECT statement is the most commonly used SQL command for retrieving data f
 
 ## Sample Data
 
-Let's create and populate a table for our examples:
+<details>
+<summary>Click to expand: Database setup script</summary>
 
 ```sql
 CREATE TABLE books (
@@ -32,6 +33,8 @@ INSERT INTO books (title, author, genre, publication_year, price, stock_quantity
 ('Brave New World', 'Aldous Huxley', 'Science Fiction', 1932, 13.49, 28, 4.3),
 ('The Lord of the Rings', 'J.R.R. Tolkien', 'Fantasy', 1954, 25.99, 15, 4.9);
 ```
+
+</details>
 
 **Books Table:**
 | book_id | title | author | genre | publication_year | price | stock_quantity | rating |

@@ -142,7 +142,8 @@ JOIN employees e2 ON e1.manager_id = e2.employee_id;
 
 For all examples in this course module, we'll use a university enrollment system:
 
-### Database Setup
+<details>
+<summary>Click to expand: Database setup script</summary>
 
 ```sql
 -- Create Students table
@@ -216,6 +217,8 @@ INSERT INTO enrollments (enrollment_id, student_id, course_id, semester, grade) 
 (107, 4, 'PHYS101', 'Spring 2024', 'A'),
 (108, 1, 'CS301', 'Fall 2024', NULL);
 ```
+
+</details>
 
 ### Students Table
 | student_id | first_name | last_name | email | major | enrollment_date |

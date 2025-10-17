@@ -6,6 +6,9 @@ Aliases are temporary names assigned to tables or columns to make queries more r
 
 ## Sample Data
 
+<details>
+<summary>Click to expand: Database setup script</summary>
+
 ```sql
 CREATE TABLE customers (
     customer_id SERIAL PRIMARY KEY,
@@ -36,6 +39,8 @@ INSERT INTO orders (customer_id, order_date, total_amount, status) VALUES
 (3, '2024-10-07', 300.00, 'pending'),
 (1, '2024-10-10', 120.75, 'shipped');
 ```
+
+</details>
 
 **Customers Table:**
 | customer_id | first_name | last_name | email | city |

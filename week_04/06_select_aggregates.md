@@ -6,6 +6,9 @@ Aggregate functions perform calculations on multiple rows and return a single re
 
 ## Sample Data
 
+<details>
+<summary>Click to expand: Database setup script</summary>
+
 ```sql
 CREATE TABLE sales (
     sale_id SERIAL PRIMARY KEY,
@@ -29,6 +32,8 @@ INSERT INTO sales (product_name, category, quantity, unit_price, sale_date, regi
 ('Mouse', 'Electronics', 15, 25.50, '2024-10-05', 'West'),
 ('Chair', 'Furniture', 12, 199.99, '2024-10-06', 'East');
 ```
+
+</details>
 
 **Sales Table:**
 | sale_id | product_name | category | quantity | unit_price | sale_date | region |

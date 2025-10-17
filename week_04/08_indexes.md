@@ -18,6 +18,9 @@ Indexes are database objects that improve query performance by allowing faster d
 
 ## Sample Data
 
+<details>
+<summary>Click to expand: Database setup script</summary>
+
 ```sql
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,  -- Automatically indexed
@@ -43,6 +46,8 @@ SELECT
     (random() * 10 + 1)::INTEGER
 FROM generate_series(1, 10000);
 ```
+
+</details>
 
 **Products Table** (10,000 rows):
 | product_id | product_name | category | price | stock_quantity | supplier_id |

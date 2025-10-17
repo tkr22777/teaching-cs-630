@@ -6,7 +6,8 @@ UPDATE and DELETE statements modify existing data in tables. These are powerful 
 
 ## Sample Data
 
-Let's create and populate a sample table:
+<details>
+<summary>Click to expand: Database setup script</summary>
 
 ```sql
 CREATE TABLE inventory (
@@ -28,6 +29,8 @@ INSERT INTO inventory (product_name, category, price, stock_quantity) VALUES
 ('Notebook', 'Office Supplies', 5.99, 200),
 ('Pen Set', 'Office Supplies', 12.99, 150);
 ```
+
+</details>
 
 **Initial Inventory Table:**
 | product_id | product_name | category | price | stock_quantity | last_updated |
