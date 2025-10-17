@@ -433,10 +433,6 @@ ORDER BY author, genre;
 | J.R.R. Tolkien | Fantasy |
 | Jane Austen | Romance |
 
-## LIMIT and OFFSET
-
-Control the number of rows returned.
-
 ### Example 19: LIMIT
 
 **SQL Statement:**
@@ -489,6 +485,26 @@ LIMIT 3 OFFSET 3;
 | Harry Potter | 19.99 |
 | Pride and Prejudice | 11.99 |
 | The Catcher in the Rye | 12.49 |
+
+### Example 18: Select with OFFSET
+
+**Result:** Returns 5 books, starting from the 6th book (skipping the first 5).
+
+<details>
+<summary>ANSI SQL Standard for Pagination</summary>
+
+While `LIMIT` and `OFFSET` are widely supported, the ANSI SQL standard (SQL:2008) provides the `OFFSET ... FETCH FIRST ...` clause, which is more portable:
+
+```sql
+-- ANSI Standard equivalent of LIMIT 5 OFFSET 10
+SELECT title, author, rating
+FROM books
+ORDER BY rating DESC
+OFFSET 10 ROWS
+FETCH FIRST 5 ROWS ONLY;
+```
+
+</details>
 
 ## Combining WHERE, ORDER BY, and LIMIT
 
