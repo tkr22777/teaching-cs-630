@@ -434,9 +434,12 @@ ORDER BY category, rank;
 | Furniture | Chair | 4399.78 |
 | Furniture | Desk | 3600.00 |
 
-## Statistical Aggregates (PostgreSQL)
+<details>
+<summary>Advanced Statistical Aggregates</summary>
 
-### Example 22: Standard Deviation and Variance
+## STDDEV and VARIANCE Functions
+
+Standard SQL includes statistical aggregate functions for analyzing data distribution.
 
 **SQL Statement:**
 ```sql
@@ -453,4 +456,8 @@ GROUP BY category;
 |----------|--------------|-----------------|-------------------|
 | Electronics | 8.83 | 6.65 | 44.17 |
 | Furniture | 7.50 | 3.70 | 13.67 |
+
+*Note: Not all databases support these functions. Check your database documentation.*
+
+</details>
 

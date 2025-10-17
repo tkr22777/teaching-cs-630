@@ -182,12 +182,7 @@ SELECT COUNT(*) FROM products;
 |-------|
 | 0 |
 
-**Table Structure Still Exists:**
-```sql
-\d products  -- PostgreSQL command to describe table
-
--- Structure is intact, just empty
-```
+**Table Structure Still Exists:** The table definition remains, only data is removed.
 
 ### Example 2: TRUNCATE vs DELETE
 

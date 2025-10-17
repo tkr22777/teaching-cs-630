@@ -215,12 +215,15 @@ Row 4 kept ─────────────────────┘
 
 **Key Point:** ALL rows from BOTH tables appear, with NULLs where there's no match on either side.
 
-### Database Support
+<details>
+<summary>Database Support for FULL OUTER JOIN</summary>
 
-**PostgreSQL:** ✅ Fully supported  
-**Oracle:** ✅ Fully supported  
-**SQL Server:** ✅ Fully supported  
-**MySQL:** ❌ Not supported (can simulate with UNION)
+- **PostgreSQL:** ✅ Fully supported  
+- **Oracle:** ✅ Fully supported  
+- **SQL Server:** ✅ Fully supported  
+- **MySQL:** ❌ Not supported (use UNION of LEFT and RIGHT JOINs instead)
+
+</details>
 
 ### Example 1: All Students and All Courses
 

@@ -390,53 +390,44 @@ DROP INDEX IF EXISTS idx_products_old1,
                      idx_products_old3;
 ```
 
+<details>
+<summary>Advanced: Concurrent Operations and Reindexing</summary>
+
 ## Concurrent Index Operations
 
-PostgreSQL allows creating/dropping indexes without blocking writes.
+Some databases (PostgreSQL, Oracle) support creating/dropping indexes without blocking writes.
 
-### Example 14: Create Index Concurrently
-
-**SQL Statement:**
+**PostgreSQL Example:**
 ```sql
 -- Doesn't lock the table
 CREATE INDEX CONCURRENTLY idx_products_name ON products (product_name);
+DROP INDEX CONCURRENTLY idx_products_old;
 ```
 
 **Benefit:** Table remains available for writes during index creation.
 
-**Use Case:** Production databases where downtime must be minimized.
-
-### Example 15: Drop Index Concurrently
-
-**SQL Statement:**
-```sql
-DROP INDEX CONCURRENTLY idx_products_old;
-```
-
 ## Reindexing
 
-Over time, indexes can become bloated. Reindexing rebuilds them.
+Over time, indexes can become fragmented. Reindexing rebuilds them for better performance.
 
-### Example 16: Reindex Single Index
-
-**SQL Statement:**
+**PostgreSQL:**
 ```sql
 REINDEX INDEX idx_products_category;
-```
-
-### Example 17: Reindex Entire Table
-
-**SQL Statement:**
-```sql
 REINDEX TABLE products;
+REINDEX INDEX CONCURRENTLY idx_products_category;  -- PostgreSQL 12+
 ```
 
-### Example 18: Reindex Concurrently (PostgreSQL 12+)
-
-**SQL Statement:**
+**MySQL:**
 ```sql
-REINDEX INDEX CONCURRENTLY idx_products_category;
+ALTER TABLE products DROP INDEX idx_products_category, ADD INDEX idx_products_category (category);
 ```
+
+**SQL Server:**
+```sql
+ALTER INDEX idx_products_category ON products REBUILD;
+```
+
+</details>
 
 ## Advanced Index Techniques
 
