@@ -1,4 +1,4 @@
-# Views in PostgreSQL
+# Views using standard SQL
 
 ## Overview
 
@@ -19,7 +19,7 @@ A view is a virtual table based on a SELECT query. It doesn't store data itself 
 
 ```sql
 CREATE TABLE employees (
-    employee_id SERIAL PRIMARY KEY,
+    employee_id INTEGER PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email VARCHAR(100),
@@ -30,7 +30,7 @@ CREATE TABLE employees (
 );
 
 CREATE TABLE departments (
-    dept_id SERIAL PRIMARY KEY,
+    dept_id INTEGER PRIMARY KEY,
     dept_name VARCHAR(50),
     location VARCHAR(50),
     budget NUMERIC(12, 2)

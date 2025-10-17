@@ -39,7 +39,7 @@ With joins:
 
 ## Join Syntax
 
-PostgreSQL supports two join syntaxes:
+SQL supports two join syntaxes:
 
 ### ANSI Standard Syntax (Preferred)
 
@@ -148,7 +148,7 @@ For all examples in this course module, we'll use a university enrollment system
 ```sql
 -- Create Students table
 CREATE TABLE students (
-    student_id SERIAL PRIMARY KEY,
+    student_id INTEGER PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE students (
 
 -- Create Instructors table
 CREATE TABLE instructors (
-    instructor_id SERIAL PRIMARY KEY,
+    instructor_id INTEGER PRIMARY KEY,
     instructor_name VARCHAR(100) NOT NULL,
     department VARCHAR(50),
     hire_date DATE
@@ -175,7 +175,7 @@ CREATE TABLE courses (
 
 -- Create Enrollments table (junction table)
 CREATE TABLE enrollments (
-    enrollment_id SERIAL PRIMARY KEY,
+    enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER REFERENCES students(student_id),
     course_id VARCHAR(10) REFERENCES courses(course_id),
     semester VARCHAR(20),

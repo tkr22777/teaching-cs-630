@@ -2,7 +2,7 @@
 
 ## Overview
 
-The SELECT statement is the most commonly used SQL command for retrieving data from database tables. This guide covers basic SELECT operations in PostgreSQL.
+The SELECT statement is the most commonly used SQL command for retrieving data from database tables. This guide covers basic SELECT operations using standard SQL.
 
 ## Sample Data
 
@@ -11,7 +11,7 @@ The SELECT statement is the most commonly used SQL command for retrieving data f
 
 ```sql
 CREATE TABLE books (
-    book_id SERIAL PRIMARY KEY,
+    book_id INTEGER PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     author VARCHAR(100) NOT NULL,
     genre VARCHAR(50),
@@ -231,7 +231,7 @@ WHERE title LIKE '_h%'
 ```sql
 SELECT title, author
 FROM books
-WHERE title ILIKE '%harry%';  -- Case-insensitive in PostgreSQL
+WHERE UPPER(title) LIKE UPPER('%harry%');  -- Case-insensitive using standard SQL
 ```
 
 **Result:**

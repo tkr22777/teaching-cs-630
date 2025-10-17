@@ -1,4 +1,4 @@
-# Indexes in PostgreSQL
+# Indexes using standard SQL
 
 ## Overview
 
@@ -23,7 +23,7 @@ Indexes are database objects that improve query performance by allowing faster d
 
 ```sql
 CREATE TABLE products (
-    product_id SERIAL PRIMARY KEY,  -- Automatically indexed
+    product_id INTEGER PRIMARY KEY,  -- Automatically indexed
     product_name VARCHAR(200),
     category VARCHAR(50),
     price NUMERIC(10, 2),
@@ -57,7 +57,7 @@ FROM generate_series(1, 10000);
 | ... | ... | ... | ... | ... | ... |
 | 10000 | Product 10000 | Home & Garden | 567.89 | 23 | 5 |
 
-## Types of Indexes in PostgreSQL
+## Types of Indexes using standard SQL
 
 ### 1. B-Tree Index (Default)
 

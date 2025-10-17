@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aliases are temporary names assigned to tables or columns to make queries more readable and concise. This guide covers both column and table aliases in PostgreSQL.
+Aliases are temporary names assigned to tables or columns to make queries more readable and concise. This guide covers both column and table aliases using standard SQL.
 
 ## Sample Data
 
@@ -11,7 +11,7 @@ Aliases are temporary names assigned to tables or columns to make queries more r
 
 ```sql
 CREATE TABLE customers (
-    customer_id SERIAL PRIMARY KEY,
+    customer_id INTEGER PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email VARCHAR(100),
@@ -19,7 +19,7 @@ CREATE TABLE customers (
 );
 
 CREATE TABLE orders (
-    order_id SERIAL PRIMARY KEY,
+    order_id INTEGER PRIMARY KEY,
     customer_id INTEGER REFERENCES customers(customer_id),
     order_date DATE,
     total_amount NUMERIC(10, 2),
@@ -267,7 +267,7 @@ ORDER BY total_spent DESC;
 **Setup:**
 ```sql
 CREATE TABLE employees (
-    employee_id SERIAL PRIMARY KEY,
+    employee_id INTEGER PRIMARY KEY,
     employee_name VARCHAR(100),
     manager_id INTEGER
 );

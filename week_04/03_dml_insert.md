@@ -2,7 +2,7 @@
 
 ## Overview
 
-The INSERT statement adds new rows to a table. This guide covers various methods of inserting data in PostgreSQL.
+The INSERT statement adds new rows to a table. This guide covers various methods of inserting data using standard SQL.
 
 ## Basic INSERT Syntax
 
@@ -17,7 +17,7 @@ Let's create a sample table for our examples:
 
 ```sql
 CREATE TABLE employees (
-    employee_id SERIAL PRIMARY KEY,
+    employee_id INTEGER PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE,
@@ -151,79 +151,70 @@ FROM temp_new_hires;
 | 8 | Grace | Lee | grace.lee@company.com | Engineering | 78000.00 | 2024-10-17 |
 | 9 | Henry | Taylor | henry.taylor@company.com | Marketing | 67000.00 | 2024-10-17 |
 
-## INSERT ... RETURNING
+<details>
+<summary>Database-Specific Features: RETURNING and UPSERT</summary>
 
-PostgreSQL allows you to return data from inserted rows.
+## INSERT ... RETURNING (PostgreSQL, SQL Server)
 
-### Example 7: RETURNING Clause
+Some databases allow you to return data from inserted rows.
 
-**SQL Statement:**
+### Example: RETURNING Clause
+
+**PostgreSQL:**
 ```sql
 INSERT INTO employees (first_name, last_name, email, department, salary)
 VALUES ('Isabel', 'Garcia', 'isabel.garcia@company.com', 'Sales', 71000.00)
 RETURNING employee_id, first_name, last_name, hire_date;
 ```
 
-**Query Result (Returned Data):**
-| employee_id | first_name | last_name | hire_date |
-|-------------|------------|-----------|-----------|
-| 10 | Isabel | Garcia | 2024-10-17 |
-
-### Example 8: RETURNING with Multiple Rows
-
-**SQL Statement:**
+**SQL Server:**
 ```sql
 INSERT INTO employees (first_name, last_name, email, department, salary)
-VALUES 
-    ('Jack', 'Anderson', 'jack.anderson@company.com', 'Engineering', 82000.00),
-    ('Kate', 'Martinez', 'kate.martinez@company.com', 'HR', 64000.00)
-RETURNING employee_id, first_name || ' ' || last_name AS full_name, salary;
+OUTPUT INSERTED.employee_id, INSERTED.first_name, INSERTED.last_name, INSERTED.hire_date
+VALUES ('Isabel', 'Garcia', 'isabel.garcia@company.com', 'Sales', 71000.00);
 ```
 
-**Query Result:**
-| employee_id | full_name | salary |
-|-------------|-----------|--------|
-| 11 | Jack Anderson | 82000.00 |
-| 12 | Kate Martinez | 64000.00 |
+## INSERT with UPSERT (Handling Conflicts)
 
-## INSERT with ON CONFLICT (UPSERT)
+Different databases have different syntax for handling duplicate key conflicts:
 
-PostgreSQL supports INSERT ... ON CONFLICT for handling duplicate key conflicts.
-
-### Example 9: INSERT with ON CONFLICT DO NOTHING
-
-**SQL Statement:**
+**PostgreSQL - ON CONFLICT:**
 ```sql
--- Try to insert duplicate email (will conflict with UNIQUE constraint)
+-- Ignore conflicts
 INSERT INTO employees (first_name, last_name, email, department, salary)
 VALUES ('John', 'Duplicate', 'john.doe@company.com', 'Sales', 70000.00)
 ON CONFLICT (email) DO NOTHING;
-```
 
-**Result:** No row inserted (email already exists), no error thrown.
-
-### Example 10: INSERT with ON CONFLICT DO UPDATE
-
-**SQL Statement:**
-```sql
--- Update if email exists, insert if it doesn't
+-- Update on conflict
 INSERT INTO employees (first_name, last_name, email, department, salary)
 VALUES ('John', 'Doe', 'john.doe@company.com', 'Management', 90000.00)
 ON CONFLICT (email) 
-DO UPDATE SET 
-    department = EXCLUDED.department,
-    salary = EXCLUDED.salary;
+DO UPDATE SET department = EXCLUDED.department, salary = EXCLUDED.salary;
 ```
 
-**Before:**
-| employee_id | first_name | last_name | email | department | salary |
-|-------------|------------|-----------|-------|------------|--------|
-| 1 | John | Doe | john.doe@company.com | Engineering | 75000.00 |
+**MySQL - INSERT IGNORE / ON DUPLICATE KEY:**
+```sql
+-- Ignore conflicts
+INSERT IGNORE INTO employees (first_name, last_name, email, department, salary)
+VALUES ('John', 'Duplicate', 'john.doe@company.com', 'Sales', 70000.00);
 
-**After:**
-| employee_id | first_name | last_name | email | department | salary |
-|-------------|------------|-----------|-------|------------|--------|
-| 1 | John | Doe | john.doe@company.com | Management | 90000.00 |
+-- Update on conflict
+INSERT INTO employees (first_name, last_name, email, department, salary)
+VALUES ('John', 'Doe', 'john.doe@company.com', 'Management', 90000.00)
+ON DUPLICATE KEY UPDATE department = VALUES(department), salary = VALUES(salary);
+```
+
+**SQL Server - MERGE:**
+```sql
+MERGE employees AS target
+USING (SELECT 'John' AS first_name, 'Doe' AS last_name, 'john.doe@company.com' AS email) AS source
+ON target.email = source.email
+WHEN MATCHED THEN UPDATE SET department = 'Management', salary = 90000.00
+WHEN NOT MATCHED THEN INSERT (first_name, last_name, email, department, salary) 
+VALUES ('John', 'Doe', 'john.doe@company.com', 'Management', 90000.00);
+```
+
+</details>
 
 ## Bulk INSERT Performance
 
@@ -248,12 +239,12 @@ VALUES
 ```sql
 -- Create related tables
 CREATE TABLE departments (
-    dept_id SERIAL PRIMARY KEY,
+    dept_id INTEGER PRIMARY KEY,
     dept_name VARCHAR(50)
 );
 
 CREATE TABLE staff (
-    staff_id SERIAL PRIMARY KEY,
+    staff_id INTEGER PRIMARY KEY,
     staff_name VARCHAR(100),
     dept_id INTEGER REFERENCES departments(dept_id)
 );

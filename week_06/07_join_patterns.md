@@ -33,7 +33,7 @@ CREATE TABLE course_sections (
 );
 
 CREATE TABLE section_enrollments (
-    enrollment_id SERIAL PRIMARY KEY,
+    enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER,
     course_id VARCHAR(10),
     semester VARCHAR(20),

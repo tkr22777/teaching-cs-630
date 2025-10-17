@@ -42,7 +42,7 @@ Original Table:              Self Join (Conceptual):
 **Setup:**
 ```sql
 CREATE TABLE employees_org (
-    employee_id SERIAL PRIMARY KEY,
+    employee_id INTEGER PRIMARY KEY,
     employee_name VARCHAR(100),
     position VARCHAR(50),
     manager_id INTEGER,

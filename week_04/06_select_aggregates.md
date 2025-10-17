@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aggregate functions perform calculations on multiple rows and return a single result. This guide covers aggregate functions, GROUP BY, and HAVING clauses in PostgreSQL.
+Aggregate functions perform calculations on multiple rows and return a single result. This guide covers aggregate functions, GROUP BY, and HAVING clauses using standard SQL.
 
 ## Sample Data
 
@@ -11,7 +11,7 @@ Aggregate functions perform calculations on multiple rows and return a single re
 
 ```sql
 CREATE TABLE sales (
-    sale_id SERIAL PRIMARY KEY,
+    sale_id INTEGER PRIMARY KEY,
     product_name VARCHAR(100),
     category VARCHAR(50),
     quantity INTEGER,

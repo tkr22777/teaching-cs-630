@@ -11,7 +11,7 @@ UPDATE and DELETE statements modify existing data in tables. These are powerful 
 
 ```sql
 CREATE TABLE inventory (
-    product_id SERIAL PRIMARY KEY,
+    product_id INTEGER PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,
     category VARCHAR(50),
     price NUMERIC(10, 2),
@@ -134,54 +134,7 @@ WHERE stock_quantity < 30;
 | 1 | Laptop | 35 |
 | 6 | Standing Desk | 30 |
 
-### Example 5: Update with RETURNING
-
-**SQL Statement:**
-```sql
-UPDATE inventory
-SET price = 299.99,
-    stock_quantity = stock_quantity - 5
-WHERE product_name = 'Monitor'
-RETURNING product_id, product_name, price, stock_quantity;
-```
-
-**Query Result:**
-| product_id | product_name | price | stock_quantity |
-|------------|--------------|--------|----------------|
-| 4 | Monitor | 299.99 | 25 |
-
-### Example 6: Update Using FROM (PostgreSQL Specific)
-
-Setup additional table:
-```sql
-CREATE TABLE price_adjustments (
-    category VARCHAR(50),
-    adjustment_factor NUMERIC(3, 2)
-);
-
-INSERT INTO price_adjustments VALUES
-('Electronics', 1.10),  -- 10% increase
-('Furniture', 0.95),    -- 5% decrease
-('Office Supplies', 1.05);  -- 5% increase
-```
-
-**SQL Statement:**
-```sql
-UPDATE inventory
-SET price = inventory.price * pa.adjustment_factor
-FROM price_adjustments pa
-WHERE inventory.category = pa.category;
-```
-
-**Result (Price Changes):**
-| product_id | product_name | category | old_price | new_price |
-|------------|--------------|----------|-----------|-----------|
-| 1 | Laptop | Electronics | 809.99 | 890.99 |
-| 2 | Mouse | Electronics | 22.95 | 25.25 |
-| 5 | Desk Chair | Furniture | 199.99 | 189.99 |
-| ... | ... | ... | ... | ... |
-
-### Example 7: Conditional Update with CASE
+### Example 5: Conditional Update with CASE
 
 **SQL Statement:**
 ```sql
@@ -288,7 +241,7 @@ RETURNING product_id, product_name, price;
 Setup orders table:
 ```sql
 CREATE TABLE orders (
-    order_id SERIAL PRIMARY KEY,
+    order_id INTEGER PRIMARY KEY,
     product_id INTEGER,
     quantity INTEGER,
     order_date DATE
@@ -329,7 +282,6 @@ WHERE product_id NOT IN (
 | Purpose | Modifies existing data | Removes rows |
 | Columns | Can update specific columns | Removes entire row |
 | WHERE clause | Optional (but recommended) | Optional (but recommended) |
-| RETURNING | Supported | Supported |
 | Rollback | Yes (within transaction) | Yes (within transaction) |
 
 ## Advanced Examples

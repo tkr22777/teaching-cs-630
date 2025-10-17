@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers DROP and TRUNCATE commands for removing database objects and data in PostgreSQL. These are powerful commands that permanently delete data, so use them carefully.
+This guide covers DROP and TRUNCATE commands for removing database objects and data using standard SQL. These are powerful commands that permanently delete data, so use them carefully.
 
 ## DROP Statement
 
@@ -23,7 +23,7 @@ Let's create sample tables to demonstrate DROP operations:
 
 ```sql
 CREATE TABLE temp_students (
-    student_id SERIAL PRIMARY KEY,
+    student_id INTEGER PRIMARY KEY,
     student_name VARCHAR(100)
 );
 
@@ -33,7 +33,7 @@ CREATE TABLE temp_courses (
 );
 
 CREATE TABLE temp_enrollments (
-    enrollment_id SERIAL PRIMARY KEY,
+    enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER REFERENCES temp_students(student_id),
     course_id VARCHAR(10) REFERENCES temp_courses(course_id)
 );
@@ -138,7 +138,7 @@ TRUNCATE TABLE table_name CASCADE;            -- Truncates referencing tables to
 ```sql
 -- Create and populate sample table
 CREATE TABLE products (
-    product_id SERIAL PRIMARY KEY,
+    product_id INTEGER PRIMARY KEY,
     product_name VARCHAR(100) NOT NULL,
     price NUMERIC(10, 2),
     stock_quantity INTEGER DEFAULT 0
@@ -263,12 +263,12 @@ INSERT INTO products (product_name, price) VALUES ('Keyboard', 75.00);
 **Setup:**
 ```sql
 CREATE TABLE categories (
-    category_id SERIAL PRIMARY KEY,
+    category_id INTEGER PRIMARY KEY,
     category_name VARCHAR(50)
 );
 
 CREATE TABLE items (
-    item_id SERIAL PRIMARY KEY,
+    item_id INTEGER PRIMARY KEY,
     item_name VARCHAR(100),
     category_id INTEGER REFERENCES categories(category_id)
 );
