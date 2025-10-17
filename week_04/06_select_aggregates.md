@@ -454,80 +454,34 @@ GROUP BY category;
 | Electronics | 8.83 | 6.65 | 44.17 |
 | Furniture | 7.50 | 3.70 | 13.67 |
 
-## Best Practices
-
-### 1. Use Meaningful Aliases
+## Quick Reference
 
 ```sql
--- Good: Clear names
-SELECT category,
-       COUNT(*) AS number_of_sales,
-       SUM(quantity) AS total_units_sold
-FROM sales
-GROUP BY category;
-```
+-- Aggregate functions
+SELECT COUNT(*) FROM table;
+SELECT COUNT(column) FROM table;  -- Excludes NULLs
+SELECT SUM(column) FROM table;
+SELECT AVG(column) FROM table;
+SELECT MAX(column) FROM table;
+SELECT MIN(column) FROM table;
 
-### 2. Filter Early with WHERE
+-- GROUP BY
+SELECT column, COUNT(*) FROM table GROUP BY column;
+SELECT col1, col2, SUM(col3) FROM table GROUP BY col1, col2;
 
-```sql
--- Efficient: Filter before grouping
-SELECT category, COUNT(*)
-FROM sales
-WHERE sale_date >= '2024-10-01'
-GROUP BY category;
+-- HAVING (filter on aggregates)
+SELECT category, COUNT(*) FROM sales GROUP BY category HAVING COUNT(*) > 5;
+SELECT category, AVG(price) FROM products GROUP BY category HAVING AVG(price) > 100;
 
--- Less efficient: Filter after grouping
-SELECT category, COUNT(*)
+-- Combined query
+SELECT category, 
+       COUNT(*) AS total_sales,
+       SUM(quantity) AS units_sold,
+       AVG(unit_price) AS avg_price
 FROM sales
+WHERE sale_date >= '2024-01-01'  -- Row-level filter (before grouping)
 GROUP BY category
-HAVING MIN(sale_date) >= '2024-10-01';
-```
-
-### 3. Use HAVING for Group Conditions Only
-
-```sql
--- Correct: WHERE for row conditions, HAVING for group conditions
-SELECT category, COUNT(*) as sales_count
-FROM sales
-WHERE quantity > 5          -- Row-level filter
-GROUP BY category
-HAVING COUNT(*) > 2;        -- Group-level filter
-```
-
-## Common Errors
-
-### Error 1: Column Not in GROUP BY
-
-**Problem:**
-```sql
-SELECT category, product_name, COUNT(*)
-FROM sales
-GROUP BY category;
--- ERROR: column "product_name" must appear in GROUP BY clause
-```
-
-**Solution:**
-```sql
-SELECT category, product_name, COUNT(*)
-FROM sales
-GROUP BY category, product_name;
-```
-
-### Error 2: Using WHERE with Aggregates
-
-**Problem:**
-```sql
-SELECT category, COUNT(*)
-FROM sales
-WHERE COUNT(*) > 2  -- Can't use aggregate in WHERE
-GROUP BY category;
-```
-
-**Solution:**
-```sql
-SELECT category, COUNT(*)
-FROM sales
-GROUP BY category
-HAVING COUNT(*) > 2;  -- Use HAVING for aggregates
+HAVING COUNT(*) > 10              -- Group-level filter (after grouping)
+ORDER BY total_sales DESC;
 ```
 

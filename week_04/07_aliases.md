@@ -407,51 +407,23 @@ SELECT *
 FROM (SELECT * FROM orders WHERE status = 'active') AS active_orders;
 ```
 
-## Best Practices
-
-### 1. Use Meaningful Aliases
+## Quick Reference
 
 ```sql
--- Good: Clear and descriptive
-SELECT c.first_name AS customer_first_name,
-       o.order_date AS purchase_date
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id;
+-- Column aliases
+SELECT column_name AS alias FROM table;
+SELECT first_name AS fname, last_name AS lname FROM customers;
+SELECT price * quantity AS total FROM orders;
 
--- Avoid: Single letters that don't match table names
-SELECT a.first_name,
-       b.order_date
-FROM customers a
-JOIN orders b ON a.customer_id = b.customer_id;
-```
+-- Table aliases
+SELECT c.name FROM customers AS c;
+SELECT c.name FROM customers c;  -- AS is optional
 
-### 2. Keep Table Aliases Short but Meaningful
-
-```sql
--- Good: First letter(s) of table name
-FROM customers c
-FROM orders o
-FROM order_items oi
-
--- Avoid: Random or confusing aliases
-FROM customers xyz
-FROM orders abc
-```
-
-### 3. Consistent Naming Convention
-
-```sql
--- Good: Consistent style
-SELECT COUNT(*) AS order_count,
-       SUM(amount) AS total_amount,
-       AVG(amount) AS average_amount
-FROM orders;
-
--- Avoid: Inconsistent style
-SELECT COUNT(*) AS orderCount,
-       SUM(amount) AS TotalAmount,
-       AVG(amount) AS avg_amt
-FROM orders;
+-- Combined
+SELECT c.first_name AS customer_name,
+       o.total_amount AS order_total
+FROM customers AS c
+JOIN orders AS o ON c.id = o.customer_id;
 ```
 
 ## Common Patterns

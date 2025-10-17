@@ -368,78 +368,22 @@ ORDER BY p.product, d.discount_pct;
 3. **You forget the join condition**
    - Accidental Cartesian product is a common mistake
 
-## Common Mistakes
+## Quick Reference
 
-### Mistake 1: Accidental Cartesian Product
-
-**Problem:**
 ```sql
--- Forgot the join condition!
-SELECT s.first_name, c.course_name
-FROM students s, courses c;
--- Returns 30 rows instead of 8!
-```
+-- CROSS JOIN (explicit syntax)
+SELECT * FROM table1 CROSS JOIN table2;
 
-**Solution:** Add proper join condition
-```sql
-SELECT s.first_name, c.course_name
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id;
-```
+-- CROSS JOIN (implicit syntax with comma)
+SELECT * FROM table1, table2;
 
-### Mistake 2: Using CROSS JOIN on Large Tables
+-- CROSS JOIN with WHERE filter
+SELECT * FROM table1 CROSS JOIN table2 WHERE condition;
 
-**Problem:**
-```sql
--- Dangerous with large tables!
-SELECT *
-FROM table_with_million_rows
-CROSS JOIN another_table_with_thousand_rows;
--- Result: 1,000,000 × 1,000 = 1,000,000,000 rows!
-```
+-- Calculate Cartesian product size
+SELECT (SELECT COUNT(*) FROM table1) * (SELECT COUNT(*) FROM table2) AS total_rows;
 
-**Solution:** Always consider result size before using CROSS JOIN
-
-## Performance Considerations
-
-### Size Matters
-
-**Calculate result size before running:**
-```sql
--- Check row counts first
-SELECT 
-    (SELECT COUNT(*) FROM table1) AS table1_count,
-    (SELECT COUNT(*) FROM table2) AS table2_count,
-    (SELECT COUNT(*) FROM table1) * (SELECT COUNT(*) FROM table2) AS cross_join_result;
-```
-
-### Optimization Tips
-
-1. **Filter early with WHERE**
-```sql
--- Good: Filter before CROSS JOIN if possible
-SELECT *
-FROM (SELECT * FROM students WHERE major = 'Computer Science') s
-CROSS JOIN (SELECT * FROM courses WHERE department = 'Computer Science') c;
-```
-
-2. **Limit results for testing**
-```sql
-SELECT *
-FROM large_table1
-CROSS JOIN large_table2
-LIMIT 100;  -- Test with small result first
-```
-
-3. **Use WITH RECURSIVE for number sequences**
-```sql
--- Better than CROSS JOIN for generating sequences
-WITH RECURSIVE numbers AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM numbers WHERE n < 100
-)
-SELECT * FROM numbers;
+-- Use LIMIT for testing
+SELECT * FROM table1 CROSS JOIN table2 LIMIT 10;
 ```
 

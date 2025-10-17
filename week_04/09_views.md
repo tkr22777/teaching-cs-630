@@ -522,76 +522,30 @@ ORDER BY table_name;
 SELECT pg_get_viewdef('employee_summary', true);
 ```
 
-## Best Practices
-
-### 1. Name Views Descriptively
+## Quick Reference
 
 ```sql
--- Good: Clear purpose
-CREATE VIEW active_engineering_employees AS ...
-CREATE VIEW monthly_sales_summary AS ...
+-- CREATE VIEW
+CREATE VIEW view_name AS SELECT ...;
+CREATE OR REPLACE VIEW view_name AS SELECT ...;
 
--- Avoid: Vague names
-CREATE VIEW view1 AS ...
-CREATE VIEW data AS ...
-```
+-- DROP VIEW
+DROP VIEW view_name;
+DROP VIEW IF EXISTS view_name;
+DROP VIEW view_name CASCADE;  -- Drop dependent views too
 
-### 2. Document Complex Views
+-- Query views (like regular tables)
+SELECT * FROM view_name;
+SELECT * FROM view_name WHERE condition;
 
-```sql
--- Good: Add comment
-COMMENT ON VIEW department_stats IS 
-'Provides employee count, salary statistics, and total payroll by department';
+-- Materialized views (PostgreSQL)
+CREATE MATERIALIZED VIEW mv_name AS SELECT ...;
+REFRESH MATERIALIZED VIEW mv_name;
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_name;
+DROP MATERIALIZED VIEW mv_name;
 
-CREATE VIEW department_stats AS
-SELECT department, COUNT(*) AS employee_count, ...
-FROM employees
-GROUP BY department;
-```
-
-### 3. Keep Views Simple
-
-```sql
--- Good: Simple, focused view
-CREATE VIEW high_earners AS
-SELECT employee_id, first_name, last_name, salary
-FROM employees
-WHERE salary > 80000;
-
--- Avoid: Overly complex views
--- (Better to create multiple simpler views or use CTEs)
-```
-
-## Common Errors
-
-### Error 1: View Already Exists
-
-**Problem:**
-```sql
-CREATE VIEW employee_summary AS SELECT ...;
--- ERROR: relation "employee_summary" already exists
-```
-
-**Solution:**
-```sql
-CREATE OR REPLACE VIEW employee_summary AS SELECT ...;
-```
-
-### Error 2: Column Name Mismatch
-
-**Problem:**
-```sql
-CREATE VIEW summary AS
-SELECT COUNT(*), department  -- Unnamed aggregate
-FROM employees
-GROUP BY department;
-```
-
-**Solution:**
-```sql
-CREATE VIEW summary AS
-SELECT COUNT(*) AS employee_count, department
-FROM employees
-GROUP BY department;
+-- Check view definition
+SELECT definition FROM pg_views WHERE viewname = 'view_name';
+\d+ view_name  -- PostgreSQL psql command
 ```
 

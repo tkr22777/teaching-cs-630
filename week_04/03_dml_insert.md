@@ -231,7 +231,7 @@ DO UPDATE SET
 
 **SQL Statement:**
 ```sql
--- Single multi-value INSERT (fast)
+-- Efficient: Single multi-value INSERT
 INSERT INTO employees (first_name, last_name, email, department, salary)
 VALUES 
     ('Person1', 'Last1', 'person1@company.com', 'Dept1', 50000),
@@ -239,55 +239,14 @@ VALUES
     ('Person3', 'Last3', 'person3@company.com', 'Dept3', 52000),
     ('Person4', 'Last4', 'person4@company.com', 'Dept4', 53000),
     ('Person5', 'Last5', 'person5@company.com', 'Dept5', 54000);
-
--- Avoid multiple single INSERTs (slower):
--- INSERT INTO employees (...) VALUES (...);
--- INSERT INTO employees (...) VALUES (...);
--- INSERT INTO employees (...) VALUES (...);
 ```
 
-## Common Errors and Solutions
+## Constraint Enforcement Examples
 
-### Error 1: NOT NULL Constraint Violation
+### Foreign Key Constraint
 
-**Problem:**
 ```sql
-INSERT INTO employees (first_name, email)
-VALUES ('Test', 'test@company.com');
--- ERROR: null value in column "last_name" violates not-null constraint
-```
-
-**Solution:**
-```sql
-INSERT INTO employees (first_name, last_name, email)
-VALUES ('Test', 'User', 'test@company.com');
-```
-
-### Error 2: UNIQUE Constraint Violation
-
-**Problem:**
-```sql
-INSERT INTO employees (first_name, last_name, email, department)
-VALUES ('Jane', 'Duplicate', 'jane.smith@company.com', 'Sales');
--- ERROR: duplicate key value violates unique constraint "employees_email_key"
-```
-
-**Solution:**
-```sql
--- Option 1: Use different email
-INSERT INTO employees (first_name, last_name, email, department)
-VALUES ('Jane', 'Duplicate', 'jane.duplicate@company.com', 'Sales');
-
--- Option 2: Use ON CONFLICT
-INSERT INTO employees (first_name, last_name, email, department)
-VALUES ('Jane', 'Duplicate', 'jane.smith@company.com', 'Sales')
-ON CONFLICT (email) DO NOTHING;
-```
-
-### Error 3: Foreign Key Constraint Violation
-
-**Setup:**
-```sql
+-- Create related tables
 CREATE TABLE departments (
     dept_id SERIAL PRIMARY KEY,
     dept_name VARCHAR(50)
@@ -298,62 +257,35 @@ CREATE TABLE staff (
     staff_name VARCHAR(100),
     dept_id INTEGER REFERENCES departments(dept_id)
 );
-```
 
-**Problem:**
-```sql
+-- Insert parent record first
+INSERT INTO departments (dept_name) VALUES ('Engineering');
+
+-- Then insert child record
 INSERT INTO staff (staff_name, dept_id)
-VALUES ('John Smith', 999);
--- ERROR: insert or update on table "staff" violates foreign key constraint
--- DETAIL: Key (dept_id)=(999) is not present in table "departments"
+VALUES ('John Smith', 1);  -- References valid dept_id
 ```
 
-**Solution:**
-```sql
--- First insert the department
-INSERT INTO departments (dept_id, dept_name)
-VALUES (999, 'New Department');
-
--- Then insert the staff
-INSERT INTO staff (staff_name, dept_id)
-VALUES ('John Smith', 999);
-```
-
-## Best Practices
-
-### 1. Always Specify Column Names
+## Quick Reference
 
 ```sql
--- Good: Explicit columns
-INSERT INTO employees (first_name, last_name, email)
-VALUES ('John', 'Doe', 'john@company.com');
+-- Basic INSERT
+INSERT INTO table_name (col1, col2) VALUES (val1, val2);
 
--- Avoid: Relying on column order (breaks if table structure changes)
-INSERT INTO employees 
-VALUES (DEFAULT, 'John', 'Doe', 'john@company.com', NULL, NULL, DEFAULT);
-```
+-- Multiple rows
+INSERT INTO table_name (col1, col2) VALUES (val1, val2), (val3, val4);
 
-### 2. Use Multi-Row INSERT for Bulk Data
+-- Using DEFAULT
+INSERT INTO table_name (col1, col2) VALUES ('value', DEFAULT);
 
-```sql
--- Good: Single statement for multiple rows
-INSERT INTO employees (first_name, last_name, email)
-VALUES 
-    ('User1', 'Last1', 'user1@company.com'),
-    ('User2', 'Last2', 'user2@company.com'),
-    ('User3', 'Last3', 'user3@company.com');
+-- INSERT ... SELECT
+INSERT INTO target_table (col1, col2) SELECT col1, col2 FROM source_table WHERE condition;
 
--- Avoid: Multiple statements
-INSERT INTO employees (first_name, last_name, email) VALUES ('User1', 'Last1', 'user1@company.com');
-INSERT INTO employees (first_name, last_name, email) VALUES ('User2', 'Last2', 'user2@company.com');
-INSERT INTO employees (first_name, last_name, email) VALUES ('User3', 'Last3', 'user3@company.com');
-```
+-- INSERT ... RETURNING
+INSERT INTO table_name (col1) VALUES (val1) RETURNING id, created_at;
 
-### 3. Use RETURNING for Audit Trails
-
-```sql
-INSERT INTO employees (first_name, last_name, email, department, salary)
-VALUES ('New', 'Employee', 'new@company.com', 'IT', 70000)
-RETURNING employee_id, hire_date;  -- Get auto-generated values
+-- INSERT ... ON CONFLICT (UPSERT)
+INSERT INTO table_name (id, name) VALUES (1, 'New') ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
+INSERT INTO table_name (id, name) VALUES (1, 'New') ON CONFLICT (id) DO NOTHING;
 ```
 

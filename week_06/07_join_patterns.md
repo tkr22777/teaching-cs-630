@@ -337,164 +337,54 @@ ORDER BY s.last_name;
 | John | Smith | Computer Science |
 | Bob | Wilson | Computer Science |
 
-## Performance Optimization
+## Performance Tips
 
-### Index Join Columns
-
-**Critical for Performance:**
 ```sql
--- Index foreign keys
+-- Index join columns (foreign keys)
 CREATE INDEX idx_enrollments_student_id ON enrollments(student_id);
 CREATE INDEX idx_enrollments_course_id ON enrollments(course_id);
-CREATE INDEX idx_courses_instructor_id ON courses(instructor_id);
 
--- Composite index for composite joins
-CREATE INDEX idx_section_enrollments_composite 
-ON section_enrollments(course_id, semester, year, section);
-```
-
-### Use EXPLAIN ANALYZE
-
-**Check query execution plan:**
-```sql
+-- Check query plan
 EXPLAIN ANALYZE
 SELECT s.first_name, c.course_name
 FROM students s
 JOIN enrollments e ON s.student_id = e.student_id
 JOIN courses c ON e.course_id = c.course_id;
-```
 
-**Look for:**
-- **Seq Scan** (sequential scan) → Consider adding index
-- **Index Scan** → Good!
-- **Hash Join** vs **Nested Loop** → Depends on data size
-- **Execution time** → Your target metric
-
-### Join Order Optimization
-
-**PostgreSQL automatically optimizes, but understand the concept:**
-
-```sql
--- Start with most restrictive table
-SELECT ...
-FROM small_filtered_table  -- Filter early
-JOIN large_table ON ...
-WHERE small_filtered_table.active = true;  -- Filter before join when possible
-```
-
-### Avoid Cartesian Products
-
-**Problem:**
-```sql
--- Missing join condition creates Cartesian product
-SELECT *
-FROM students, courses;  -- 5 × 6 = 30 rows!
-```
-
-**Solution:**
-```sql
-SELECT *
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id;
-```
-
-## Best Practices
-
-### 1. Always Use Table Aliases
-
-**Good:**
-```sql
-SELECT s.first_name, e.grade, c.course_name
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id;
-```
-
-**Avoid:**
-```sql
-SELECT students.first_name, enrollments.grade, courses.course_name
-FROM students
-JOIN enrollments ON students.student_id = enrollments.student_id
-JOIN courses ON enrollments.course_id = courses.course_id;
-```
-
-### 2. Use Meaningful Aliases
-
-**Good:**
-```sql
+-- Filter early with WHERE
+SELECT s.first_name, c.course_name
 FROM students s
 JOIN enrollments e ON s.student_id = e.student_id
 JOIN courses c ON e.course_id = c.course_id
+WHERE s.major = 'Computer Science';  -- Filter before joining when possible
 ```
 
-**Avoid:**
-```sql
-FROM students a
-JOIN enrollments b ON a.student_id = b.student_id
-JOIN courses c ON b.course_id = c.course_id
--- What do 'a' and 'b' mean?
-```
+## Quick Reference
 
-### 3. Specify Column Names
-
-**Good:**
 ```sql
-SELECT s.student_id, s.first_name, e.course_id, e.grade
+-- Multiple table joins (3-way)
+SELECT s.name, c.course_name, i.instructor_name
 FROM students s
-JOIN enrollments e ON s.student_id = e.student_id;
-```
+JOIN enrollments e ON s.student_id = e.student_id
+JOIN courses c ON e.course_id = c.course_id
+JOIN instructors i ON c.instructor_id = i.instructor_id;
 
-**Avoid:**
-```sql
+-- Composite joins (multi-column)
 SELECT *
+FROM table1 t1
+JOIN table2 t2 ON t1.col1 = t2.col1 AND t1.col2 = t2.col2;
+
+-- Mixed join types
+SELECT s.name, c.course_name, i.instructor_name
 FROM students s
-JOIN enrollments e ON s.student_id = e.student_id;
-```
+LEFT JOIN enrollments e ON s.student_id = e.student_id
+INNER JOIN courses c ON e.course_id = c.course_id
+LEFT JOIN instructors i ON c.instructor_id = i.instructor_id;
 
-**Why:**
-- SELECT * returns all columns (inefficient)
-- Column order can change
-- Ambiguous when same column name exists in multiple tables
-
-## Common Mistakes and Solutions
-
-### Mistake 1: Forgetting NULL Handling
-
-**Problem:**
-```sql
--- COUNT(*) counts rows, not NULL-safe values
-SELECT s.first_name, COUNT(*)
+-- NULL-safe aggregates with LEFT JOIN
+SELECT s.first_name, COUNT(e.enrollment_id)  -- Use specific column, not *
 FROM students s
 LEFT JOIN enrollments e ON s.student_id = e.student_id
 GROUP BY s.student_id, s.first_name;
--- Returns 1 for students with no enrollments (wrong!)
-```
-
-**Solution:**
-```sql
--- COUNT(column) is NULL-safe
-SELECT s.first_name, COUNT(e.enrollment_id)
-FROM students s
-LEFT JOIN enrollments e ON s.student_id = e.student_id
-GROUP BY s.student_id, s.first_name;
--- Returns 0 for students with no enrollments (correct!)
-```
-
-### Mistake 2: Ambiguous Columns
-
-**Problem:**
-```sql
-SELECT student_id, course_id
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id;
--- ERROR: column "student_id" is ambiguous
-```
-
-**Solution:**
-```sql
-SELECT s.student_id, e.course_id
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id;
 ```
 

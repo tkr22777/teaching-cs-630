@@ -322,7 +322,7 @@ WHERE product_id NOT IN (
 | 1 | Laptop |
 | 2 | Mouse |
 
-## UPDATE vs DELETE: Important Differences
+## UPDATE vs DELETE Comparison
 
 | Aspect | UPDATE | DELETE |
 |--------|--------|--------|
@@ -332,138 +332,9 @@ WHERE product_id NOT IN (
 | RETURNING | Supported | Supported |
 | Rollback | Yes (within transaction) | Yes (within transaction) |
 
-## Common Errors and Solutions
+## Advanced Examples
 
-### Error 1: Forgetting WHERE Clause
-
-**Problem:**
-```sql
--- DANGER: Updates ALL rows!
-UPDATE inventory
-SET price = 0;
-```
-
-**Solution:**
-```sql
--- Always use WHERE for specific updates
-UPDATE inventory
-SET price = 0
-WHERE product_id = 999;
-```
-
-### Error 2: NULL Constraint Violation
-
-**Problem:**
-```sql
-UPDATE inventory
-SET product_name = NULL
-WHERE product_id = 1;
--- ERROR: null value in column "product_name" violates not-null constraint
-```
-
-**Solution:**
-```sql
-UPDATE inventory
-SET product_name = 'Unknown Product'
-WHERE product_id = 1;
-```
-
-### Error 3: Check Constraint Violation
-
-Assuming we have:
-```sql
-ALTER TABLE inventory
-ADD CONSTRAINT check_positive_price CHECK (price > 0);
-```
-
-**Problem:**
-```sql
-UPDATE inventory
-SET price = -10
-WHERE product_id = 1;
--- ERROR: new row for relation "inventory" violates check constraint
-```
-
-**Solution:**
-```sql
-UPDATE inventory
-SET price = 10  -- Use positive value
-WHERE product_id = 1;
-```
-
-## Transaction Safety
-
-### Example 13: Safe UPDATE with Transaction
-
-```sql
-BEGIN;
-
--- Update prices
-UPDATE inventory
-SET price = price * 1.15
-WHERE category = 'Electronics';
-
--- Verify changes
-SELECT product_name, price FROM inventory WHERE category = 'Electronics';
-
--- If correct:
-COMMIT;
-
--- If wrong:
--- ROLLBACK;
-```
-
-### Example 14: Safe DELETE with Verification
-
-```sql
-BEGIN;
-
--- See what will be deleted
-SELECT * FROM inventory WHERE stock_quantity = 0;
-
--- Delete if correct
-DELETE FROM inventory WHERE stock_quantity = 0;
-
--- Verify deletion count
-SELECT COUNT(*) FROM inventory;
-
-COMMIT;
-```
-
-## Best Practices
-
-### 1. Always Use WHERE Clause
-
-```sql
--- Good: Specific update
-UPDATE inventory SET price = 99.99 WHERE product_id = 1;
-
--- Dangerous: Updates ALL rows
-UPDATE inventory SET price = 99.99;
-```
-
-### 2. Test with SELECT First
-
-```sql
--- First, SELECT to see what will be affected
-SELECT * FROM inventory WHERE category = 'Electronics';
-
--- Then UPDATE
-UPDATE inventory SET price = price * 0.9 WHERE category = 'Electronics';
-```
-
-### 3. Use Transactions for Multiple Operations
-
-```sql
-BEGIN;
-    UPDATE inventory SET stock_quantity = stock_quantity - 5 WHERE product_id = 1;
-    DELETE FROM inventory WHERE stock_quantity <= 0;
-COMMIT;
-```
-
-## Practical Examples
-
-### Example 15: Bulk Price Update with Conditions
+### Example 13: Bulk Price Update with CASE
 
 **SQL Statement:**
 ```sql
@@ -495,14 +366,36 @@ WHERE product_id IN (
 );
 ```
 
-### Example 17: Cascading Updates
+### Example 14: Transactions for Safety
 
 ```sql
--- Update related records across tables
-UPDATE inventory
-SET category = 'Tech'
-WHERE category = 'Electronics';
+BEGIN;
+    -- Preview changes
+    SELECT * FROM inventory WHERE category = 'Electronics';
+    
+    -- Make updates
+    UPDATE inventory 
+    SET price = price * 1.15 
+    WHERE category = 'Electronics';
+    
+    -- Verify
+    SELECT product_name, price FROM inventory WHERE category = 'Electronics';
+    
+COMMIT;  -- or ROLLBACK if incorrect
+```
 
--- This affects all related queries/reports automatically
+## Quick Reference
+
+```sql
+-- UPDATE
+UPDATE table_name SET column = value WHERE condition;
+UPDATE table_name SET col1 = val1, col2 = val2 WHERE condition;
+UPDATE table_name SET column = column + 10 WHERE condition;
+UPDATE table_name SET column = value WHERE condition RETURNING *;
+
+-- DELETE
+DELETE FROM table_name WHERE condition;
+DELETE FROM table_name WHERE condition RETURNING *;
+DELETE FROM table_name;  -- Deletes all rows (use with caution)
 ```
 

@@ -315,96 +315,26 @@ ADD CONSTRAINT fk_courses_dept
     FOREIGN KEY (dept_id) REFERENCES departments(dept_id);
 ```
 
-## Best Practices
+## Quick Reference
 
-### 1. Use Appropriate Data Types
 ```sql
--- Good: Use SERIAL for auto-increment
-CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    username VARCHAR(50)
+-- CREATE with constraints
+CREATE TABLE table_name (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category_id INTEGER REFERENCES categories(id),
+    price NUMERIC(10,2) CHECK (price > 0),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Avoid: Manual integer management
-CREATE TABLE users (
-    user_id INTEGER PRIMARY KEY,
-    username VARCHAR(50)
-);
-```
-
-### 2. Name Constraints Explicitly
-```sql
--- Good: Named constraint
-ALTER TABLE orders 
-ADD CONSTRAINT check_order_total_positive 
-CHECK (total > 0);
-
--- Avoid: Anonymous constraint (harder to drop later)
-ALTER TABLE orders 
-ADD CHECK (total > 0);
-```
-
-### 3. Use NOT NULL Wisely
-```sql
--- Required fields should be NOT NULL
-CREATE TABLE customers (
-    customer_id SERIAL PRIMARY KEY,
-    email VARCHAR(100) NOT NULL,  -- Always required
-    phone VARCHAR(20),             -- Optional
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-```
-
-### 4. Consider Default Values
-```sql
-CREATE TABLE orders (
-    order_id SERIAL PRIMARY KEY,
-    order_date DATE DEFAULT CURRENT_DATE,
-    status VARCHAR(20) DEFAULT 'pending',
-    is_paid BOOLEAN DEFAULT FALSE
-);
-```
-
-## Common Errors and Solutions
-
-### Error: Violating Foreign Key Constraint
-
-**Problem:**
-```sql
--- This will fail if instructor_id 999 doesn't exist
-INSERT INTO courses (course_id, course_name, instructor_id)
-VALUES ('CS999', 'Test Course', 999);
-```
-
-**Solution:** Ensure referenced record exists first:
-```sql
--- First create the instructor
-INSERT INTO instructors (instructor_id, instructor_name, dept_id)
-VALUES (999, 'Dr. Test', 1);
-
--- Then create the course
-INSERT INTO courses (course_id, course_name, instructor_id)
-VALUES ('CS999', 'Test Course', 999);
-```
-
-### Error: Adding NOT NULL to Column with NULLs
-
-**Problem:**
-```sql
--- This will fail if any existing rows have NULL values
-ALTER TABLE products 
-ALTER COLUMN description SET NOT NULL;
-```
-
-**Solution:** Update NULLs first:
-```sql
--- First, set default value for NULLs
-UPDATE products 
-SET description = 'No description' 
-WHERE description IS NULL;
-
--- Then add NOT NULL constraint
-ALTER TABLE products 
-ALTER COLUMN description SET NOT NULL;
+-- ALTER operations
+ALTER TABLE table_name ADD COLUMN column_name datatype;
+ALTER TABLE table_name ALTER COLUMN column_name TYPE new_datatype;
+ALTER TABLE table_name ALTER COLUMN column_name SET NOT NULL;
+ALTER TABLE table_name DROP COLUMN column_name;
+ALTER TABLE table_name ADD CONSTRAINT name CHECK (condition);
+ALTER TABLE table_name DROP CONSTRAINT constraint_name;
+ALTER TABLE table_name RENAME COLUMN old_name TO new_name;
+ALTER TABLE table_name RENAME TO new_table_name;
 ```
 

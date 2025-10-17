@@ -469,59 +469,29 @@ ON products (category)
 WHERE category IS NULL;
 ```
 
-## Best Practices
-
-### 1. Name Indexes Descriptively
+## Quick Reference
 
 ```sql
--- Good: Clear naming convention
-CREATE INDEX idx_orders_customer_id ON orders (customer_id);
-CREATE INDEX idx_products_category_price ON products (category, price);
+-- CREATE INDEX
+CREATE INDEX idx_name ON table_name (column);
+CREATE INDEX idx_name ON table_name (col1, col2);  -- Composite index
+CREATE UNIQUE INDEX idx_name ON table_name (column);
+CREATE INDEX idx_name ON table_name (column) WHERE condition;  -- Partial index
 
--- Avoid: Generic names
-CREATE INDEX index1 ON orders (customer_id);
-```
+-- DROP INDEX
+DROP INDEX idx_name;
+DROP INDEX IF EXISTS idx_name;
+DROP INDEX CONCURRENTLY idx_name;  -- Won't block reads/writes
 
-### 2. Monitor Index Usage
+-- REINDEX
+REINDEX INDEX idx_name;
+REINDEX TABLE table_name;
 
-```sql
--- Regularly check which indexes are used
-SELECT indexname, idx_scan
-FROM pg_stat_user_indexes
-WHERE schemaname = 'public'
-ORDER BY idx_scan DESC;
-```
+-- Naming convention
+-- idx_{table}_{column(s)}
+-- Example: idx_orders_customer_id, idx_products_category_price
 
-### 3. Don't Over-Index
-
-```sql
--- Avoid: Too many indexes on same column combinations
-CREATE INDEX idx1 ON products (category);
-CREATE INDEX idx2 ON products (category, price);  -- idx1 is redundant
-```
-
-## Common Mistakes
-
-### Mistake 1: Creating Redundant Indexes
-
-**Problem:**
-```sql
-CREATE INDEX idx_a ON table (col1);
-CREATE INDEX idx_b ON table (col1, col2);  -- idx_a is now redundant
-```
-
-**Solution:** Drop idx_a, idx_b can handle queries on just col1.
-
-### Mistake 2: Indexing Low-Cardinality Columns
-
-**Problem:**
-```sql
--- Boolean column - only 2 possible values
-CREATE INDEX idx_users_active ON users (is_active);  -- Low benefit
-```
-
-**Solution:** Only index if queries are very selective or use partial index:
-```sql
-CREATE INDEX idx_users_active ON users (is_active) WHERE is_active = true;
+-- Check index usage
+SELECT indexname, idx_scan FROM pg_stat_user_indexes WHERE schemaname = 'public';
 ```
 

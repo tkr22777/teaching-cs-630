@@ -418,32 +418,25 @@ NATURAL JOIN courses;
 - Changes to table structure can silently break queries
 - Difficult to debug
 
-## Best Practices
-
-### ✅ DO: Use Explicit Joins
+## Quick Reference
 
 ```sql
--- Good: Clear and maintainable
-SELECT s.first_name, s.last_name, e.course_id, e.grade
-FROM students s
-INNER JOIN enrollments e ON s.student_id = e.student_id;
-```
-
-### ❌ DON'T: Use NATURAL JOIN
-
-```sql
--- Bad: Implicit and risky
-SELECT *
-FROM students
-NATURAL JOIN enrollments;
-```
-
-### ✅ DO: Use Table Aliases in Self Joins
-
-```sql
--- Good: Clear distinction between instances
+-- Self join (hierarchical relationships)
 SELECT e.employee_name, m.employee_name AS manager
-FROM employees_org e
-LEFT JOIN employees_org m ON e.manager_id = m.employee_id;
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id;
+
+-- Self join (comparisons within same table)
+SELECT s1.student_name, s2.student_name AS classmate
+FROM students s1
+JOIN students s2 ON s1.major = s2.major AND s1.student_id < s2.student_id;
+
+-- Multi-level self join (grandparent)
+SELECT e.employee_name AS employee,
+       m.employee_name AS manager,
+       gm.employee_name AS grand_manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id
+LEFT JOIN employees gm ON m.manager_id = gm.employee_id;
 ```
 

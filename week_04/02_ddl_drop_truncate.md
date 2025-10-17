@@ -75,22 +75,9 @@ SELECT * FROM temp_enrollments;
 -- Error: relation "temp_enrollments" does not exist
 ```
 
-### Example 2: DROP TABLE with Foreign Key Dependencies
+### Example 2: DROP TABLE with Dependencies (CASCADE)
 
-**SQL Statement:**
-```sql
--- This will FAIL because temp_enrollments references temp_students
-DROP TABLE temp_students;
-```
-
-**Error Message:**
-```
-ERROR: cannot drop table temp_students because other objects depend on it
-DETAIL: constraint temp_enrollments_student_id_fkey on table temp_enrollments depends on table temp_students
-HINT: Use DROP ... CASCADE to drop the dependent objects too.
-```
-
-**Solution 1: Drop in correct order**
+**Option 1: Drop in correct order**
 ```sql
 -- Drop dependent table first
 DROP TABLE temp_enrollments;
@@ -98,16 +85,11 @@ DROP TABLE temp_enrollments;
 DROP TABLE temp_students;
 ```
 
-**Solution 2: Use CASCADE**
+**Option 2: Use CASCADE**
 ```sql
--- Drops table and all dependent objects
+-- Drops table and all dependent objects automatically
 DROP TABLE temp_students CASCADE;
 ```
-
-**Effect of CASCADE:**
-- Drops `temp_students` table
-- Automatically drops foreign key constraint in `temp_enrollments`
-- May drop the entire `temp_enrollments` table if it depends on `temp_students`
 
 ### Example 3: DROP IF EXISTS
 
@@ -434,76 +416,23 @@ CREATE TABLE courses (...);
 CREATE TABLE enrollments (...);
 ```
 
-## Safety Best Practices
-
-### 1. Always Use Transactions for Testing
+## Quick Reference
 
 ```sql
-BEGIN;
-    TRUNCATE TABLE products;
-    -- Check if this is what you wanted
-    SELECT COUNT(*) FROM products;
-ROLLBACK;  -- Undo if not what you wanted
--- COMMIT;  -- Keep changes if correct
-```
+-- DROP TABLE
+DROP TABLE table_name;
+DROP TABLE IF EXISTS table_name;
+DROP TABLE table_name CASCADE;                    -- Drop with all dependencies
+DROP TABLE table1, table2, table3;                -- Drop multiple tables
 
-### 2. Use IF EXISTS
+-- TRUNCATE TABLE  
+TRUNCATE TABLE table_name;
+TRUNCATE TABLE table_name RESTART IDENTITY;       -- Reset auto-increment
+TRUNCATE TABLE table_name CASCADE;                -- Truncate referencing tables
+TRUNCATE TABLE table1, table2;                    -- Truncate multiple tables
 
-```sql
--- Safe to run even if table doesn't exist
-DROP TABLE IF EXISTS old_table;
-```
-
-### 3. Backup Before Dropping
-
-```sql
--- Create backup
-CREATE TABLE products_backup AS SELECT * FROM products;
-
--- Now safe to drop
-DROP TABLE products;
-
--- Restore if needed
-CREATE TABLE products AS SELECT * FROM products_backup;
-```
-
-## Common Errors and Solutions
-
-### Error 1: Cannot DROP due to Dependencies
-
-**Problem:**
-```sql
-DROP TABLE students;
--- ERROR: cannot drop table students because other objects depend on it
-```
-
-**Solution:**
-```sql
--- Check dependencies
-\d+ students  -- Shows foreign key references
-
--- Option 1: Drop in correct order
-DROP TABLE enrollments;
-DROP TABLE students;
-
--- Option 2: Use CASCADE
-DROP TABLE students CASCADE;
-```
-
-### Error 2: Cannot TRUNCATE due to Foreign Keys
-
-**Problem:**
-```sql
-TRUNCATE TABLE categories;
--- ERROR: cannot truncate a table referenced in a foreign key constraint
-```
-
-**Solution:**
-```sql
--- Option 1: Truncate both tables
-TRUNCATE TABLE categories, items RESTART IDENTITY;
-
--- Option 2: Use CASCADE
-TRUNCATE TABLE categories CASCADE;
+-- DELETE (for comparison)
+DELETE FROM table_name;
+DELETE FROM table_name WHERE condition;
 ```
 

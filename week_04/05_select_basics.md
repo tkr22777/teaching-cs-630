@@ -512,40 +512,31 @@ LIMIT 3;
 | 1984 | George Orwell | Science Fiction | 13.99 | 4.7 |
 | The Great Gatsby | F. Scott Fitzgerald | Fiction | 12.99 | 4.5 |
 
-## Best Practices
-
-### 1. Specify Column Names
+## Quick Reference
 
 ```sql
--- Good: Explicit columns
-SELECT title, author, price FROM books;
+-- Basic SELECT
+SELECT column1, column2 FROM table_name;
+SELECT * FROM table_name;
 
--- Avoid: SELECT * (except for quick testing)
-SELECT * FROM books;
-```
+-- WHERE clause
+SELECT * FROM table WHERE condition;
+SELECT * FROM table WHERE col1 = value AND col2 > value;
+SELECT * FROM table WHERE col IN (val1, val2, val3);
+SELECT * FROM table WHERE col BETWEEN val1 AND val2;
+SELECT * FROM table WHERE col LIKE 'pattern%';
+SELECT * FROM table WHERE col IS NULL;
 
-### 2. Use WHERE to Reduce Data Early
+-- ORDER BY
+SELECT * FROM table ORDER BY column ASC;
+SELECT * FROM table ORDER BY col1 DESC, col2 ASC;
 
-```sql
--- Efficient: Filter first, then process
-SELECT title, price
-FROM books
-WHERE genre = 'Fiction'
-ORDER BY price;
-```
+-- DISTINCT
+SELECT DISTINCT column FROM table;
 
-### 3. Always Use ORDER BY with LIMIT
-
-```sql
--- Good: Predictable results
-SELECT title, price
-FROM books
-ORDER BY price DESC
-LIMIT 5;
-
--- Avoid: Without ORDER BY, results are unpredictable
-SELECT title, price
-FROM books
-LIMIT 5;
+-- LIMIT and OFFSET
+SELECT * FROM table LIMIT 10;
+SELECT * FROM table LIMIT 10 OFFSET 20;
+SELECT * FROM table ORDER BY col LIMIT 5;  -- Always use ORDER BY with LIMIT
 ```
 

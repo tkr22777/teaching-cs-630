@@ -436,28 +436,33 @@ ORDER BY i.instructor_name NULLS LAST, c.course_id NULLS LAST;
 | Dr. Taylor | Chemistry | NULL | NULL | NULL | No Courses |
 | NULL | NULL | ENG101 | English Composition | English | No Instructor |
 
-## Performance Considerations
+## Quick Reference
 
-### RIGHT JOIN Performance
-- Similar performance to LEFT JOIN
-- Convert to LEFT JOIN for consistency and readability
-
-### FULL OUTER JOIN Performance
-- Can be slower than INNER/LEFT/RIGHT JOINs
-- Returns more rows (all records from both tables)
-- May require more memory for large datasets
-- Index both join columns for best performance
-
-**Optimization Tips:**
 ```sql
--- Index join columns
-CREATE INDEX idx_enrollments_student ON enrollments(student_id);
-CREATE INDEX idx_enrollments_course ON enrollments(course_id);
-
--- Filter early when possible
+-- RIGHT JOIN (returns all from right table)
 SELECT *
-FROM students s
-FULL OUTER JOIN enrollments e ON s.student_id = e.student_id
-WHERE s.enrollment_date >= '2024-01-01'  -- Filter before joining if possible
+FROM table1
+RIGHT JOIN table2 ON table1.id = table2.id;
+
+-- RIGHT JOIN with NULL filter
+SELECT *
+FROM table1
+RIGHT JOIN table2 ON table1.id = table2.id
+WHERE table1.id IS NULL;  -- Only unmatched rows from right table
+
+-- FULL OUTER JOIN (returns all from both tables)
+SELECT *
+FROM table1
+FULL OUTER JOIN table2 ON table1.id = table2.id;
+
+-- FULL OUTER JOIN - only unmatched rows
+SELECT *
+FROM table1
+FULL OUTER JOIN table2 ON table1.id = table2.id
+WHERE table1.id IS NULL OR table2.id IS NULL;
+
+-- Convert RIGHT JOIN to LEFT JOIN (more readable)
+-- Instead of: SELECT * FROM table1 RIGHT JOIN table2 ON ...
+SELECT * FROM table2 LEFT JOIN table1 ON ...;
 ```
 
