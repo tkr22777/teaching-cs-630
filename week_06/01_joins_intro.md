@@ -39,8 +39,6 @@ With joins:
 
 ## Join Syntax
 
-SQL supports two join syntaxes:
-
 ### ANSI Standard Syntax (Preferred)
 
 ```sql
@@ -54,21 +52,6 @@ JOIN table2 ON table1.column = table2.column;
 - Separates join conditions from filter conditions
 - Better readability
 - Industry standard
-
-### Older Comma Syntax (Avoid)
-
-```sql
-SELECT columns
-FROM table1, table2
-WHERE table1.column = table2.column;
-```
-
-**Why to avoid:**
-- Mixes join conditions with filter conditions
-- Less readable for complex queries
-- Easier to accidentally create Cartesian products
-
-**Best Practice:** Always use the ANSI standard JOIN syntax.
 
 ## Types of Joins
 
