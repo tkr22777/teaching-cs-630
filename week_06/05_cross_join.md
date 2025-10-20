@@ -15,12 +15,6 @@ FROM table1
 CROSS JOIN table2;
 ```
 
-**Implicit syntax (older style):**
-```sql
-SELECT columns
-FROM table1, table2;
-```
-
 **Best Practice:** Use explicit `CROSS JOIN` syntax for clarity.
 
 ## How CROSS JOIN Works
@@ -44,7 +38,7 @@ Table A (3 rows)    Table B (2 rows)    Result (A CROSS JOIN B)
 
 **Key Point:** Every row from table A is paired with every row from table B.
 
-## Basic CROSS JOIN Examples
+## Basic CROSS JOIN Example
 
 ### Example 1: Simple Cartesian Product
 
@@ -81,7 +75,7 @@ LIMIT 10;
 - Each student paired with each course
 - No relationship required - all combinations generated
 
-### Example 2: Count Total Combinations
+###
 
 **Query:** How many possible student-course pairings exist?
 
@@ -100,11 +94,9 @@ CROSS JOIN courses;
 
 **Explanation:** 5 × 6 = 30 possible combinations
 
-## CROSS JOIN with WHERE Clause
+## CROSS JOIN with WHERE Clause (filtering the product)
 
-Adding a WHERE clause to a CROSS JOIN filters the Cartesian product.
-
-### Example 3: Filter Combinations
+### Example 2: Filter Combinations
 
 **Query:** Generate all CS student and CS course combinations.
 
@@ -137,7 +129,7 @@ ORDER BY s.last_name, c.course_id;
 - WHERE clause filters after Cartesian product is generated
 - Useful for seeing all possible valid pairings
 
-### Example 4: Finding Potential Enrollments
+### Example 3: Finding Potential Enrollments
 
 **Query:** Show CS students and courses they're NOT currently enrolled in.
 
@@ -170,9 +162,9 @@ ORDER BY s.student_id, c.course_id;
 - Shows courses Bob Wilson could still enroll in
 - John Smith is enrolled in all 3 CS courses (doesn't appear)
 
-## Practical Use Cases
+## Practical Use Case
 
-### Use Case 1: Generating Date/Time Combinations
+### Use Case: Generating Date/Time Combinations
 
 **Setup:**
 ```sql
@@ -215,7 +207,7 @@ ORDER BY d.date_value, t.slot_time;
 
 **Explanation:** Creates 9 appointment slots (3 days × 3 time slots)
 
-### Use Case 2: Product Variants
+###
 
 **Setup:**
 ```sql
@@ -253,7 +245,7 @@ ORDER BY p.product_name, s.size_code, c.color_code;
 
 **Explanation:** 2 products × 3 sizes × 3 colors = 18 variants
 
-### Use Case 3: Test Data Generation
+###
 
 **Query:** Create test enrollment data for all possible student-course pairs.
 
@@ -284,7 +276,7 @@ LIMIT 5;
 
 **Explanation:** Creates test enrollments matching students with their department courses
 
-### Use Case 4: Price Matrix
+###
 
 **Setup:**
 ```sql

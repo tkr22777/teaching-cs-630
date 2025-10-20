@@ -35,9 +35,7 @@ Original Table:              Self Join (Conceptual):
                              Same table, two aliases
 ```
 
-## Common Use Cases
-
-### Use Case 1: Hierarchical Data (Employee-Manager)
+## Common Use Case: Hierarchical Data (Employee-Manager)
 
 **Setup:**
 ```sql
@@ -100,7 +98,7 @@ ORDER BY e.employee_id;
 - LEFT JOIN includes CEO (who has no manager)
 - Self join links employee's manager_id to manager's employee_id
 
-### Example 2: Find Direct Reports
+###
 
 **Query:** List managers and their direct reports.
 
@@ -129,7 +127,7 @@ ORDER BY direct_reports DESC;
 - Uses aggregation to count and list direct reports
 - HAVING filters to show only managers with reports
 
-### Example 3: Salary Comparison with Manager
+###
 
 **Query:** Compare each employee's salary with their manager's salary.
 
@@ -161,9 +159,9 @@ ORDER BY salary_diff DESC;
 - Calculates difference and percentage
 - Shows compensation structure relative to management
 
-## Use Case 2: Finding Pairs or Relationships
+##
 
-### Example 4: Find Students in the Same Major
+### Example: Find Students in the Same Major
 
 **Query:**
 ```sql
@@ -189,7 +187,7 @@ ORDER BY s1.major, s1.student_id;
   - Duplicate pairs (John-Bob and Bob-John)
 - Only shows unique pairs of students sharing a major
 
-### Example 5: Find Students Who Took the Same Course
+###
 
 **Query:**
 ```sql
@@ -221,9 +219,9 @@ ORDER BY c.course_name, s1.last_name;
 - Shows different semesters when applicable
 - CS101 had 3 students, producing 3 pairs (1-2, 1-3, 2-3)
 
-## Use Case 3: Comparing Rows Within Same Table
+## Comparing Rows Within Same Table
 
-### Example 6: Find Courses with Similar Enrollments
+### Example: Find Courses with Similar Enrollments
 
 **Query:** Find pairs of courses with similar enrollment counts (within 1 of each other).
 
@@ -267,9 +265,9 @@ ORDER BY enrollment_diff, cc1.course_id;
 - Uses ABS() for absolute difference
 - Useful for identifying courses that could be combined or compared
 
-## Advanced Self Join Patterns
+## Advanced Self Join Pattern (optional)
 
-### Example 7: Multi-Level Hierarchy
+### Example: Multi-Level Hierarchy
 
 **Query:** Show employee, manager, and manager's manager.
 
@@ -299,122 +297,10 @@ ORDER BY e.employee_id;
 - Shows 3 levels: employee → manager → grand-manager
 - Can extend further for deeper hierarchies
 
-## NATURAL JOIN
+<details>
+<summary>NATURAL JOIN (cautionary note)</summary>
 
-### Overview
+Avoid `NATURAL JOIN` in production code because join columns are implicit and can change with schema evolution. Prefer explicit `JOIN ... ON ...` with clear conditions.
 
-A **NATURAL JOIN** automatically joins tables based on columns with the same name. It's a convenience feature but comes with significant risks.
-
-### Syntax
-
-```sql
-SELECT columns
-FROM table1
-NATURAL JOIN table2;
-```
-
-### How NATURAL JOIN Works
-
-The database automatically:
-1. Finds columns with matching names in both tables
-2. Creates equality conditions for all matching columns
-3. Returns rows where all matching columns have equal values
-
-### Example 8: NATURAL JOIN Demo
-
-**Setup:**
-```sql
-CREATE TABLE table_a (
-    id INTEGER,
-    name VARCHAR(50),
-    value INTEGER
-);
-
-CREATE TABLE table_b (
-    id INTEGER,
-    value INTEGER,
-    description VARCHAR(50)
-);
-
-INSERT INTO table_a VALUES (1, 'Alice', 100), (2, 'Bob', 200);
-INSERT INTO table_b VALUES (1, 100, 'First'), (2, 300, 'Second');
-```
-
-**NATURAL JOIN:**
-```sql
-SELECT *
-FROM table_a
-NATURAL JOIN table_b;
-```
-
-**Result:**
-| id | name | value | description |
-|----|------|-------|-------------|
-| 1 | Alice | 100 | First |
-
-**Explanation:**
-- Joins on both `id` AND `value` (both columns match)
-- Only row 1 matches on both columns
-- Row 2 excluded because values don't match (200 ≠ 300)
-
-**Equivalent explicit JOIN:**
-```sql
-SELECT *
-FROM table_a a
-INNER JOIN table_b b ON a.id = b.id AND a.value = b.value;
-```
-
-## Why NATURAL JOIN is Dangerous
-
-### Problem 1: Implicit Join Conditions
-
-**Issue:** Not clear what columns are being joined.
-
-```sql
--- What columns are being joined?
-SELECT *
-FROM students
-NATURAL JOIN enrollments;
-```
-
-**Better:** Explicit join
-```sql
-SELECT *
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id;
-```
-
-### Problem 2: Schema Changes Break Queries
-
-**Scenario:** Someone adds a `department` column to both tables.
-
-**Before:**
-```sql
-NATURAL JOIN  -- Joins on student_id only
-```
-
-**After adding department column:**
-```sql
-NATURAL JOIN  -- Now joins on student_id AND department!
--- Suddenly returns different results or no results!
-```
-
-### Problem 3: Unexpected Column Matches
-
-**Example:**
-```sql
--- Accidentally matches on 'year' column present in both tables
--- but meaning different things (graduation year vs. course year)
-SELECT *
-FROM students
-NATURAL JOIN courses;
-```
-
-### Problem 4: Poor Readability and Maintenance
-
-**Issues:**
-- Future developers don't know what the join condition is
-- Must examine schema to understand the query
-- Changes to table structure can silently break queries
-- Difficult to debug
+</details>
 
