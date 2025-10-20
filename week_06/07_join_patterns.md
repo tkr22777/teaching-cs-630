@@ -92,7 +92,7 @@ ORDER BY se.year, se.semester, s.last_name;
 - Each enrollment matches its specific section
 - Essential for systems with multiple offerings of same course
 
-## Common Join Patterns
+## Common Join Patterns (minimal set)
 
 ### Pattern 1: Master-Detail Relationship
 
@@ -224,7 +224,7 @@ ORDER BY issue_type, student_id, course_id;
 - LEFT JOIN + IS NULL pattern finds missing relationships
 - Useful for data quality audits
 
-### Pattern 4: Latest Record Per Group
+###
 
 **Use Case:** Get the most recent record for each entity.
 
@@ -264,7 +264,7 @@ ORDER BY s.student_id;
 - Filter WHERE rn = 1 gets the latest only
 - Alternative: MAX(enrollment_id) with subquery
 
-### Pattern 5: Conditional Joins
+###
 
 **Use Case:** Join based on complex conditions.
 
@@ -295,7 +295,7 @@ ORDER BY s.last_name, c.course_name;
 
 **Note:** Our sample data doesn't have retakes, but this pattern is useful when students retake courses.
 
-### Pattern 6: Filtered Joins (Semi-Join Pattern)
+### Pattern 4: Filtered Joins (Semi-Join Pattern)
 
 **Use Case:** Filter main table based on existence in related table.
 

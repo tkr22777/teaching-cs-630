@@ -278,7 +278,7 @@ ORDER BY course_count DESC;
 - COALESCE converts NULL to 0 for total_credits
 - This is the key difference from INNER JOIN: complete roster
 
-### Example 8: Average Grade Calculation
+###
 
 **Query:** Calculate average grade for all students (excluding those with no grades).
 
