@@ -136,7 +136,7 @@ ORDER BY net_salary DESC;
 | Jane Smith | Engineering | 72250.00 | 4 |
 | Bob Johnson | Sales | 63750.00 | 3 |
 
-### Example 3: View with JOIN
+###
 
 **SQL Statement:**
 ```sql
@@ -168,7 +168,7 @@ ORDER BY department, employee_name;
 | 3 | Bob Johnson | Sales | 75000 | NULL |
 | 8 | Frank Wilson | Sales | 72000 | Bob Johnson |
 
-### Example 4: View with Aggregation
+### Example 3: View with Aggregation
 
 **SQL Statement:**
 ```sql
@@ -197,7 +197,7 @@ ORDER BY total_payroll DESC;
 | Marketing | 1 | 65000.00 | 65000 | 65000 | 65000 |
 | HR | 1 | 60000.00 | 60000 | 60000 | 60000 |
 
-### Example 5: View for Security/Privacy
+###
 
 **SQL Statement:**
 ```sql
@@ -230,7 +230,7 @@ WHERE department = 'Sales';
 
 Views can be queried just like regular tables:
 
-### Example 6: Filtering a View
+### Filtering a View
 
 **SQL Statement:**
 ```sql
@@ -247,7 +247,7 @@ ORDER BY net_salary DESC;
 | Eve Miller | 76500.00 |
 | John Doe | 80750.00 |
 
-### Example 7: Joining Views
+### Joining Views
 
 **SQL Statement:**
 ```sql
@@ -268,7 +268,7 @@ WHERE es.salary > ds.avg_salary;
 
 ## Modifying Views
 
-### Example 8: CREATE OR REPLACE VIEW
+### CREATE OR REPLACE VIEW
 
 **SQL Statement:**
 ```sql
@@ -298,7 +298,7 @@ SELECT * FROM engineering_employees;
 | 2 | Jane | Smith | jane.smith@company.com | 85000 | 2020-03-20 | 1 |
 | 7 | Eve | Miller | eve.m@company.com | 90000 | 2022-07-01 | 1 |
 
-### Example 9: Dropping Views
+### Dropping Views
 
 **SQL Statement:**
 ```sql
@@ -310,14 +310,14 @@ DROP VIEW engineering_employees;
 DROP VIEW IF EXISTS engineering_employees;
 ```
 
-### Example 10: Dropping Multiple Views
+###
 
 **SQL Statement:**
 ```sql
 DROP VIEW IF EXISTS view1, view2, view3;
 ```
 
-## Updatable Views
+## Updatable Views (brief)
 
 Some views allow INSERT, UPDATE, DELETE operations.
 
@@ -329,7 +329,7 @@ Some views allow INSERT, UPDATE, DELETE operations.
 - No set operations (UNION, INTERSECT, EXCEPT)
 - No window functions
 
-### Example 11: Simple Updatable View
+### Example: Simple Updatable View
 
 **SQL Statement:**
 ```sql
@@ -362,7 +362,7 @@ WHERE employee_id = 5;
 |-------------|------------|-----------|------------|
 | 5 | Charlie | Brown | Engineering |
 
-### Example 12: Insert Through View
+###
 
 **SQL Statement:**
 ```sql
@@ -372,7 +372,7 @@ VALUES ('Grace', 'Lee', 'grace.l@company.com', 'HR');
 
 **Result:** New row is inserted into base `employees` table.
 
-### Example 13: Non-Updatable View
+###
 
 **SQL Statement:**
 ```sql
@@ -429,7 +429,7 @@ MySQL does not have native materialized views; emulate with tables + scheduled r
 
 </details>
 
-### Example 14: Materialized View with Index
+### Materialized View with Index
 
 **SQL Statement:**
 ```sql
@@ -460,9 +460,9 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY mv_employee_stats;
 | Space usage | Minimal | Can be significant |
 | Best for | Real-time data, simple queries | Complex queries, reports, dashboards |
 
-## Advanced View Techniques
+## Advanced View Technique
 
-### Example 15: View with UNION
+### View with UNION
 
 **SQL Statement:**
 ```sql
@@ -480,36 +480,7 @@ SELECT customer_id AS id,
 FROM customers;
 ```
 
-### Example 16: Recursive View
-
-**SQL Statement:**
-```sql
--- Employee hierarchy
-CREATE VIEW employee_hierarchy AS
-WITH RECURSIVE emp_tree AS (
-    -- Base case: top-level managers
-    SELECT employee_id, first_name, last_name, manager_id, 1 AS level
-    FROM employees
-    WHERE manager_id IS NULL
-    
-    UNION ALL
-    
-    -- Recursive case: employees with managers
-    SELECT e.employee_id, e.first_name, e.last_name, e.manager_id, et.level + 1
-    FROM employees e
-    JOIN emp_tree et ON e.manager_id = et.employee_id
-)
-SELECT * FROM emp_tree;
-```
-
-**Using the View:**
-```sql
-SELECT employee_id, 
-       REPEAT('  ', level - 1) || first_name || ' ' || last_name AS name,
-       level
-FROM employee_hierarchy
-ORDER BY level, first_name;
-```
+###
 
 ## Viewing View Definitions
 
