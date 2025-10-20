@@ -344,8 +344,7 @@ ORDER BY s.last_name;
 CREATE INDEX idx_enrollments_student_id ON enrollments(student_id);
 CREATE INDEX idx_enrollments_course_id ON enrollments(course_id);
 
--- Check query plan
-EXPLAIN ANALYZE
+-- Example query (check plan using your database's tools if desired)
 SELECT s.first_name, c.course_name
 FROM students s
 JOIN enrollments e ON s.student_id = e.student_id

@@ -211,7 +211,7 @@ ORDER BY d.date_value, t.slot_time;
 
 **Setup:**
 ```sql
-CREATE TABLE products (product_id SERIAL, product_name VARCHAR(50));
+CREATE TABLE products (product_id INTEGER PRIMARY KEY, product_name VARCHAR(50));
 CREATE TABLE sizes (size_code VARCHAR(5), size_name VARCHAR(20));
 CREATE TABLE colors (color_code VARCHAR(10), color_name VARCHAR(20));
 

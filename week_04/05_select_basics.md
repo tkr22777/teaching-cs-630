@@ -151,7 +151,7 @@ WHERE author IN ('George Orwell', 'J.R.R. Tolkien');
 
 ###
 
-### Example 10: Case-Insensitive Pattern Matching (ILIKE)
+### Example 10: Case-Insensitive Pattern Matching
 
 **SQL Statement:**
 ```sql

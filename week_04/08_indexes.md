@@ -165,7 +165,7 @@ WHERE LOWER(product_name) = 'product 100';
 
 ## Index Performance Impact
 
-### Example 6: Measuring Query Performance
+### Example 6: Measuring Query Performance (conceptual)
 
 **Without Index:**
 ```sql
@@ -173,7 +173,6 @@ WHERE LOWER(product_name) = 'product 100';
 DROP INDEX IF EXISTS idx_products_supplier;
 
 -- Explain query
-EXPLAIN ANALYZE
 SELECT product_name, price
 FROM products
 WHERE supplier_id = 5;
@@ -193,7 +192,6 @@ Execution Time: 15.5 ms
 CREATE INDEX idx_products_supplier ON products (supplier_id);
 
 -- Same query
-EXPLAIN ANALYZE
 SELECT product_name, price
 FROM products
 WHERE supplier_id = 5;

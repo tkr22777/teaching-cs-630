@@ -57,7 +57,7 @@ VALUES ('Jane', 'Smith', 'jane.smith@company.com', 'Marketing');
 **Note:** 
 - `salary` is NULL (not provided)
 - `hire_date` uses DEFAULT value (CURRENT_DATE)
-- `employee_id` auto-increments (SERIAL)
+- `employee_id` is a primary key and can be generated via identity/sequence per database
 
 ## Example 3: Insert Multiple Rows
 

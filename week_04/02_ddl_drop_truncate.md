@@ -166,7 +166,7 @@ SELECT COUNT(*) FROM products;
 
 ### Example 3: TRUNCATE with RESTART IDENTITY
 
-When using SERIAL columns, TRUNCATE can reset the sequence:
+When using identity/sequence-generated keys, TRUNCATE can reset the sequence:
 
 **Without RESTART IDENTITY:**
 ```sql
