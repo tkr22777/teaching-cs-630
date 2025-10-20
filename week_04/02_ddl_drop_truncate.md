@@ -77,15 +77,6 @@ SELECT * FROM temp_enrollments;
 
 ### Example 2: DROP TABLE with Dependencies (CASCADE)
 
-**Option 1: Drop in correct order**
-```sql
--- Drop dependent table first
-DROP TABLE temp_enrollments;
--- Then drop the referenced table
-DROP TABLE temp_students;
-```
-
-**Option 2: Use CASCADE**
 ```sql
 -- Drops table and all dependent objects automatically
 DROP TABLE temp_students CASCADE;
@@ -106,20 +97,7 @@ DROP TABLE IF EXISTS temp_enrollments;
 
 **Result:** Tables are dropped if they exist; no error if they don't exist.
 
-### Example 4: DROP Multiple Tables
-
-**SQL Statement:**
-```sql
--- Create test tables
-CREATE TABLE test_a (id INTEGER);
-CREATE TABLE test_b (id INTEGER);
-CREATE TABLE test_c (id INTEGER);
-
--- Drop all at once
-DROP TABLE test_a, test_b, test_c;
-```
-
-**Result:** All three tables are removed in a single statement.
+###
 
 ## TRUNCATE Statement
 
@@ -184,37 +162,7 @@ SELECT COUNT(*) FROM products;
 
 **Table Structure Still Exists:** The table definition remains, only data is removed.
 
-### Example 2: TRUNCATE vs DELETE
-
-Let's compare TRUNCATE with DELETE:
-
-**Setup:**
-```sql
--- Recreate and populate products
-INSERT INTO products (product_name, price, stock_quantity) VALUES
-('Laptop', 999.99, 15),
-('Mouse', 25.50, 100);
-```
-
-**Using DELETE:**
-```sql
-DELETE FROM products;
-```
-- Removes rows one by one
-- Can use WHERE clause
-- Triggers fire
-- Can be rolled back
-- Slower on large tables
-
-**Using TRUNCATE:**
-```sql
-TRUNCATE TABLE products;
-```
-- Removes all rows at once
-- Cannot use WHERE clause
-- Triggers do NOT fire
-- Cannot be rolled back (in most cases)
-- Much faster on large tables
+###
 
 ### Example 3: TRUNCATE with RESTART IDENTITY
 
@@ -253,7 +201,7 @@ INSERT INTO products (product_name, price) VALUES ('Keyboard', 75.00);
 |------------|--------------|--------|----------------|
 | 1 | Keyboard | 75.00 | 0 |
 
-### Example 4: TRUNCATE with Foreign Keys
+### Example 2: TRUNCATE with Foreign Keys
 
 **Setup:**
 ```sql
@@ -318,11 +266,10 @@ TRUNCATE TABLE categories CASCADE;
 |---------|-----------|-------------|
 | *(no rows)* | |
 
-**Solution 2: TRUNCATE Multiple Tables**
+**Solution 2: TRUNCATE multiple tables**
 ```sql
 TRUNCATE TABLE categories, items RESTART IDENTITY;
 ```
-**Result:** Both tables are truncated and their sequences reset.
 
 ## DELETE vs TRUNCATE vs DROP
 
