@@ -52,15 +52,6 @@ INSERT INTO books (title, author, genre, publication_year, price, stock_quantity
 
 ## Basic SELECT Statement
 
-### Example 1: Select All Columns
-
-**SQL Statement:**
-```sql
-SELECT * FROM books;
-```
-
-**Result:** Returns all 10 rows with all columns (shown above).
-
 ### Example 2: Select Specific Columns
 
 **SQL Statement:**
@@ -139,41 +130,7 @@ WHERE genre = 'Fiction' AND rating > 4.5;
 |-------|-------|-------|--------|
 | To Kill a Mockingbird | Fiction | 14.99 | 4.8 |
 
-### Example 6: Multiple WHERE Conditions (OR)
-
-**SQL Statement:**
-```sql
-SELECT title, genre, price
-FROM books
-WHERE genre = 'Fantasy' OR genre = 'Science Fiction';
-```
-
-**Result:**
-| title | genre | price |
-|-------|-------|-------|
-| 1984 | Science Fiction | 13.99 |
-| The Hobbit | Fantasy | 15.99 |
-| Harry Potter | Fantasy | 19.99 |
-| Brave New World | Science Fiction | 13.49 |
-| The Lord of the Rings | Fantasy | 25.99 |
-
-### Example 7: BETWEEN Operator
-
-**SQL Statement:**
-```sql
-SELECT title, publication_year, price
-FROM books
-WHERE publication_year BETWEEN 1920 AND 1950;
-```
-
-**Result:**
-| title | publication_year | price |
-|-------|------------------|-------|
-| The Great Gatsby | 1925 | 12.99 |
-| The Hobbit | 1937 | 15.99 |
-| 1984 | 1949 | 13.99 |
-| Animal Farm | 1945 | 10.99 |
-| Brave New World | 1932 | 13.49 |
+###
 
 ### Example 8: IN Operator
 
@@ -192,38 +149,7 @@ WHERE author IN ('George Orwell', 'J.R.R. Tolkien');
 | Animal Farm | George Orwell | Fiction |
 | The Lord of the Rings | J.R.R. Tolkien | Fantasy |
 
-### Example 9: LIKE Operator for Pattern Matching
-
-**SQL Statement:**
-```sql
--- Books with "The" in the title
-SELECT title, author
-FROM books
-WHERE title LIKE 'The%';
-```
-
-**Result:**
-| title | author |
-|-------|--------|
-| The Great Gatsby | F. Scott Fitzgerald |
-| The Hobbit | J.R.R. Tolkien |
-| The Catcher in the Rye | J.D. Salinger |
-| The Lord of the Rings | J.R.R. Tolkien |
-
-**LIKE Pattern Examples:**
-```sql
--- Starts with "The"
-WHERE title LIKE 'The%'
-
--- Ends with "Farm"
-WHERE title LIKE '%Farm'
-
--- Contains "and"
-WHERE title LIKE '%and%'
-
--- Second character is 'h'
-WHERE title LIKE '_h%'
-```
+###
 
 ### Example 10: Case-Insensitive Pattern Matching (ILIKE)
 
@@ -239,26 +165,7 @@ WHERE UPPER(title) LIKE UPPER('%harry%');  -- Case-insensitive using standard SQ
 |-------|--------|
 | Harry Potter | J.K. Rowling |
 
-### Example 11: IS NULL and IS NOT NULL
-
-**Setup:**
-```sql
--- Add a book with missing information
-INSERT INTO books (title, author, genre, price) 
-VALUES ('Unknown Book', 'Unknown Author', NULL, 9.99);
-```
-
-**SQL Statement:**
-```sql
-SELECT title, author, genre
-FROM books
-WHERE genre IS NULL;
-```
-
-**Result:**
-| title | author | genre |
-|-------|--------|-------|
-| Unknown Book | Unknown Author | NULL |
+### Example 11: IS NOT NULL
 
 **SQL Statement:**
 ```sql
@@ -275,78 +182,11 @@ WHERE genre IS NOT NULL
 | 1984 | Science Fiction |
 | Harry Potter | Fantasy |
 
-### Example 12: Comparison Operators
-
-**SQL Statement:**
-```sql
-SELECT title, price, stock_quantity
-FROM books
-WHERE price >= 15.00 AND stock_quantity < 30;
-```
-
-**Result:**
-| title | price | stock_quantity |
-|-------|-------|----------------|
-| The Hobbit | 15.99 | 25 |
-| The Lord of the Rings | 25.99 | 15 |
-
-**All Comparison Operators:**
-- `=` Equal to
-- `<>` or `!=` Not equal to
-- `>` Greater than
-- `<` Less than
-- `>=` Greater than or equal
-- `<=` Less than or equal
+###
 
 ## ORDER BY Clause
 
 The ORDER BY clause sorts the result set.
-
-### Example 13: Sort Ascending (Default)
-
-**SQL Statement:**
-```sql
-SELECT title, price
-FROM books
-ORDER BY price;
-```
-
-**Result:**
-| title | price |
-|-------|-------|
-| Animal Farm | 10.99 |
-| Pride and Prejudice | 11.99 |
-| The Catcher in the Rye | 12.49 |
-| The Great Gatsby | 12.99 |
-| Brave New World | 13.49 |
-| 1984 | 13.99 |
-| To Kill a Mockingbird | 14.99 |
-| The Hobbit | 15.99 |
-| Harry Potter | 19.99 |
-| The Lord of the Rings | 25.99 |
-
-### Example 14: Sort Descending
-
-**SQL Statement:**
-```sql
-SELECT title, rating
-FROM books
-ORDER BY rating DESC;
-```
-
-**Result:**
-| title | rating |
-|-------|--------|
-| The Hobbit | 4.9 |
-| The Lord of the Rings | 4.9 |
-| To Kill a Mockingbird | 4.8 |
-| Harry Potter | 4.8 |
-| 1984 | 4.7 |
-| Pride and Prejudice | 4.6 |
-| The Great Gatsby | 4.5 |
-| Animal Farm | 4.5 |
-| Brave New World | 4.3 |
-| The Catcher in the Rye | 4.2 |
 
 ### Example 15: Sort by Multiple Columns
 
@@ -371,24 +211,7 @@ ORDER BY genre ASC, rating DESC;
 | 1984 | Science Fiction | 4.7 |
 | Brave New World | Science Fiction | 4.3 |
 
-### Example 16: Order by Calculated Column
-
-**SQL Statement:**
-```sql
-SELECT title, price, stock_quantity,
-       price * stock_quantity AS total_value
-FROM books
-ORDER BY total_value DESC;
-```
-
-**Result:**
-| title | price | stock_quantity | total_value |
-|-------|-------|----------------|-------------|
-| Harry Potter | 19.99 | 60 | 1199.40 |
-| 1984 | 13.99 | 52 | 727.48 |
-| The Great Gatsby | 12.99 | 45 | 584.55 |
-| To Kill a Mockingbird | 14.99 | 38 | 569.62 |
-| ... | ... | ... | ... |
+###
 
 ## DISTINCT Keyword
 
@@ -411,46 +234,7 @@ ORDER BY genre;
 | Romance |
 | Science Fiction |
 
-### Example 18: DISTINCT on Multiple Columns
-
-**SQL Statement:**
-```sql
-SELECT DISTINCT author, genre
-FROM books
-ORDER BY author, genre;
-```
-
-**Result:**
-| author | genre |
-|--------|-------|
-| Aldous Huxley | Science Fiction |
-| F. Scott Fitzgerald | Fiction |
-| George Orwell | Fiction |
-| George Orwell | Science Fiction |
-| Harper Lee | Fiction |
-| J.D. Salinger | Fiction |
-| J.K. Rowling | Fantasy |
-| J.R.R. Tolkien | Fantasy |
-| Jane Austen | Romance |
-
-### Example 19: LIMIT
-
-**SQL Statement:**
-```sql
-SELECT title, price
-FROM books
-ORDER BY price DESC
-LIMIT 5;
-```
-
-**Result:**
-| title | price |
-|-------|-------|
-| The Lord of the Rings | 25.99 |
-| Harry Potter | 19.99 |
-| The Hobbit | 15.99 |
-| To Kill a Mockingbird | 14.99 |
-| 1984 | 13.99 |
+###
 
 ### Example 20: LIMIT with OFFSET (Pagination)
 
@@ -469,27 +253,6 @@ LIMIT 3 OFFSET 0;
 | 1984 | 13.99 |
 | Animal Farm | 10.99 |
 | Brave New World | 13.49 |
-
-**SQL Statement:**
-```sql
--- Page 2 (next 3 books)
-SELECT title, price
-FROM books
-ORDER BY title
-LIMIT 3 OFFSET 3;
-```
-
-**Result (Page 2):**
-| title | price |
-|-------|-------|
-| Harry Potter | 19.99 |
-| Pride and Prejudice | 11.99 |
-| The Catcher in the Rye | 12.49 |
-
-### Example 18: Select with OFFSET
-
-**Result:** Returns 5 books, starting from the 6th book (skipping the first 5).
-
 <details>
 <summary>ANSI SQL Standard for Pagination</summary>
 
