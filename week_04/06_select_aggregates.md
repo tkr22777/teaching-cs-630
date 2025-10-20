@@ -71,8 +71,8 @@ GROUP BY category;
 **Result:**
 | category | total_quantity | total_revenue |
 |----------|----------------|---------------|
-| Electronics | 53 | 12299.18 |
-| Furniture | 30 | 6599.93 |
+| Electronics | 53 | 13292.32 |
+| Furniture | 30 | 7999.78 |
 
 ### AVG()
 
@@ -131,10 +131,10 @@ ORDER BY total_revenue DESC;
 **Result:**
 | region | number_of_sales | revenue | avg_sale_value |
 |--------|-----------------|---------|----------------|
-| North | 3 | 5509.93 | 1836.64 |
-| East | 3 | 5399.85 | 1799.95 |
+| North | 3 | 7509.93 | 2503.31 |
+| East | 3 | 7799.77 | 2599.92 |
 | West | 2 | 2632.50 | 1316.25 |
-| South | 2 | 3356.80 | 1678.40 |
+| South | 2 | 3349.90 | 1674.95 |
 
 ###
 
@@ -152,12 +152,12 @@ ORDER BY total_revenue DESC;
 **Result:**
 | category | region | sales_count | revenue |
 |----------|--------|-------------|---------|
-| Electronics | North | 2 | 5509.93 |
-| Electronics | East | 2 | 5399.85 |
+| Electronics | North | 3 | 7509.93 |
+| Electronics | East | 2 | 5399.92 |
 | Electronics | West | 1 | 382.50 |
 | Electronics | South | 0 | 0.00 |
 | Furniture | East | 1 | 2399.88 |
-| Furniture | South | 1 | 2349.90 |
+| Furniture | South | 2 | 3349.90 |
 | Furniture | West | 1 | 2250.00 |
 | Furniture | North | 0 | 0.00 |
 
@@ -166,7 +166,7 @@ ORDER BY total_revenue DESC;
 **Result:**
 | year | month | sales_count | monthly_revenue |
 |------|-------|-------------|-----------------|
-| 2024 | 10 | 10 | 14899.11 |
+| 2024 | 10 | 10 | 21292.10 |
 
 ## HAVING Clause
 
@@ -188,7 +188,7 @@ ORDER BY total_revenue DESC;
 **Result:**
 | category | sales_count | total_revenue |
 |----------|-------------|---------------|
-| Electronics | 6 | 12299.18 |
+| Electronics | 6 | 13292.32 |
 
 ###
 
