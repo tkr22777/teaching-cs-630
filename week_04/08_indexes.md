@@ -57,44 +57,11 @@ FROM generate_series(1, 10000);
 | ... | ... | ... | ... | ... | ... |
 | 10000 | Product 10000 | Home & Garden | 567.89 | 23 | 5 |
 
-## Types of Indexes using standard SQL
+## Types of Indexes (brief)
 
-### 1. B-Tree Index (Default)
-
-Most common index type, good for:
-- Equality comparisons (=)
-- Range queries (<, >, <=, >=, BETWEEN)
-- Sorting (ORDER BY)
-- Pattern matching (LIKE 'text%')
-
-**Syntax:**
-```sql
-CREATE INDEX index_name ON table_name (column_name);
-```
-
-### 2. Hash Index
-
-Good for simple equality comparisons only:
-- Equality (=)
-- Not good for ranges or sorting
-
-**Syntax:**
-```sql
-CREATE INDEX index_name ON table_name USING HASH (column_name);
-```
-
-### 3. GIN (Generalized Inverted Index)
-
-Good for:
-- Full-text search
-- Array operations
-- JSONB data
-
-### 4. GiST (Generalized Search Tree)
-
-Good for:
-- Geometric data
-- Full-text search
+- B-Tree (default and most common)
+- Unique indexes enforce uniqueness
+- Composite indexes cover multiple columns
 
 ## Creating Indexes
 
@@ -417,34 +384,5 @@ MySQL note: emulate concurrent behavior via online DDL (depends on storage engin
 
 </details>
 
-## Advanced Index Techniques
-
-### Example 19: Covering Index
-
-Include additional columns in index to avoid table lookups:
-
-**SQL Statement:**
-```sql
-CREATE INDEX idx_products_category_covering 
-ON products (category) 
-INCLUDE (product_name, price);
-```
-
-**Benefit:** Query can be answered entirely from index:
-```sql
--- Faster: all columns in index
-SELECT product_name, price
-FROM products
-WHERE category = 'Electronics';
-```
-
-### Example 20: Index with NULL Handling
-
-**SQL Statement:**
-```sql
--- Index products with NULL categories
-CREATE INDEX idx_products_category_nulls 
-ON products (category) 
-WHERE category IS NULL;
-```
+##
 
