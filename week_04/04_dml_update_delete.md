@@ -77,82 +77,7 @@ FROM inventory
 WHERE product_id = 1;
 ```
 
-### Example 2: Update Multiple Columns
-
-**SQL Statement:**
-```sql
-UPDATE inventory
-SET price = 79.99,
-    stock_quantity = 75
-WHERE product_name = 'Keyboard';
-```
-
-**Result:**
-| product_id | product_name | category | price | stock_quantity |
-|------------|--------------|----------|--------|----------------|
-| 3 | Keyboard | Electronics | 79.99 | 75 |
-
-### Example 3: Update Multiple Rows
-
-**SQL Statement:**
-```sql
--- Give 10% discount on all Electronics
-UPDATE inventory
-SET price = price * 0.90
-WHERE category = 'Electronics';
-```
-
-**Result:**
-| product_id | product_name | category | price | stock_quantity |
-|------------|--------------|----------|--------|----------------|
-| 1 | Laptop | Electronics | 809.99 | 15 |
-| 2 | Mouse | Electronics | 22.95 | 100 |
-| 3 | Keyboard | Electronics | 71.99 | 75 |
-| 4 | Monitor | Electronics | 269.99 | 30 |
-| 5 | Desk Chair | Furniture | 199.99 | 25 |
-| ... | ... | ... | ... | ... |
-
-### Example 4: Update with Calculation
-
-**SQL Statement:**
-```sql
--- Increase stock by 20 units for low-stock items
-UPDATE inventory
-SET stock_quantity = stock_quantity + 20
-WHERE stock_quantity < 30;
-```
-
-**Before:**
-| product_id | product_name | stock_quantity |
-|------------|--------------|----------------|
-| 1 | Laptop | 15 |
-| 6 | Standing Desk | 10 |
-
-**After:**
-| product_id | product_name | stock_quantity |
-|------------|--------------|----------------|
-| 1 | Laptop | 35 |
-| 6 | Standing Desk | 30 |
-
-### Example 5: Conditional Update with CASE
-
-**SQL Statement:**
-```sql
-UPDATE inventory
-SET price = CASE 
-    WHEN stock_quantity > 100 THEN price * 0.95  -- 5% discount for high stock
-    WHEN stock_quantity < 20 THEN price * 1.10   -- 10% markup for low stock
-    ELSE price  -- No change
-END;
-```
-
-**Result:**
-| product_id | product_name | stock_quantity | price_change |
-|------------|--------------|----------------|--------------|
-| 2 | Mouse | 100 | Discounted 5% |
-| 7 | Notebook | 200 | Discounted 5% |
-| 1 | Laptop | 35 | No change |
-| 6 | Standing Desk | 30 | Markup 10% |
+###
 
 ## DELETE Statement
 
@@ -192,147 +117,21 @@ SELECT COUNT(*) FROM inventory WHERE product_id = 8;
 |-------|
 | 0 |
 
-### Example 9: Delete Multiple Rows
+###
 
-**SQL Statement:**
+<details>
+<summary>PostgreSQL: RETURNING</summary>
+
 ```sql
--- Remove all out-of-stock items
-DELETE FROM inventory
-WHERE stock_quantity = 0;
-```
-
-### Example 10: Delete with Multiple Conditions
-
-**SQL Statement:**
-```sql
--- Remove expensive furniture items
-DELETE FROM inventory
-WHERE category = 'Furniture' 
-  AND price > 400;
-```
-
-**Before:**
-| product_id | product_name | category | price |
-|------------|--------------|----------|--------|
-| 5 | Desk Chair | Furniture | 189.99 |
-| 6 | Standing Desk | Furniture | 495.00 |
-
-**After:**
-| product_id | product_name | category | price |
-|------------|--------------|----------|--------|
-| 5 | Desk Chair | Furniture | 189.99 |
-
-### Example 11: DELETE with RETURNING
-
-**SQL Statement:**
-```sql
+-- Return deleted rows
 DELETE FROM inventory
 WHERE price < 10
 RETURNING product_id, product_name, price;
 ```
 
-**Query Result (Deleted Rows):**
-| product_id | product_name | price |
-|------------|--------------|-------|
-| 7 | Notebook | 5.99 |
+</details>
 
-### Example 12: DELETE with Subquery
+###
 
-Setup orders table:
-```sql
-CREATE TABLE orders (
-    order_id INTEGER PRIMARY KEY,
-    product_id INTEGER,
-    quantity INTEGER,
-    order_date DATE
-);
-
-INSERT INTO orders (product_id, quantity, order_date) VALUES
-(1, 2, '2024-10-15'),
-(2, 10, '2024-10-16');
-```
-
-**SQL Statement:**
-```sql
--- Delete products that have never been ordered
-DELETE FROM inventory
-WHERE product_id NOT IN (
-    SELECT DISTINCT product_id FROM orders
-);
-```
-
-**Before DELETE:**
-| product_id | product_name | has_orders |
-|------------|--------------|------------|
-| 1 | Laptop | Yes |
-| 2 | Mouse | Yes |
-| 3 | Keyboard | No |
-| 4 | Monitor | No |
-
-**After DELETE:**
-| product_id | product_name |
-|------------|--------------|
-| 1 | Laptop |
-| 2 | Mouse |
-
-## UPDATE vs DELETE Comparison
-
-| Aspect | UPDATE | DELETE |
-|--------|--------|--------|
-| Purpose | Modifies existing data | Removes rows |
-| Columns | Can update specific columns | Removes entire row |
-| WHERE clause | Optional (but recommended) | Optional (but recommended) |
-| Rollback | Yes (within transaction) | Yes (within transaction) |
-
-## Advanced Examples
-
-### Example 13: Bulk Price Update with CASE
-
-**SQL Statement:**
-```sql
-UPDATE inventory
-SET price = CASE 
-    WHEN category = 'Electronics' THEN price * 1.05
-    WHEN category = 'Furniture' THEN price * 1.10
-    WHEN category = 'Office Supplies' THEN price * 1.02
-    ELSE price
-END,
-last_updated = CURRENT_TIMESTAMP
-WHERE price IS NOT NULL;
-```
-
-### Example 16: Archive and Delete Old Records
-
-```sql
--- Create archive table
-CREATE TABLE inventory_archive AS SELECT * FROM inventory WHERE 1=0;
-
--- Move old records to archive
-INSERT INTO inventory_archive
-SELECT * FROM inventory WHERE stock_quantity = 0;
-
--- Delete from main table
-DELETE FROM inventory
-WHERE product_id IN (
-    SELECT product_id FROM inventory_archive
-);
-```
-
-### Example 14: Transactions for Safety
-
-```sql
-BEGIN;
-    -- Preview changes
-    SELECT * FROM inventory WHERE category = 'Electronics';
-    
-    -- Make updates
-    UPDATE inventory 
-    SET price = price * 1.15 
-    WHERE category = 'Electronics';
-    
-    -- Verify
-    SELECT product_name, price FROM inventory WHERE category = 'Electronics';
-    
-COMMIT;  -- or ROLLBACK if incorrect
-```
+##
 
