@@ -138,7 +138,7 @@ SELECT e.employee_name,
        m.employee_name AS manager,
        m.salary AS manager_salary,
        m.salary - e.salary AS salary_diff,
-       ROUND((e.salary::NUMERIC / m.salary * 100), 1) AS pct_of_manager_salary
+       ROUND((e.salary / m.salary * 100), 1) AS pct_of_manager_salary
 FROM employees_org e
 INNER JOIN employees_org m ON e.manager_id = m.employee_id
 ORDER BY salary_diff DESC;

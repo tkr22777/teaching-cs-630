@@ -117,7 +117,7 @@ SELECT employee_id,
        salary,
        salary * 0.15 AS estimated_tax,
        salary * 0.85 AS net_salary,
-       EXTRACT(YEAR FROM AGE(CURRENT_DATE, hire_date)) AS years_employed
+       FLOOR(MONTHS_BETWEEN(SYSDATE, hire_date) / 12) AS years_employed
 FROM employees;
 ```
 
@@ -498,6 +498,9 @@ ORDER BY table_name;
 
 **SQL Statement:**
 ```sql
-SELECT pg_get_viewdef('employee_summary', true);
+-- Oracle: Query view definition from USER_VIEWS
+SELECT text
+FROM user_views
+WHERE view_name = 'EMPLOYEE_SUMMARY';
 ```
 

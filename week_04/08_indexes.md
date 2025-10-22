@@ -32,19 +32,22 @@ CREATE TABLE products (
     created_at TIMESTAMP DEFAULT SYSTIMESTAMP
 );
 
-INSERT INTO products (product_name, category, price, stock_quantity, supplier_id) 
+-- Generate sample data using Oracle's CONNECT BY
+INSERT INTO products (product_id, product_name, category, price, stock_quantity, supplier_id) 
 SELECT 
-    'Product ' || generate_series,
-    CASE (generate_series % 4)
+    LEVEL,
+    'Product ' || LEVEL,
+    CASE MOD(LEVEL, 4)
         WHEN 0 THEN 'Electronics'
         WHEN 1 THEN 'Clothing'
         WHEN 2 THEN 'Books'
         ELSE 'Home & Garden'
     END,
-    (random() * 1000)::NUMERIC(10,2),
-    (random() * 100)::INTEGER,
-    (random() * 10 + 1)::INTEGER
-FROM generate_series(1, 10000);
+    ROUND(DBMS_RANDOM.VALUE(1, 1000), 2),
+    FLOOR(DBMS_RANDOM.VALUE(1, 100)),
+    FLOOR(DBMS_RANDOM.VALUE(1, 11))
+FROM dual
+CONNECT BY LEVEL <= 10000;
 ```
 
 </details>
@@ -74,9 +77,10 @@ CREATE INDEX idx_products_category ON products (category);
 
 **Verification:**
 ```sql
-SELECT indexname, indexdef
-FROM pg_indexes
-WHERE tablename = 'products';
+-- Oracle: Query index information from USER_INDEXES
+SELECT index_name, index_type, uniqueness
+FROM user_indexes
+WHERE table_name = 'PRODUCTS';
 ```
 
 **Result:**
@@ -211,15 +215,16 @@ Execution Time: 2.1 ms
 
 **SQL Statement:**
 ```sql
-SELECT schemaname,
-       tablename,
-       indexname,
-       idx_scan AS number_of_scans,
-       idx_tup_read AS tuples_read,
-       idx_tup_fetch AS tuples_fetched
-FROM pg_stat_user_indexes
-WHERE tablename = 'products'
-ORDER BY idx_scan DESC;
+-- Oracle: Monitor index usage statistics
+-- Note: Requires ALTER INDEX index_name MONITORING USAGE to be enabled first
+SELECT index_name,
+       table_name,
+       monitoring,
+       used,
+       start_monitoring
+FROM v$object_usage
+WHERE table_name = 'PRODUCTS'
+ORDER BY index_name;
 ```
 
 **Result:**
@@ -288,47 +293,52 @@ CREATE INDEX idx_users_email ON users (email);
 
 **SQL Statement:**
 ```sql
-SELECT tablename,
-       indexname,
-       indexdef
-FROM pg_indexes
-WHERE schemaname = 'public'
-ORDER BY tablename, indexname;
+-- Oracle: List all indexes in current schema
+SELECT table_name,
+       index_name,
+       index_type,
+       uniqueness
+FROM user_indexes
+ORDER BY table_name, index_name;
 ```
 
 ### Example 9: Checking Index Size
 
 **SQL Statement:**
 ```sql
-SELECT indexname,
-       pg_size_pretty(pg_relation_size(indexname::regclass)) AS index_size
-FROM pg_indexes
-WHERE tablename = 'products';
+-- Oracle: Query index sizes from USER_SEGMENTS
+SELECT segment_name AS index_name,
+       ROUND(bytes / 1024 / 1024, 2) AS size_mb
+FROM user_segments
+WHERE segment_type = 'INDEX'
+  AND segment_name LIKE '%PRODUCTS%'
+ORDER BY bytes DESC;
 ```
 
 **Result:**
-| indexname | index_size |
-|-----------|------------|
-| products_pkey | 216 kB |
-| idx_products_category | 184 kB |
-| idx_products_supplier | 184 kB |
+| index_name | size_mb |
+|-----------|---------|
+| PRODUCTS_PK | 0.21 |
+| IDX_PRODUCTS_CATEGORY | 0.18 |
+| IDX_PRODUCTS_SUPPLIER | 0.18 |
 
-### Example 10: Finding Unused Indexes
+### Example 10: Monitoring Index Usage
 
 **SQL Statement:**
 ```sql
-SELECT schemaname,
-       tablename,
-       indexname,
-       idx_scan,
-       pg_size_pretty(pg_relation_size(indexname::regclass)) AS index_size
-FROM pg_stat_user_indexes
-WHERE idx_scan = 0
-  AND indexname NOT LIKE '%_pkey'  -- Exclude primary keys
-ORDER BY pg_relation_size(indexname::regclass) DESC;
+-- Oracle: Monitor index usage via V$OBJECT_USAGE (requires monitoring to be enabled)
+-- First enable monitoring: ALTER INDEX index_name MONITORING USAGE;
+SELECT index_name,
+       table_name,
+       monitoring,
+       used,
+       start_monitoring,
+       end_monitoring
+FROM v$object_usage
+WHERE table_name = 'PRODUCTS';
 ```
 
-**Use Case:** Identify indexes that are never used and can be dropped.
+**Use Case:** Identify indexes that are not being used and can potentially be dropped.
 
 ## Dropping Indexes
 
