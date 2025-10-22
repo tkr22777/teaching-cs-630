@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers DROP and TRUNCATE commands for removing database objects and data using standard SQL. These are powerful commands that permanently delete data, so use them carefully.
+This guide covers DROP and TRUNCATE commands for removing database objects and data using Oracle SQL. These are powerful commands that permanently delete data, so use them carefully.
 
 ## DROP Statement
 
@@ -14,8 +14,10 @@ The `DROP` statement permanently removes database objects (tables, indexes, view
 
 ```sql
 DROP TABLE table_name;
-DROP TABLE IF EXISTS table_name;  -- Doesn't error if table doesn't exist
+DROP TABLE table_name CASCADE CONSTRAINTS;  -- Drops table and dependent constraints
 ```
+
+**Note:** Oracle does not support `IF EXISTS` in DROP TABLE. To avoid errors, use PL/SQL blocks or handle exceptions in your application code.
 
 ### Example Setup
 
@@ -24,24 +26,25 @@ Let's create sample tables to demonstrate DROP operations:
 ```sql
 CREATE TABLE temp_students (
     student_id INTEGER PRIMARY KEY,
-    student_name VARCHAR(100)
+    student_name VARCHAR2(100)
 );
 
 CREATE TABLE temp_courses (
-    course_id VARCHAR(10) PRIMARY KEY,
-    course_name VARCHAR(100)
+    course_id VARCHAR2(10) PRIMARY KEY,
+    course_name VARCHAR2(100)
 );
 
 CREATE TABLE temp_enrollments (
     enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER REFERENCES temp_students(student_id),
-    course_id VARCHAR(10) REFERENCES temp_courses(course_id)
+    course_id VARCHAR2(10) REFERENCES temp_courses(course_id)
 );
 
 -- Insert sample data
-INSERT INTO temp_students (student_name) VALUES ('John Doe'), ('Jane Smith');
+INSERT INTO temp_students (student_id, student_name) VALUES (1, 'John Doe');
+INSERT INTO temp_students (student_id, student_name) VALUES (2, 'Jane Smith');
 INSERT INTO temp_courses (course_id, course_name) VALUES ('CS101', 'Intro to CS');
-INSERT INTO temp_enrollments (student_id, course_id) VALUES (1, 'CS101');
+INSERT INTO temp_enrollments (enrollment_id, student_id, course_id) VALUES (1, 1, 'CS101');
 ```
 
 **Temp_Students Table:**
@@ -75,27 +78,26 @@ SELECT * FROM temp_enrollments;
 -- Error: relation "temp_enrollments" does not exist
 ```
 
-### Example 2: DROP TABLE with Dependencies (CASCADE)
+### Example 2: DROP TABLE with Dependencies (CASCADE CONSTRAINTS)
 
 ```sql
--- Drops table and all dependent objects automatically
-DROP TABLE temp_students CASCADE;
+-- Drops table and all dependent constraints automatically
+DROP TABLE temp_students CASCADE CONSTRAINTS;
 ```
 
-### Example 3: DROP IF EXISTS
+**Result:** The table and all foreign key constraints referencing it are dropped.
+
+### Example 3: Dropping Multiple Tables
 
 **SQL Statement:**
 ```sql
--- Won't error even if table doesn't exist
-DROP TABLE IF EXISTS non_existent_table;
-
--- Safe to run multiple times
-DROP TABLE IF EXISTS temp_students;
-DROP TABLE IF EXISTS temp_courses;
-DROP TABLE IF EXISTS temp_enrollments;
+-- Drop tables in correct order (child tables first)
+DROP TABLE temp_enrollments;
+DROP TABLE temp_courses;
+DROP TABLE temp_students;
 ```
 
-**Result:** Tables are dropped if they exist; no error if they don't exist.
+**Result:** All tables are dropped successfully when done in the correct dependency order.
 
 ###
 
@@ -107,9 +109,11 @@ The `TRUNCATE` statement removes all rows from a table quickly, but keeps the ta
 
 ```sql
 TRUNCATE TABLE table_name;
-TRUNCATE TABLE table_name RESTART IDENTITY;  -- Resets auto-increment
-TRUNCATE TABLE table_name CASCADE;            -- Truncates referencing tables too
+TRUNCATE TABLE table_name DROP STORAGE;      -- Deallocates freed space
+TRUNCATE TABLE table_name REUSE STORAGE;     -- Keeps allocated space (default)
 ```
+
+**Note:** Oracle does not have `RESTART IDENTITY` like PostgreSQL. To reset sequences, you must manually reset them after truncating.
 
 ### Sample Data for TRUNCATE Examples
 
@@ -117,17 +121,16 @@ TRUNCATE TABLE table_name CASCADE;            -- Truncates referencing tables to
 -- Create and populate sample table
 CREATE TABLE products (
     product_id INTEGER PRIMARY KEY,
-    product_name VARCHAR(100) NOT NULL,
-    price NUMERIC(10, 2),
+    product_name VARCHAR2(100) NOT NULL,
+    price NUMBER(10, 2),
     stock_quantity INTEGER DEFAULT 0
 );
 
-INSERT INTO products (product_name, price, stock_quantity) VALUES
-('Laptop', 999.99, 15),
-('Mouse', 25.50, 100),
-('Keyboard', 75.00, 50),
-('Monitor', 299.99, 30),
-('Webcam', 89.99, 45);
+INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (1, 'Laptop', 999.99, 15);
+INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (2, 'Mouse', 25.50, 100);
+INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (3, 'Keyboard', 75.00, 50);
+INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (4, 'Monitor', 299.99, 30);
+INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (5, 'Webcam', 89.99, 45);
 ```
 
 **Products Table (Before TRUNCATE):**
@@ -164,42 +167,40 @@ SELECT COUNT(*) FROM products;
 
 ###
 
-### Example 3: TRUNCATE with RESTART IDENTITY
+### Example 3: Resetting Sequences After TRUNCATE
 
-When using identity/sequence-generated keys, TRUNCATE can reset the sequence:
+When using sequences for auto-incrementing keys, you must manually reset them after truncating:
 
-**Without RESTART IDENTITY:**
+**Example with Sequence:**
 ```sql
--- Insert data
-INSERT INTO products (product_name, price) VALUES ('Laptop', 999.99);
--- product_id = 1
+-- Create sequence for product_id
+CREATE SEQUENCE product_seq START WITH 1 INCREMENT BY 1;
 
-TRUNCATE TABLE products;
+-- Create table using sequence
+CREATE TABLE products_seq (
+    product_id INTEGER PRIMARY KEY,
+    product_name VARCHAR2(100),
+    price NUMBER(10, 2)
+);
 
-INSERT INTO products (product_name, price) VALUES ('Mouse', 25.50);
--- product_id = 2 (continues from before)
+-- Insert using sequence
+INSERT INTO products_seq VALUES (product_seq.NEXTVAL, 'Laptop', 999.99);
+INSERT INTO products_seq VALUES (product_seq.NEXTVAL, 'Mouse', 25.50);
+
+-- Truncate table
+TRUNCATE TABLE products_seq;
+
+-- Reset sequence to start from 1 again
+ALTER SEQUENCE product_seq RESTART START WITH 1;
+
+-- Next insert will use product_id = 1
+INSERT INTO products_seq VALUES (product_seq.NEXTVAL, 'Keyboard', 75.00);
 ```
 
-**Products Table:**
-| product_id | product_name | price | stock_quantity |
-|------------|--------------|--------|----------------|
-| 2 | Mouse | 25.50 | 0 |
-
-**With RESTART IDENTITY:**
-```sql
-INSERT INTO products (product_name, price) VALUES ('Laptop', 999.99);
--- product_id = 3
-
-TRUNCATE TABLE products RESTART IDENTITY;
-
-INSERT INTO products (product_name, price) VALUES ('Keyboard', 75.00);
--- product_id = 1 (restarted)
-```
-
-**Products Table:**
-| product_id | product_name | price | stock_quantity |
-|------------|--------------|--------|----------------|
-| 1 | Keyboard | 75.00 | 0 |
+**Products_Seq Table After Reset:**
+| product_id | product_name | price |
+|------------|--------------|--------|
+| 1 | Keyboard | 75.00 |
 
 ### Example 2: TRUNCATE with Foreign Keys
 
@@ -207,19 +208,19 @@ INSERT INTO products (product_name, price) VALUES ('Keyboard', 75.00);
 ```sql
 CREATE TABLE categories (
     category_id INTEGER PRIMARY KEY,
-    category_name VARCHAR(50)
+    category_name VARCHAR2(50)
 );
 
 CREATE TABLE items (
     item_id INTEGER PRIMARY KEY,
-    item_name VARCHAR(100),
+    item_name VARCHAR2(100),
     category_id INTEGER REFERENCES categories(category_id)
 );
 
-INSERT INTO categories (category_name) VALUES ('Electronics'), ('Furniture');
-INSERT INTO items (item_name, category_id) VALUES 
-    ('Laptop', 1),
-    ('Desk', 2);
+INSERT INTO categories (category_id, category_name) VALUES (1, 'Electronics');
+INSERT INTO categories (category_id, category_name) VALUES (2, 'Furniture');
+INSERT INTO items (item_id, item_name, category_id) VALUES (1, 'Laptop', 1);
+INSERT INTO items (item_id, item_name, category_id) VALUES (2, 'Desk', 2);
 ```
 
 **Categories Table:**
@@ -241,20 +242,31 @@ TRUNCATE TABLE categories;
 
 **Error:**
 ```
-ERROR: cannot truncate a table referenced in a foreign key constraint
-DETAIL: Table "items" references "categories"
-HINT: Truncate table "items" at the same time, or use TRUNCATE ... CASCADE
+ORA-02266: unique/primary keys in table referenced by enabled foreign keys
 ```
 
-**Solution 1: TRUNCATE CASCADE**
+**Solution 1: Disable and Re-enable Constraints**
 ```sql
-TRUNCATE TABLE categories CASCADE;
-```
-**Result:** 
-- Truncates `categories` table
-- Automatically truncates `items` table (because it references categories)
+-- Disable foreign key constraint
+ALTER TABLE items DISABLE CONSTRAINT items_category_fk;
 
-**Both Tables After CASCADE:**
+-- Truncate both tables
+TRUNCATE TABLE categories;
+TRUNCATE TABLE items;
+
+-- Re-enable foreign key constraint
+ALTER TABLE items ENABLE CONSTRAINT items_category_fk;
+```
+
+**Solution 2: Truncate in Correct Order**
+```sql
+-- Truncate child table first
+TRUNCATE TABLE items;
+-- Then truncate parent table
+TRUNCATE TABLE categories;
+```
+
+**Both Tables After Truncate:**
 
 **Categories:**
 | category_id | category_name |
@@ -266,11 +278,6 @@ TRUNCATE TABLE categories CASCADE;
 |---------|-----------|-------------|
 | *(no rows)* | |
 
-**Solution 2: TRUNCATE multiple tables**
-```sql
-TRUNCATE TABLE categories, items RESTART IDENTITY;
-```
-
 ## DELETE vs TRUNCATE vs DROP
 
 ### Comparison Table
@@ -281,10 +288,10 @@ TRUNCATE TABLE categories, items RESTART IDENTITY;
 | Table structure | Kept | Kept | Removed |
 | WHERE clause | Supported | Not supported | N/A |
 | Speed | Slower | Faster | Fastest |
-| Rollback | Can rollback | Limited rollback | Can rollback (DDL transaction) |
+| Rollback | Can rollback | Cannot rollback (DDL) | Cannot rollback (DDL) |
 | Triggers | Fires | Doesn't fire | N/A |
-| Auto-increment | Continues | Can reset with RESTART IDENTITY | N/A |
-| Foreign keys | Checks constraints | Requires CASCADE or drop dependents | Requires CASCADE or drop dependents |
+| Sequences | Continues | Must manually reset | N/A |
+| Foreign keys | Checks constraints | Must disable or truncate child first | Use CASCADE CONSTRAINTS |
 
 ### When to Use Each
 
@@ -299,11 +306,11 @@ DELETE FROM products WHERE price < 10;
 
 **Use TRUNCATE when:**
 - You need to remove ALL rows quickly
-- You want to reset auto-increment counters
 - Performance is important
+- You can manually reset sequences if needed
 
 ```sql
-TRUNCATE TABLE products RESTART IDENTITY;
+TRUNCATE TABLE products;
 ```
 
 **Use DROP when:**
@@ -320,37 +327,39 @@ DROP TABLE products;
 ### Example 1: Clean Up Test Data
 
 ```sql
--- Remove all test data but keep tables
-TRUNCATE TABLE test_enrollments, test_students, test_courses RESTART IDENTITY CASCADE;
+-- Remove all test data but keep tables (truncate in correct order)
+TRUNCATE TABLE test_enrollments;
+TRUNCATE TABLE test_students;
+TRUNCATE TABLE test_courses;
 ```
 
 ### Example 2: Remove Temporary Tables
 
 ```sql
 -- Remove tables created for one-time analysis
-DROP TABLE IF EXISTS temp_analysis_results;
-DROP TABLE IF EXISTS temp_calculations;
-DROP TABLE IF EXISTS temp_staging_data;
+DROP TABLE temp_staging_data;
+DROP TABLE temp_calculations;
+DROP TABLE temp_analysis_results;
 ```
 
 ### Example 3: Clear Log Table Daily
 
 ```sql
 -- Clear old logs (in a scheduled job)
-TRUNCATE TABLE application_logs RESTART IDENTITY;
+TRUNCATE TABLE application_logs;
 
 -- Or delete old logs only
 DELETE FROM application_logs 
-WHERE log_date < CURRENT_DATE - INTERVAL '30 days';
+WHERE log_date < SYSDATE - 30;
 ```
 
 ### Example 4: Database Reset for Development
 
 ```sql
--- Complete database reset script
-DROP TABLE IF EXISTS enrollments CASCADE;
-DROP TABLE IF EXISTS courses CASCADE;
-DROP TABLE IF EXISTS students CASCADE;
+-- Complete database reset script (drop in correct order)
+DROP TABLE enrollments CASCADE CONSTRAINTS;
+DROP TABLE courses CASCADE CONSTRAINTS;
+DROP TABLE students CASCADE CONSTRAINTS;
 
 -- Recreate fresh tables
 CREATE TABLE students (...);
