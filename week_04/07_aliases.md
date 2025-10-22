@@ -12,18 +12,18 @@ Aliases are temporary names assigned to tables or columns to make queries more r
 ```sql
 CREATE TABLE customers (
     customer_id INTEGER PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    email VARCHAR(100),
-    city VARCHAR(50)
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    email VARCHAR2(100),
+    city VARCHAR2(50)
 );
 
 CREATE TABLE orders (
     order_id INTEGER PRIMARY KEY,
     customer_id INTEGER REFERENCES customers(customer_id),
     order_date DATE,
-    total_amount NUMERIC(10, 2),
-    status VARCHAR(20)
+    total_amount NUMBER(10, 2),
+    status VARCHAR2(20)
 );
 
 INSERT INTO customers (first_name, last_name, email, city) VALUES
@@ -157,7 +157,7 @@ ORDER BY c.last_name, o.order_date;
 ```sql
 CREATE TABLE employees (
     employee_id INTEGER PRIMARY KEY,
-    employee_name VARCHAR(100),
+    employee_name VARCHAR2(100),
     manager_id INTEGER
 );
 

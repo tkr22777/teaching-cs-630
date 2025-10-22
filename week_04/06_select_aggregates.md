@@ -12,25 +12,24 @@ Aggregate functions perform calculations on multiple rows and return a single re
 ```sql
 CREATE TABLE sales (
     sale_id INTEGER PRIMARY KEY,
-    product_name VARCHAR(100),
-    category VARCHAR(50),
+    product_name VARCHAR2(100),
+    category VARCHAR2(50),
     quantity INTEGER,
-    unit_price NUMERIC(10, 2),
+    unit_price NUMBER(10, 2),
     sale_date DATE,
-    region VARCHAR(50)
+    region VARCHAR2(50)
 );
 
-INSERT INTO sales (product_name, category, quantity, unit_price, sale_date, region) VALUES
-('Laptop', 'Electronics', 5, 999.99, '2024-10-01', 'North'),
-('Mouse', 'Electronics', 20, 25.50, '2024-10-01', 'North'),
-('Desk', 'Furniture', 3, 450.00, '2024-10-02', 'South'),
-('Chair', 'Furniture', 10, 199.99, '2024-10-02', 'South'),
-('Laptop', 'Electronics', 3, 999.99, '2024-10-03', 'East'),
-('Monitor', 'Electronics', 8, 299.99, '2024-10-03', 'East'),
-('Desk', 'Furniture', 5, 450.00, '2024-10-04', 'West'),
-('Laptop', 'Electronics', 2, 999.99, '2024-10-05', 'North'),
-('Mouse', 'Electronics', 15, 25.50, '2024-10-05', 'West'),
-('Chair', 'Furniture', 12, 199.99, '2024-10-06', 'East');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (1, 'Laptop', 'Electronics', 5, 999.99, DATE '2024-10-01', 'North');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (2, 'Mouse', 'Electronics', 20, 25.50, DATE '2024-10-01', 'North');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (3, 'Desk', 'Furniture', 3, 450.00, DATE '2024-10-02', 'South');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (4, 'Chair', 'Furniture', 10, 199.99, DATE '2024-10-02', 'South');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (5, 'Laptop', 'Electronics', 3, 999.99, DATE '2024-10-03', 'East');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (6, 'Monitor', 'Electronics', 8, 299.99, DATE '2024-10-03', 'East');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (7, 'Desk', 'Furniture', 5, 450.00, DATE '2024-10-04', 'West');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (8, 'Laptop', 'Electronics', 2, 999.99, DATE '2024-10-05', 'North');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (9, 'Mouse', 'Electronics', 15, 25.50, DATE '2024-10-05', 'West');
+INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_date, region) VALUES (10, 'Chair', 'Furniture', 12, 199.99, DATE '2024-10-06', 'East');
 ```
 
 </details>

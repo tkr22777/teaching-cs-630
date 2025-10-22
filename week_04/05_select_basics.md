@@ -2,7 +2,7 @@
 
 ## Overview
 
-The SELECT statement is the most commonly used SQL command for retrieving data from database tables. This guide covers basic SELECT operations using standard SQL.
+The SELECT statement is the most commonly used SQL command for retrieving data from database tables. This guide covers basic SELECT operations using Oracle SQL.
 
 ## Sample Data
 
@@ -12,26 +12,25 @@ The SELECT statement is the most commonly used SQL command for retrieving data f
 ```sql
 CREATE TABLE books (
     book_id INTEGER PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    author VARCHAR(100) NOT NULL,
-    genre VARCHAR(50),
+    title VARCHAR2(200) NOT NULL,
+    author VARCHAR2(100) NOT NULL,
+    genre VARCHAR2(50),
     publication_year INTEGER,
-    price NUMERIC(10, 2),
+    price NUMBER(10, 2),
     stock_quantity INTEGER,
-    rating NUMERIC(3, 2)
+    rating NUMBER(3, 2)
 );
 
-INSERT INTO books (title, author, genre, publication_year, price, stock_quantity, rating) VALUES
-('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction', 1925, 12.99, 45, 4.5),
-('To Kill a Mockingbird', 'Harper Lee', 'Fiction', 1960, 14.99, 38, 4.8),
-('1984', 'George Orwell', 'Science Fiction', 1949, 13.99, 52, 4.7),
-('Pride and Prejudice', 'Jane Austen', 'Romance', 1813, 11.99, 30, 4.6),
-('The Hobbit', 'J.R.R. Tolkien', 'Fantasy', 1937, 15.99, 25, 4.9),
-('Harry Potter', 'J.K. Rowling', 'Fantasy', 1997, 19.99, 60, 4.8),
-('The Catcher in the Rye', 'J.D. Salinger', 'Fiction', 1951, 12.49, 20, 4.2),
-('Animal Farm', 'George Orwell', 'Fiction', 1945, 10.99, 35, 4.5),
-('Brave New World', 'Aldous Huxley', 'Science Fiction', 1932, 13.49, 28, 4.3),
-('The Lord of the Rings', 'J.R.R. Tolkien', 'Fantasy', 1954, 25.99, 15, 4.9);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (1, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction', 1925, 12.99, 45, 4.5);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (2, 'To Kill a Mockingbird', 'Harper Lee', 'Fiction', 1960, 14.99, 38, 4.8);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (3, '1984', 'George Orwell', 'Science Fiction', 1949, 13.99, 52, 4.7);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (4, 'Pride and Prejudice', 'Jane Austen', 'Romance', 1813, 11.99, 30, 4.6);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (5, 'The Hobbit', 'J.R.R. Tolkien', 'Fantasy', 1937, 15.99, 25, 4.9);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (6, 'Harry Potter', 'J.K. Rowling', 'Fantasy', 1997, 19.99, 60, 4.8);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (7, 'The Catcher in the Rye', 'J.D. Salinger', 'Fiction', 1951, 12.49, 20, 4.2);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (8, 'Animal Farm', 'George Orwell', 'Fiction', 1945, 10.99, 35, 4.5);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (9, 'Brave New World', 'Aldous Huxley', 'Science Fiction', 1932, 13.49, 28, 4.3);
+INSERT INTO books (book_id, title, author, genre, publication_year, price, stock_quantity, rating) VALUES (10, 'The Lord of the Rings', 'J.R.R. Tolkien', 'Fantasy', 1954, 25.99, 15, 4.9);
 ```
 
 </details>
@@ -236,15 +235,15 @@ ORDER BY genre;
 
 ###
 
-### Example 20: LIMIT with OFFSET (Pagination)
+### Example 20: Pagination with OFFSET and FETCH
 
 **SQL Statement:**
 ```sql
--- Page 1 (first 3 books)
+-- Page 1 (first 3 books) - Oracle 12c+ syntax
 SELECT title, price
 FROM books
 ORDER BY title
-LIMIT 3 OFFSET 0;
+OFFSET 0 ROWS FETCH FIRST 3 ROWS ONLY;
 ```
 
 **Result (Page 1):**
@@ -253,23 +252,37 @@ LIMIT 3 OFFSET 0;
 | 1984 | 13.99 |
 | Animal Farm | 10.99 |
 | Brave New World | 13.49 |
-<details>
-<summary>ANSI SQL Standard for Pagination</summary>
 
-While `LIMIT` and `OFFSET` are widely supported, the ANSI SQL standard (SQL:2008) provides the `OFFSET ... FETCH FIRST ...` clause, which is more portable:
+**Page 2 (next 3 books):**
+```sql
+SELECT title, price
+FROM books
+ORDER BY title
+OFFSET 3 ROWS FETCH FIRST 3 ROWS ONLY;
+```
+
+<details>
+<summary>Alternative: ROWNUM for Oracle 11g and earlier</summary>
+
+For Oracle versions before 12c, use ROWNUM with a subquery:
 
 ```sql
--- ANSI Standard equivalent of LIMIT 5 OFFSET 10
-SELECT title, author, rating
-FROM books
-ORDER BY rating DESC
-OFFSET 10 ROWS
-FETCH FIRST 5 ROWS ONLY;
+-- Get rows 4-6 (page 2, 3 rows per page)
+SELECT * FROM (
+    SELECT title, price, ROWNUM rnum
+    FROM (
+        SELECT title, price
+        FROM books
+        ORDER BY title
+    )
+    WHERE ROWNUM <= 6
+)
+WHERE rnum > 3;
 ```
 
 </details>
 
-## Combining WHERE, ORDER BY, and LIMIT
+## Combining WHERE, ORDER BY, and FETCH
 
 ### Example 21: Complex Query
 
@@ -281,7 +294,7 @@ WHERE genre IN ('Fiction', 'Science Fiction')
   AND rating >= 4.5
   AND price < 15.00
 ORDER BY rating DESC, price ASC
-LIMIT 3;
+FETCH FIRST 3 ROWS ONLY;
 ```
 
 **Result:**

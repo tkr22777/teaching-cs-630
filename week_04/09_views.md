@@ -20,20 +20,20 @@ A view is a virtual table based on a SELECT query. It doesn't store data itself 
 ```sql
 CREATE TABLE employees (
     employee_id INTEGER PRIMARY KEY,
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    email VARCHAR(100),
-    department VARCHAR(50),
-    salary NUMERIC(10, 2),
+    first_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    email VARCHAR2(100),
+    department VARCHAR2(50),
+    salary NUMBER(10, 2),
     hire_date DATE,
     manager_id INTEGER
 );
 
 CREATE TABLE departments (
     dept_id INTEGER PRIMARY KEY,
-    dept_name VARCHAR(50),
-    location VARCHAR(50),
-    budget NUMERIC(12, 2)
+    dept_name VARCHAR2(50),
+    location VARCHAR2(50),
+    budget NUMBER(12, 2)
 );
 
 INSERT INTO departments (dept_name, location, budget) VALUES

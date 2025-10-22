@@ -24,12 +24,12 @@ Indexes are database objects that improve query performance by allowing faster d
 ```sql
 CREATE TABLE products (
     product_id INTEGER PRIMARY KEY,  -- Automatically indexed
-    product_name VARCHAR(200),
-    category VARCHAR(50),
-    price NUMERIC(10, 2),
+    product_name VARCHAR2(200),
+    category VARCHAR2(50),
+    price NUMBER(10, 2),
     stock_quantity INTEGER,
     supplier_id INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT SYSTIMESTAMP
 );
 
 INSERT INTO products (product_name, category, price, stock_quantity, supplier_id) 
@@ -111,7 +111,7 @@ WHERE category = 'Electronics' AND price < 500;
 **SQL Statement:**
 ```sql
 -- Ensure email addresses are unique
-ALTER TABLE customers ADD COLUMN email VARCHAR(100);
+ALTER TABLE customers ADD email VARCHAR2(100);
 
 CREATE UNIQUE INDEX idx_customers_email_unique 
 ON customers (email);
