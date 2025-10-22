@@ -132,26 +132,26 @@ For all examples in this course module, we'll use a university enrollment system
 -- Create Students table
 CREATE TABLE students (
     student_id INTEGER PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    major VARCHAR(50),
-    enrollment_date DATE DEFAULT CURRENT_DATE
+    first_name VARCHAR2(50) NOT NULL,
+    last_name VARCHAR2(50) NOT NULL,
+    email VARCHAR2(100) UNIQUE NOT NULL,
+    major VARCHAR2(50),
+    enrollment_date DATE DEFAULT SYSDATE
 );
 
 -- Create Instructors table
 CREATE TABLE instructors (
     instructor_id INTEGER PRIMARY KEY,
-    instructor_name VARCHAR(100) NOT NULL,
-    department VARCHAR(50),
+    instructor_name VARCHAR2(100) NOT NULL,
+    department VARCHAR2(50),
     hire_date DATE
 );
 
 -- Create Courses table
 CREATE TABLE courses (
-    course_id VARCHAR(10) PRIMARY KEY,
-    course_name VARCHAR(100) NOT NULL,
-    department VARCHAR(50),
+    course_id VARCHAR2(10) PRIMARY KEY,
+    course_name VARCHAR2(100) NOT NULL,
+    department VARCHAR2(50),
     credits INTEGER,
     instructor_id INTEGER REFERENCES instructors(instructor_id)
 );
@@ -160,9 +160,9 @@ CREATE TABLE courses (
 CREATE TABLE enrollments (
     enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER REFERENCES students(student_id),
-    course_id VARCHAR(10) REFERENCES courses(course_id),
-    semester VARCHAR(20),
-    grade VARCHAR(5)
+    course_id VARCHAR2(10) REFERENCES courses(course_id),
+    semester VARCHAR2(20),
+    grade VARCHAR2(5)
 );
 
 -- Insert Students

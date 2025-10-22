@@ -41,10 +41,10 @@ Original Table:              Self Join (Conceptual):
 ```sql
 CREATE TABLE employees_org (
     employee_id INTEGER PRIMARY KEY,
-    employee_name VARCHAR(100),
-    position VARCHAR(50),
+    employee_name VARCHAR2(100),
+    position VARCHAR2(50),
     manager_id INTEGER,
-    salary NUMERIC(10, 2)
+    salary NUMBER(10, 2)
 );
 
 INSERT INTO employees_org (employee_id, employee_name, position, manager_id, salary) VALUES

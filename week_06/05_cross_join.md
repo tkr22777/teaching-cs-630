@@ -169,7 +169,7 @@ ORDER BY s.student_id, c.course_id;
 **Setup:**
 ```sql
 CREATE TABLE dates (date_value DATE);
-CREATE TABLE time_slots (slot_time TIME, slot_name VARCHAR(50));
+CREATE TABLE time_slots (slot_time TIMESTAMP, slot_name VARCHAR2(50));
 
 INSERT INTO dates VALUES 
     ('2024-10-21'), ('2024-10-22'), ('2024-10-23');
@@ -211,9 +211,9 @@ ORDER BY d.date_value, t.slot_time;
 
 **Setup:**
 ```sql
-CREATE TABLE products (product_id INTEGER PRIMARY KEY, product_name VARCHAR(50));
-CREATE TABLE sizes (size_code VARCHAR(5), size_name VARCHAR(20));
-CREATE TABLE colors (color_code VARCHAR(10), color_name VARCHAR(20));
+CREATE TABLE products (product_id INTEGER PRIMARY KEY, product_name VARCHAR2(50));
+CREATE TABLE sizes (size_code VARCHAR2(5), size_name VARCHAR2(20));
+CREATE TABLE colors (color_code VARCHAR2(10), color_name VARCHAR2(20));
 
 INSERT INTO products (product_name) VALUES ('T-Shirt'), ('Hoodie');
 INSERT INTO sizes VALUES ('S', 'Small'), ('M', 'Medium'), ('L', 'Large');
@@ -280,8 +280,8 @@ LIMIT 5;
 
 **Setup:**
 ```sql
-CREATE TABLE products_simple (product VARCHAR(50), base_price NUMERIC(10,2));
-CREATE TABLE discount_tiers (tier VARCHAR(20), discount_pct NUMERIC(5,2));
+CREATE TABLE products_simple (product VARCHAR2(50), base_price NUMBER(10,2));
+CREATE TABLE discount_tiers (tier VARCHAR2(20), discount_pct NUMBER(5,2));
 
 INSERT INTO products_simple VALUES 
     ('Laptop', 999.99),

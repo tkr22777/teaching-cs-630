@@ -22,12 +22,12 @@ A **composite join** uses multiple columns in the join condition. This is necess
 **Setup:**
 ```sql
 CREATE TABLE course_sections (
-    course_id VARCHAR(10),
-    semester VARCHAR(20),
+    course_id VARCHAR2(10),
+    semester VARCHAR2(20),
     year INTEGER,
-    section VARCHAR(5),
+    section VARCHAR2(5),
     instructor_id INTEGER,
-    room VARCHAR(20),
+    room VARCHAR2(20),
     max_students INTEGER,
     PRIMARY KEY (course_id, semester, year, section)
 );
@@ -35,11 +35,11 @@ CREATE TABLE course_sections (
 CREATE TABLE section_enrollments (
     enrollment_id INTEGER PRIMARY KEY,
     student_id INTEGER,
-    course_id VARCHAR(10),
-    semester VARCHAR(20),
+    course_id VARCHAR2(10),
+    semester VARCHAR2(20),
     year INTEGER,
-    section VARCHAR(5),
-    grade VARCHAR(5)
+    section VARCHAR2(5),
+    grade VARCHAR2(5)
 );
 
 INSERT INTO course_sections VALUES
