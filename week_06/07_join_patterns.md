@@ -105,7 +105,7 @@ SELECT s.student_id,
        s.first_name || ' ' || s.last_name AS student_name,
        s.major,
        COUNT(e.enrollment_id) AS course_count,
-       STRING_AGG(c.course_name, ', ' ORDER BY c.course_name) AS courses,
+       LISTAGG(c.course_name, ', ') WITHIN GROUP (ORDER BY c.course_name) AS courses,
        ROUND(AVG(
            CASE e.grade
                WHEN 'A' THEN 4.0
@@ -134,7 +134,7 @@ ORDER BY gpa DESC NULLS LAST;
 **Explanation:**
 - LEFT JOIN preserves all students
 - Aggregates detail records (enrollments)
-- STRING_AGG creates comma-separated list
+- LISTAGG creates comma-separated list
 - Calculates GPA from grades
 
 ### Pattern 2: Many-to-Many Through Junction Table

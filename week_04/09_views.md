@@ -488,10 +488,10 @@ FROM customers;
 
 **SQL Statement:**
 ```sql
-SELECT table_name, view_definition
-FROM information_schema.views
-WHERE table_schema = 'public'
-ORDER BY table_name;
+-- Oracle: Query all views in current schema
+SELECT view_name, text_length
+FROM user_views
+ORDER BY view_name;
 ```
 
 ### Example 18: Get Specific View Definition

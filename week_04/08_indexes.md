@@ -260,7 +260,7 @@ JOIN customers c ON o.customer_id = c.customer_id;
 CREATE INDEX idx_products_created_at ON products (created_at);
 
 -- Benefits this query:
-SELECT * FROM products ORDER BY created_at DESC LIMIT 10;
+SELECT * FROM products ORDER BY created_at DESC FETCH FIRST 10 ROWS ONLY;
 ```
 
 4. **Columns with high selectivity**

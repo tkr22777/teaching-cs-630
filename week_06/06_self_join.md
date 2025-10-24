@@ -106,7 +106,7 @@ ORDER BY e.employee_id;
 SELECT m.employee_name AS manager,
        m.position AS manager_position,
        COUNT(e.employee_id) AS direct_reports,
-       STRING_AGG(e.employee_name, ', ' ORDER BY e.employee_name) AS report_names
+       LISTAGG(e.employee_name, ', ') WITHIN GROUP (ORDER BY e.employee_name) AS report_names
 FROM employees_org m
 LEFT JOIN employees_org e ON m.employee_id = e.manager_id
 GROUP BY m.employee_id, m.employee_name, m.position

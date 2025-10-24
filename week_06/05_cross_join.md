@@ -53,7 +53,7 @@ SELECT s.student_id,
 FROM students s
 CROSS JOIN courses c
 ORDER BY s.student_id, c.course_id
-LIMIT 10;
+FETCH FIRST 10 ROWS ONLY;
 ```
 
 **Result (First 10 rows of 30 total):**
@@ -262,7 +262,7 @@ WHERE s.major = c.department;
 -- Check results
 SELECT * FROM test_enrollments
 ORDER BY student_id, course_id
-LIMIT 5;
+FETCH FIRST 5 ROWS ONLY;
 ```
 
 **Result:**
