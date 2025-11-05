@@ -2,26 +2,22 @@
 
 ## Overview
 
-A **correlated subquery** is a subquery that references columns from the outer query. Unlike non-correlated subqueries that execute once, correlated subqueries execute once for each row processed by the outer query, making them more computationally intensive but enabling powerful row-by-row comparisons.
+A **correlated subquery** references columns from the outer query and executes once for each row processed by the outer query. This enables powerful row-by-row comparisons but is more computationally intensive than non-correlated subqueries.
 
 ## Key Terms
 
-**Correlated Subquery**: A subquery that references one or more columns from the outer query and executes repeatedly for each outer row.
-
-**Non-Correlated Subquery**: An independent subquery that executes once and returns results to the outer query.
-
-**Correlation**: The relationship between the inner and outer queries through shared column references.
+**Correlated Subquery**: A subquery that references columns from the outer query and executes repeatedly for each outer row.
 
 **Row-by-Row Processing**: The execution pattern where the subquery runs once for each row in the outer query.
 
-**Table Alias**: A required shorthand name for tables in correlated subqueries to distinguish between inner and outer references.
+**Table Alias**: Required shorthand name for tables to distinguish between inner and outer references.
 
 ## Sample Database Schema
 
 This module uses the university enrollment system. If you haven't set it up yet:
 
 <details>
-<summary>Click to expand: Database setup script</summary>
+<parameter name="summary">Click to expand: Database setup script</summary>
 
 ```sql
 -- Create Students table
@@ -121,84 +117,67 @@ COMMIT;
 
 </details>
 
-## Characteristics of Correlated Subqueries
+## Key Characteristics
 
-### Key Features
+**Correlated subqueries:**
+1. Reference outer query columns
+2. Execute once per outer row
+3. Require table aliases
+4. Enable row-specific comparisons
+5. Generally slower than non-correlated subqueries
 
-1. **References outer query columns** - Uses columns from the parent query in the WHERE clause
-2. **Executes repeatedly** - Runs once for each row in the outer query
-3. **Requires table aliases** - Must distinguish between inner and outer table references
-4. **Row-dependent results** - Each execution can return different results based on the current outer row
-5. **More processing** - Generally slower than non-correlated subqueries
-
-### Execution Flow
-
+**Execution Flow:**
 ```sql
-SELECT outer.column1, outer.column2
+SELECT outer.column
 FROM table1 outer
-WHERE outer.column3 = (
-    SELECT inner.column_x
+WHERE outer.value = (
+    SELECT inner.value
     FROM table2 inner
-    WHERE inner.column_y = outer.column_z  -- Correlation point
+    WHERE inner.id = outer.id  -- Correlation
 );
 ```
 
-**Execution Steps:**
+**Steps:**
 1. Outer query reads first row
-2. Inner query executes with values from that row
-3. Result used to evaluate WHERE condition
-4. Process repeats for each outer row
+2. Inner query executes with that row's values
+3. Result evaluates WHERE condition
+4. Repeat for each outer row
 
-## Correlated vs. Non-Correlated Subqueries
+## Correlated vs. Non-Correlated
 
-### Non-Correlated Example
+| Aspect | Non-Correlated | Correlated |
+|--------|----------------|------------|
+| **Execution** | Once | Once per outer row |
+| **References** | No outer columns | References outer columns |
+| **Performance** | Faster | Slower |
+| **Use Case** | Global comparisons | Row-specific comparisons |
 
+**Non-Correlated Example:**
 ```sql
--- Executes subquery ONCE
+-- Executes once
 SELECT first_name, last_name, gpa
 FROM students
 WHERE gpa > (SELECT AVG(gpa) FROM students);
 ```
 
-**Execution:** 
-1. Calculate average GPA once: 3.48
-2. Find all students where gpa > 3.48
-
-### Correlated Example
-
+**Correlated Example:**
 ```sql
--- Executes subquery ONCE PER STUDENT
+-- Executes once per student
 SELECT s.first_name, s.last_name, s.major, s.gpa
 FROM students s
 WHERE s.gpa > (
     SELECT AVG(s2.gpa)
     FROM students s2
-    WHERE s2.major = s.major  -- Correlation: references outer query
-);
+    WHERE s2.major = s.major  -- Correlation
+)
+AND s.major IS NOT NULL;
 ```
 
-**Execution:**
-1. For John (CS major): Calculate AVG(gpa) for CS majors → Compare John's GPA
-2. For Jane (Math major): Calculate AVG(gpa) for Math majors → Compare Jane's GPA
-3. Repeat for each student
-
-**Result:** Students performing above their own major's average.
-
-### Comparison Table
-
-| Aspect | Non-Correlated | Correlated |
-|--------|----------------|------------|
-| **Independence** | Independent of outer query | Depends on outer query |
-| **Execution** | Once | Once per outer row |
-| **References** | No outer table references | References outer columns |
-| **Performance** | Generally faster | Generally slower |
-| **Use Case** | Global comparisons | Row-specific comparisons |
-
-## Common Patterns with Correlated Subqueries
+## Common Patterns
 
 ### Pattern 1: Above-Average Within Group
 
-**Query: Find students with GPA above their major's average**
+**Find students with GPA above their major's average:**
 
 ```sql
 SELECT s.first_name, s.last_name, s.major, s.gpa,
@@ -220,35 +199,36 @@ ORDER BY s.major, s.gpa DESC;
 |------------|-----------|-------|-----|-----------|
 | John | Smith | Computer Science | 3.8 | 3.5 |
 
-**Explanation:** Only John's GPA (3.8) is above his major's average (3.5). Jane's GPA equals the Mathematics average (3.9 = 3.9), and Alice's equals the Physics average (3.7 = 3.7), so they are not included since the query uses greater than (>), not greater than or equal to (>=).
+Only John's GPA (3.8) exceeds his major's average (3.5).
 
-### Pattern 2: Ranking Within Categories
+### Pattern 2: Count Related Records
 
-**Query: Find the highest-enrolled course in each department**
+**Show each course with its enrollment count:**
 
 ```sql
-SELECT c.course_id, c.course_name, c.department,
-       (SELECT COUNT(*)
-        FROM enrollments e
-        WHERE e.course_id = c.course_id) AS enrollment_count
+SELECT 
+    c.course_id,
+    c.course_name,
+    (SELECT COUNT(*)
+     FROM enrollments e
+     WHERE e.course_id = c.course_id) AS enrollment_count
 FROM courses c
-WHERE (SELECT COUNT(*)
-       FROM enrollments e
-       WHERE e.course_id = c.course_id) = (
-           SELECT MAX(course_enrollment)
-           FROM (
-               SELECT COUNT(*) AS course_enrollment
-               FROM enrollments e2
-               JOIN courses c2 ON e2.course_id = c2.course_id
-               WHERE c2.department = c.department
-               GROUP BY e2.course_id
-           )
-       );
+ORDER BY enrollment_count DESC;
 ```
+
+**Result:**
+| course_id | course_name | enrollment_count |
+|-----------|-------------|------------------|
+| CS101 | Introduction to Programming | 3 |
+| CS201 | Data Structures | 2 |
+| CS301 | Database Systems | 1 |
+| MATH101 | Calculus I | 1 |
+| PHYS101 | Physics I | 1 |
+| ENG101 | English Composition | 0 |
 
 ### Pattern 3: Latest/Most Recent Record
 
-**Query: Find each student's most recent enrollment**
+**Find each student's most recent enrollment:**
 
 ```sql
 SELECT s.first_name, s.last_name, e.course_id, e.semester
@@ -269,39 +249,9 @@ WHERE e.enrollment_id = (
 | Bob | Wilson | CS201 | Spring 2024 |
 | Alice | Brown | PHYS101 | Spring 2024 |
 
-## Correlated Subqueries in SELECT Clause
+## Using in Different Clauses
 
-Correlated subqueries in the SELECT clause create calculated columns based on related data.
-
-### Example 1: Count Related Records
-
-**Query: Show each course with its enrollment count**
-
-```sql
-SELECT 
-    c.course_id,
-    c.course_name,
-    c.credits,
-    (SELECT COUNT(*)
-     FROM enrollments e
-     WHERE e.course_id = c.course_id) AS enrollment_count
-FROM courses c
-ORDER BY enrollment_count DESC;
-```
-
-**Result:**
-| course_id | course_name | credits | enrollment_count |
-|-----------|-------------|---------|------------------|
-| CS101 | Introduction to Programming | 3 | 3 |
-| CS201 | Data Structures | 4 | 2 |
-| CS301 | Database Systems | 3 | 1 |
-| MATH101 | Calculus I | 4 | 1 |
-| PHYS101 | Physics I | 4 | 1 |
-| ENG101 | English Composition | 3 | 0 |
-
-### Example 2: Calculate Running Totals
-
-**Query: Show cumulative enrollments for each student**
+### In SELECT Clause (Calculated Columns)
 
 ```sql
 SELECT 
@@ -309,96 +259,27 @@ SELECT
     s.last_name,
     (SELECT COUNT(*)
      FROM enrollments e
-     WHERE e.student_id = s.student_id) AS total_enrollments,
-    (SELECT COUNT(*)
-     FROM enrollments e
-     WHERE e.student_id = s.student_id
-     AND e.grade IS NOT NULL) AS completed_courses
-FROM students s
-ORDER BY total_enrollments DESC;
-```
-
-### Example 3: Retrieve Related Single Value
-
-**Query: Show each student with their best grade**
-
-```sql
-SELECT 
-    s.first_name,
-    s.last_name,
-    (SELECT MAX(e.grade)
-     FROM enrollments e
-     WHERE e.student_id = s.student_id) AS best_grade,
+     WHERE e.student_id = s.student_id) AS course_count,
     (SELECT AVG(e.grade_points)
      FROM enrollments e
-     WHERE e.student_id = s.student_id
-     AND e.grade_points IS NOT NULL) AS avg_grade_points
+     WHERE e.student_id = s.student_id) AS avg_grade
 FROM students s;
 ```
 
-## Correlated Subqueries in WHERE Clause
-
-### Example 1: Comparison Within Same Table
-
-**Query: Find students with above-average GPA in their major**
+### In WHERE Clause (Row Filtering)
 
 ```sql
-SELECT s1.first_name, s1.last_name, s1.major, s1.gpa
-FROM students s1
-WHERE s1.gpa > (
+SELECT s.first_name, s.last_name, s.major, s.gpa
+FROM students s
+WHERE s.gpa > (
     SELECT AVG(s2.gpa)
     FROM students s2
-    WHERE s2.major = s1.major
-    AND s2.gpa IS NOT NULL
+    WHERE s2.major = s.major AND s2.gpa IS NOT NULL
 )
-AND s1.major IS NOT NULL;
+AND s.major IS NOT NULL;
 ```
 
-### Example 2: Comparing Across Tables
-
-**Query: Find courses with more enrollments than their department's average**
-
-```sql
-SELECT c.course_id, c.course_name, c.department
-FROM courses c
-WHERE (SELECT COUNT(*)
-       FROM enrollments e
-       WHERE e.course_id = c.course_id) > (
-           SELECT AVG(dept_avg)
-           FROM (
-               SELECT c2.course_id, COUNT(*) AS dept_avg
-               FROM courses c2
-               LEFT JOIN enrollments e2 ON c2.course_id = e2.course_id
-               WHERE c2.department = c.department
-               GROUP BY c2.course_id
-           )
-       );
-```
-
-### Example 3: Conditional Filtering
-
-**Query: Find students who have taken more courses than Jane Doe**
-
-```sql
-SELECT s.first_name, s.last_name,
-       (SELECT COUNT(*) 
-        FROM enrollments e 
-        WHERE e.student_id = s.student_id) AS course_count
-FROM students s
-WHERE (SELECT COUNT(*) 
-       FROM enrollments e 
-       WHERE e.student_id = s.student_id) > (
-           SELECT COUNT(*)
-           FROM enrollments e2
-           JOIN students s2 ON e2.student_id = s2.student_id
-           WHERE s2.first_name = 'Jane' AND s2.last_name = 'Doe'
-       )
-ORDER BY course_count DESC;
-```
-
-## Correlated Subqueries in HAVING Clause
-
-**Query: Find majors where the average GPA is higher than the overall average**
+### In HAVING Clause (Group Filtering)
 
 ```sql
 SELECT s.major, AVG(s.gpa) AS major_avg_gpa
@@ -419,239 +300,100 @@ HAVING AVG(s.gpa) > (
 | Physics | 3.7 |
 | Computer Science | 3.5 |
 
-## Advanced Correlated Subquery Patterns
-
-### Pattern 1: Finding Gaps or Missing Values
-
-**Query: Find students who haven't taken CS101 but have taken other CS courses**
-
-```sql
-SELECT DISTINCT s.first_name, s.last_name
-FROM students s
-WHERE EXISTS (
-    SELECT 1
-    FROM enrollments e
-    JOIN courses c ON e.course_id = c.course_id
-    WHERE e.student_id = s.student_id
-    AND c.department = 'Computer Science'
-)
-AND NOT EXISTS (
-    SELECT 1
-    FROM enrollments e
-    WHERE e.student_id = s.student_id
-    AND e.course_id = 'CS101'
-);
-```
-
-### Pattern 2: Self-Comparison
-
-**Query: Find students with identical GPAs**
-
-```sql
-SELECT DISTINCT s1.first_name, s1.last_name, s1.gpa
-FROM students s1
-WHERE EXISTS (
-    SELECT 1
-    FROM students s2
-    WHERE s2.gpa = s1.gpa
-    AND s2.student_id != s1.student_id
-)
-ORDER BY s1.gpa;
-```
-
-### Pattern 3: Hierarchical Data
-
-**Query: Find instructors who teach more courses than their department average**
-
-```sql
-SELECT i.instructor_name, i.department,
-       (SELECT COUNT(*)
-        FROM courses c
-        WHERE c.instructor_id = i.instructor_id) AS courses_taught
-FROM instructors i
-WHERE (SELECT COUNT(*)
-       FROM courses c
-       WHERE c.instructor_id = i.instructor_id) > (
-           SELECT AVG(course_count)
-           FROM (
-               SELECT i2.instructor_id, COUNT(*) AS course_count
-               FROM instructors i2
-               LEFT JOIN courses c2 ON i2.instructor_id = c2.instructor_id
-               WHERE i2.department = i.department
-               GROUP BY i2.instructor_id
-           )
-       );
-```
-
 ## Performance Considerations
 
-### Understanding Performance Impact
+**Why correlated subqueries can be slow:**
+- Execute once per outer row
+- No result caching between executions
+- Performance depends heavily on indexes
 
-Correlated subqueries can be expensive because:
-1. **Multiple executions** - Run once per outer row
-2. **No result caching** - Each execution is independent
-3. **Index dependency** - Performance heavily depends on indexes on correlated columns
+**Optimization strategies:**
 
-### Example Performance Analysis
-
-```sql
--- Correlated subquery (potentially slower)
-SELECT s.first_name, s.last_name
-FROM students s
-WHERE (SELECT COUNT(*) 
-       FROM enrollments e 
-       WHERE e.student_id = s.student_id) > 2;
-
--- Equivalent JOIN (potentially faster)
-SELECT s.first_name, s.last_name
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-GROUP BY s.student_id, s.first_name, s.last_name
-HAVING COUNT(*) > 2;
-```
-
-### Optimization Strategies
-
-**1. Add Indexes on Correlated Columns**
+**1. Add indexes on correlated columns**
 ```sql
 CREATE INDEX idx_enrollments_student ON enrollments(student_id);
 ```
 
-**2. Consider Analytic Functions**
+**2. Use JOINs when appropriate**
 ```sql
--- Instead of correlated subquery
-SELECT first_name, last_name, gpa,
-       AVG(gpa) OVER (PARTITION BY major) AS major_avg
-FROM students;
-```
+-- Correlated subquery
+SELECT s.first_name, 
+       (SELECT COUNT(*) FROM enrollments e WHERE e.student_id = s.student_id)
+FROM students s;
 
-**3. Use JOINs When Possible**
-```sql
--- Instead of subquery in SELECT
-SELECT s.first_name, COUNT(e.enrollment_id) AS enrollment_count
+-- JOIN alternative (often faster)
+SELECT s.first_name, COUNT(e.enrollment_id)
 FROM students s
 LEFT JOIN enrollments e ON s.student_id = e.student_id
 GROUP BY s.student_id, s.first_name;
 ```
 
-**4. Materialize Intermediate Results**
+**3. Consider analytic functions**
 ```sql
--- Create temporary table for repeated calculations
-CREATE TEMPORARY TABLE major_averages AS
-SELECT major, AVG(gpa) AS avg_gpa
-FROM students
-GROUP BY major;
-
--- Use the materialized results
-SELECT s.first_name, s.last_name
-FROM students s
-JOIN major_averages ma ON s.major = ma.major
-WHERE s.gpa > ma.avg_gpa;
+-- Instead of correlated subquery for group averages
+SELECT first_name, last_name, gpa,
+       AVG(gpa) OVER (PARTITION BY major) AS major_avg
+FROM students;
 ```
 
-## Common Mistakes and Solutions
+## Common Mistakes
 
-### Mistake 1: Missing Table Aliases
-
-**Problem:**
+**Mistake 1: Missing table aliases**
 ```sql
--- ERROR: ambiguous column reference
-SELECT first_name, last_name
-FROM students
-WHERE gpa > (SELECT AVG(gpa) FROM students WHERE major = major);
+-- ERROR: Which table's major?
+WHERE gpa > (SELECT AVG(gpa) FROM students WHERE major = major)
+
+-- Correct
+WHERE s1.gpa > (SELECT AVG(s2.gpa) FROM students s2 WHERE s2.major = s1.major)
 ```
 
-**Solution:**
+**Mistake 2: Forgetting NULL handling**
 ```sql
-SELECT s1.first_name, s1.last_name
-FROM students s1
-WHERE s1.gpa > (
-    SELECT AVG(s2.gpa) 
-    FROM students s2 
-    WHERE s2.major = s1.major
-);
+-- May fail with NULLs
+WHERE s.major IS NOT NULL
+AND gpa > (SELECT AVG(gpa) FROM students s2 WHERE s2.major = s.major AND gpa IS NOT NULL)
 ```
 
-### Mistake 2: Forgetting NULL Handling
-
-**Problem:**
+**Mistake 3: Repeating identical subqueries**
 ```sql
--- May not work correctly with NULL majors
-SELECT first_name FROM students s1
-WHERE gpa > (SELECT AVG(gpa) FROM students s2 WHERE s2.major = s1.major);
-```
-
-**Solution:**
-```sql
-SELECT first_name FROM students s1
-WHERE s1.major IS NOT NULL
-AND gpa > (
-    SELECT AVG(gpa) 
-    FROM students s2 
-    WHERE s2.major = s1.major 
-    AND s2.gpa IS NOT NULL
-);
-```
-
-### Mistake 3: Inefficient Repeated Subqueries
-
-**Problem:**
-```sql
--- Same subquery executed twice per row
-SELECT first_name,
-       (SELECT COUNT(*) FROM enrollments e WHERE e.student_id = s.student_id),
-       (SELECT COUNT(*) FROM enrollments e WHERE e.student_id = s.student_id) * 2
+-- Inefficient: same subquery twice
+SELECT (SELECT COUNT(*) FROM enrollments e WHERE e.student_id = s.student_id) AS cnt1,
+       (SELECT COUNT(*) FROM enrollments e WHERE e.student_id = s.student_id) AS cnt2
 FROM students s;
-```
 
-**Solution:**
-```sql
--- Use JOIN or WITH clause to calculate once
-WITH enrollment_counts AS (
-    SELECT student_id, COUNT(*) AS cnt
-    FROM enrollments
-    GROUP BY student_id
+-- Better: use WITH clause
+WITH counts AS (
+    SELECT student_id, COUNT(*) AS cnt FROM enrollments GROUP BY student_id
 )
-SELECT s.first_name, ec.cnt, ec.cnt * 2
-FROM students s
-LEFT JOIN enrollment_counts ec ON s.student_id = ec.student_id;
+SELECT c.cnt AS cnt1, c.cnt AS cnt2
+FROM students s LEFT JOIN counts c ON s.student_id = c.student_id;
 ```
 
 ## When to Use Correlated Subqueries
 
-### Good Use Cases
+**Good use cases:**
+- Row-specific comparisons (e.g., above own group average)
+- Calculated columns in SELECT
+- Existence checks with EXISTS
+- Complex row-level filtering
 
-1. **Row-specific comparisons** - Comparing each row to its own group average
-2. **Existence checks** - Testing if related records exist (use EXISTS)
-3. **Calculated columns** - Adding computed values to result sets
-4. **Complex filtering** - Conditions based on related table aggregates
-
-### When to Consider Alternatives
-
-1. **Simple aggregates** - Use non-correlated subquery if comparison is global
-2. **Multiple columns from related table** - Use JOIN instead
-3. **Performance critical queries** - Consider JOINs or analytic functions
-4. **Large datasets** - Optimize with indexes or rewrite using JOINs
+**Consider alternatives when:**
+- Query performance is critical
+- Simple global comparisons (use non-correlated)
+- Need multiple columns from related table (use JOIN)
+- Working with large datasets (optimize with indexes or JOINs)
 
 ## Summary
 
-**Key Takeaways:**
+**Key Points:**
 
-1. **Correlated subqueries reference outer query columns** and execute once for each row processed by the outer query.
+1. **Correlated subqueries reference outer query columns** and execute once per outer row
+2. **Require table aliases** to distinguish inner/outer references (s1, s2)
+3. **Enable row-specific comparisons** like "above own group average"
+4. **Can appear in any clause**: SELECT, WHERE, HAVING
+5. **Performance**: Slower than non-correlated; add indexes on correlated columns
+6. **Common patterns**: Group comparisons, counting related records, finding latest records
+7. **Alternatives**: JOINs, analytic functions, materialized intermediate results
+8. **Best practices**: Use aliases, handle NULLs, avoid repeating identical subqueries
 
-2. **Require table aliases** to distinguish between inner and outer table references (e.g., students s1 vs. students s2).
-
-3. **Execute repeatedly** making them potentially slower than non-correlated subqueries, but enabling row-specific comparisons.
-
-4. **Common patterns include**: comparing to group averages, finding latest/most recent records, calculating per-row aggregates, and ranking within categories.
-
-5. **Can appear in any clause**: SELECT (calculated columns), WHERE (row filtering), HAVING (group filtering), FROM (inline views).
-
-6. **Performance optimization**: Add indexes on correlated columns, consider JOINs or analytic functions, materialize intermediate results when possible.
-
-7. **Best practices**: Always use table aliases, handle NULLs explicitly, avoid repeating identical subqueries, and choose based on readability vs. performance needs.
-
-8. **Use when**: Row-by-row comparison is needed, testing existence with EXISTS, or when logic is clearer with nested structure.
-
-Correlated subqueries provide powerful capabilities for row-specific analysis but should be used judiciously with attention to performance implications.
-
+Correlated subqueries provide powerful row-level analysis but should be used with attention to performance.

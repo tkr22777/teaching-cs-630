@@ -2,19 +2,17 @@
 
 ## Overview
 
-A **multiple-row subquery** returns zero or more rows (typically with one column). These subqueries cannot be used with simple comparison operators (=, >, <) and instead require special operators: IN, ANY, ALL, or EXISTS.
+A **multiple-row subquery** returns zero or more rows. These require special operators: IN, NOT IN, ANY, or ALL (EXISTS covered separately).
 
 ## Key Terms
 
-**Multiple-Row Subquery**: A subquery that returns zero, one, or more rows.
+**Multiple-Row Subquery**: A subquery returning zero, one, or more rows.
 
-**IN Operator**: Tests whether a value matches any value in a list.
+**IN Operator**: Tests if a value matches any value in a list.
 
-**ANY Operator**: Compares a value to each value returned by the subquery; returns TRUE if any comparison is true.
+**ANY Operator**: Compares a value to each subquery value; TRUE if any comparison is true.
 
-**ALL Operator**: Compares a value to each value returned by the subquery; returns TRUE only if all comparisons are true.
-
-**List Subquery**: A subquery that returns a single column with multiple rows, creating a list of values.
+**ALL Operator**: Compares a value to each subquery value; TRUE only if all comparisons are true.
 
 ## Sample Database Schema
 
@@ -123,30 +121,29 @@ COMMIT;
 
 ## Multiple-Row Operators
 
-### Comparison Table
+| Operator | Description | Example |
+|----------|-------------|---------|
+| **IN** | Matches any value in list | `WHERE id IN (1, 2, 3)` |
+| **NOT IN** | Does not match any value | `WHERE id NOT IN (4, 5)` |
+| **ANY** | Compare to any value (>, <, =, etc.) | `WHERE salary > ANY (...)` |
+| **ALL** | Compare to all values (all must match) | `WHERE salary > ALL (...)` |
 
-| Operator | Description | Equivalent | Example |
-|----------|-------------|------------|---------|
-| **IN** | Equal to any value in list | = ANY | `WHERE id IN (1, 2, 3)` |
-| **NOT IN** | Not equal to any value in list | != ALL | `WHERE id NOT IN (4, 5)` |
-| **ANY** | Compare to any value (with >, <, =, etc.) | At least one match | `WHERE salary > ANY (...)` |
-| **ALL** | Compare to all values (with >, <, =, etc.) | All must match | `WHERE salary > ALL (...)` |
-| **EXISTS** | TRUE if subquery returns rows | N/A | `WHERE EXISTS (SELECT ...)` |
-| **NOT EXISTS** | TRUE if subquery returns no rows | N/A | `WHERE NOT EXISTS (...)` |
+**Quick Reference:**
+- `= ANY` is same as `IN`
+- `!= ALL` is same as `NOT IN`
+- `> ANY` means "greater than minimum"
+- `> ALL` means "greater than maximum"
 
 ## IN Operator
 
-The **IN** operator checks if a value matches any value in a list of values returned by the subquery.
+Tests if a value matches any value in the subquery result.
 
-### Syntax
-
+**Syntax:**
 ```sql
 WHERE column IN (subquery)
 ```
 
-### Example 1: Basic IN Subquery
-
-**Query: Find all students enrolled in Computer Science courses**
+**Example: Find students enrolled in Computer Science courses**
 
 ```sql
 SELECT first_name, last_name, major
@@ -159,10 +156,6 @@ WHERE student_id IN (
 );
 ```
 
-**Execution:**
-1. Inner query returns: `(1, 2, 3)` - student IDs enrolled in CS courses
-2. Outer query finds: students where student_id is 1, 2, or 3
-
 **Result:**
 | first_name | last_name | major |
 |------------|-----------|-------|
@@ -170,150 +163,77 @@ WHERE student_id IN (
 | Jane | Doe | Mathematics |
 | Bob | Wilson | Computer Science |
 
-### Example 2: IN with Aggregate Filter
-
-**Query: Find courses taught by instructors in the Computer Science department**
-
-```sql
-SELECT course_id, course_name, instructor_id
-FROM courses
-WHERE instructor_id IN (
-    SELECT instructor_id
-    FROM instructors
-    WHERE department = 'Computer Science'
-);
-```
-
-### Example 3: Hardcoded List vs. Subquery
-
-**Hardcoded:**
-```sql
-SELECT first_name, last_name
-FROM students
-WHERE student_id IN (1, 2, 3);
-```
-
-**Dynamic (with subquery):**
-```sql
-SELECT first_name, last_name
-FROM students
-WHERE student_id IN (
-    SELECT student_id 
-    FROM enrollments 
-    WHERE grade = 'A'
-);
-```
-
-**Advantage:** The subquery version adapts automatically as data changes.
+**How it works:**
+1. Inner query returns student IDs: `(1, 2, 3)`
+2. Outer query finds students where `student_id` matches any of these values
 
 ## NOT IN Operator
 
-The **NOT IN** operator checks if a value does NOT match any value in the list.
+Tests if a value does NOT match any value in the list.
 
-### Syntax
-
+**Syntax:**
 ```sql
 WHERE column NOT IN (subquery)
 ```
 
-### Example 1: Finding Unmatched Records
+**Example: Find students who have NOT enrolled in any courses**
 
-**Query: Find students who have NOT enrolled in any courses**
-
-```sql
-SELECT first_name, last_name, enrollment_date
-FROM students
-WHERE student_id NOT IN (
-    SELECT DISTINCT student_id 
-    FROM enrollments
-);
-```
-
-**Result:**
-| first_name | last_name | enrollment_date |
-|------------|-----------|-----------------|
-| Charlie | Davis | 2024-09-01 |
-
-### Example 2: Exclusion Filter
-
-**Query: Find courses not taught by Dr. Johnson**
-
-```sql
-SELECT course_id, course_name, instructor_id
-FROM courses
-WHERE instructor_id NOT IN (
-    SELECT instructor_id
-    FROM instructors
-    WHERE instructor_name = 'Dr. Johnson'
-)
-OR instructor_id IS NULL;
-```
-
-**Important:** Note the `OR instructor_id IS NULL` - this is critical! (See NULL handling section below)
-
-### NOT IN and NULL - A Critical Issue
-
-**Problem:**
-```sql
--- May return NO rows if subquery contains NULL
-SELECT first_name, last_name
-FROM students
-WHERE student_id NOT IN (1, 2, NULL);
-```
-
-**Why:** 
-- `NOT IN (1, 2, NULL)` becomes: `!= 1 AND != 2 AND != NULL`
-- Anything compared to NULL returns NULL (not TRUE or FALSE)
-- The entire WHERE condition evaluates to NULL, which is treated as FALSE
-
-**Solution 1: Filter NULLs in subquery**
 ```sql
 SELECT first_name, last_name
 FROM students
 WHERE student_id NOT IN (
     SELECT student_id 
     FROM enrollments
-    WHERE student_id IS NOT NULL
+    WHERE student_id IS NOT NULL  -- Important!
 );
 ```
 
-**Solution 2: Use NOT EXISTS (preferred)**
+**Result:**
+| first_name | last_name |
+|------------|-----------|
+| Charlie | Davis |
+
+### Critical: NOT IN and NULL Values
+
+**Problem:** If the subquery returns any NULL, `NOT IN` may return no rows!
+
 ```sql
-SELECT first_name, last_name
-FROM students s
+-- This can fail if subquery has NULL
+WHERE id NOT IN (SELECT id FROM table)
+```
+
+**Why:** `NOT IN (1, 2, NULL)` becomes `!= 1 AND != 2 AND != NULL`. Comparing to NULL returns NULL (not TRUE/FALSE), making the entire condition NULL, which is treated as FALSE.
+
+**Solutions:**
+
+```sql
+-- Solution 1: Filter out NULLs
+WHERE id NOT IN (SELECT id FROM table WHERE id IS NOT NULL)
+
+-- Solution 2: Use NOT EXISTS (preferred)
 WHERE NOT EXISTS (
-    SELECT 1
-    FROM enrollments e
-    WHERE e.student_id = s.student_id
-);
+    SELECT 1 FROM table t WHERE t.id = outer.id
+)
 ```
 
 ## ANY Operator
 
-The **ANY** operator compares a value to each value returned by the subquery using a comparison operator. Returns TRUE if ANY comparison is true.
+Compares a value to each subquery result. Returns TRUE if ANY comparison is true.
 
-### Syntax
-
+**Syntax:**
 ```sql
 WHERE column operator ANY (subquery)
+-- operator can be: =, !=, >, <, >=, <=
 ```
 
-Where operator is: =, !=, >, <, >=, <=
+**Meaning:**
+| Expression | Equivalent |
+|------------|------------|
+| `> ANY (100, 200, 300)` | `> 100` (greater than minimum) |
+| `< ANY (100, 200, 300)` | `< 300` (less than maximum) |
+| `= ANY (100, 200, 300)` | Same as `IN` |
 
-### Operator Meanings
-
-| Expression | Meaning |
-|------------|---------|
-| `= ANY` | Same as IN |
-| `!= ANY` | Not equal to at least one value |
-| `> ANY` | Greater than the minimum value |
-| `< ANY` | Less than the maximum value |
-| `>= ANY` | Greater than or equal to the minimum |
-| `<= ANY` | Less than or equal to the maximum |
-
-### Example 1: Greater Than ANY (> ANY)
-
-**Query: Find students with GPA higher than any Computer Science major**
+**Example: Find students with GPA higher than any CS major**
 
 ```sql
 SELECT first_name, last_name, major, gpa
@@ -321,16 +241,15 @@ FROM students
 WHERE gpa > ANY (
     SELECT gpa
     FROM students
-    WHERE major = 'Computer Science'
-    AND gpa IS NOT NULL
+    WHERE major = 'Computer Science' AND gpa IS NOT NULL
 )
 AND major != 'Computer Science';
 ```
 
 **Logic:**
-- Subquery returns: `(3.8, 3.2)` - GPAs of CS majors
-- `> ANY (3.8, 3.2)` means `> 3.2` (greater than minimum)
-- Returns students with GPA > 3.2 who are not CS majors
+- Subquery returns: `(3.8, 3.2)`
+- `> ANY (3.8, 3.2)` means `> 3.2`
+- Returns non-CS students with GPA > 3.2
 
 **Result:**
 | first_name | last_name | major | gpa |
@@ -338,63 +257,23 @@ AND major != 'Computer Science';
 | Jane | Doe | Mathematics | 3.9 |
 | Alice | Brown | Physics | 3.7 |
 
-### Example 2: Equals ANY (= ANY)
-
-**Query: Find students in the same department as course instructors**
-
-```sql
-SELECT first_name, last_name, major
-FROM students
-WHERE major = ANY (
-    SELECT department
-    FROM instructors
-);
-```
-
-**Note:** `= ANY` is functionally identical to `IN`.
-
-### Example 3: Less Than ANY (< ANY)
-
-**Query: Find courses with fewer credits than any 4-credit course**
-
-```sql
-SELECT course_id, course_name, credits
-FROM courses
-WHERE credits < ANY (
-    SELECT credits
-    FROM courses
-    WHERE credits = 4
-);
-```
-
-**Logic:** 
-- `< ANY (4, 4, 4, 4)` means `< 4` (less than maximum)
-- Returns courses with less than 4 credits
-
 ## ALL Operator
 
-The **ALL** operator compares a value to each value in the subquery. Returns TRUE only if ALL comparisons are true.
+Compares a value to each subquery result. Returns TRUE only if ALL comparisons are true.
 
-### Syntax
-
+**Syntax:**
 ```sql
 WHERE column operator ALL (subquery)
 ```
 
-### Operator Meanings
+**Meaning:**
+| Expression | Equivalent |
+|------------|------------|
+| `> ALL (100, 200, 300)` | `> 300` (greater than maximum) |
+| `< ALL (100, 200, 300)` | `< 100` (less than minimum) |
+| `!= ALL (100, 200, 300)` | Same as `NOT IN` |
 
-| Expression | Meaning |
-|------------|---------|
-| `> ALL` | Greater than the maximum value |
-| `< ALL` | Less than the minimum value |
-| `>= ALL` | Greater than or equal to the maximum |
-| `<= ALL` | Less than or equal to the minimum |
-| `!= ALL` | Same as NOT IN |
-| `= ALL` | Equals to all (only true if subquery returns one distinct value) |
-
-### Example 1: Greater Than ALL (> ALL)
-
-**Query: Find students with the highest GPA (higher than all others)**
+**Example: Find student with highest GPA**
 
 ```sql
 SELECT first_name, last_name, gpa
@@ -402,256 +281,79 @@ FROM students s1
 WHERE gpa > ALL (
     SELECT gpa
     FROM students s2
-    WHERE s2.student_id != s1.student_id
-    AND gpa IS NOT NULL
+    WHERE s2.student_id != s1.student_id AND gpa IS NOT NULL
 )
 AND gpa IS NOT NULL;
 ```
 
-**Alternative (clearer):**
+**Alternative (simpler):**
 ```sql
 SELECT first_name, last_name, gpa
 FROM students
 WHERE gpa = (SELECT MAX(gpa) FROM students);
 ```
 
-### Example 2: Less Than ALL (< ALL)
+## Best Practices
 
-**Query: Find courses with fewer credits than any other course**
-
+**1. Use IN for simple membership tests**
 ```sql
-SELECT course_id, course_name, credits
-FROM courses
-WHERE credits < ALL (
-    SELECT credits
-    FROM courses c2
-    WHERE c2.course_id != courses.course_id
-);
-```
-
-**Logic:** Credits must be less than ALL other courses (i.e., the minimum).
-
-### Example 3: Not Equal to ALL (!= ALL)
-
-**Query: Find students not enrolled in any Computer Science courses**
-
-```sql
-SELECT first_name, last_name
-FROM students
-WHERE student_id != ALL (
-    SELECT DISTINCT student_id
-    FROM enrollments e
-    JOIN courses c ON e.course_id = c.course_id
-    WHERE c.department = 'Computer Science'
-);
-```
-
-**Note:** `!= ALL` is equivalent to `NOT IN`.
-
-## Comparing ANY vs. ALL
-
-### Visual Comparison
-
-**Subquery returns:** `(100, 200, 300)`
-
-| Condition | Equivalent To | Example Values That Match |
-|-----------|---------------|---------------------------|
-| `> ANY (100, 200, 300)` | `> 100` (min) | 101, 150, 200, 500 |
-| `> ALL (100, 200, 300)` | `> 300` (max) | 301, 400, 500 |
-| `< ANY (100, 200, 300)` | `< 300` (max) | 50, 100, 250 |
-| `< ALL (100, 200, 300)` | `< 100` (min) | 50, 75, 99 |
-
-### Example: Salary Comparison
-
-**Subquery returns salaries:** `(50000, 60000, 70000)`
-
-```sql
--- Earns more than the lowest-paid person
-WHERE salary > ANY (50000, 60000, 70000)  
--- TRUE for: 51000, 60000, 75000
-
--- Earns more than the highest-paid person
-WHERE salary > ALL (50000, 60000, 70000)  
--- TRUE for: 71000, 80000, 100000
-```
-
-## Practical Examples
-
-### Example 1: Course Enrollment Analysis
-
-**Query: Find courses with more enrollments than any Math course**
-
-```sql
-SELECT c.course_id, c.course_name, COUNT(e.enrollment_id) AS enrollment_count
-FROM courses c
-LEFT JOIN enrollments e ON c.course_id = e.course_id
-WHERE c.department != 'Mathematics'
-GROUP BY c.course_id, c.course_name
-HAVING COUNT(e.enrollment_id) > ANY (
-    SELECT COUNT(*)
-    FROM enrollments e2
-    JOIN courses c2 ON e2.course_id = c2.course_id
-    WHERE c2.department = 'Mathematics'
-    GROUP BY c2.course_id
-);
-```
-
-### Example 2: Student Performance Tracking
-
-**Query: Find students who scored higher than all students in a different major**
-
-```sql
-SELECT s1.first_name, s1.last_name, s1.major, s1.gpa
-FROM students s1
-WHERE s1.gpa > ALL (
-    SELECT s2.gpa
-    FROM students s2
-    WHERE s2.major = 'Physics'
-    AND s2.gpa IS NOT NULL
-)
-AND s1.major != 'Physics'
-AND s1.gpa IS NOT NULL;
-```
-
-### Example 3: Course Prerequisite Checking
-
-**Query: Find students eligible for advanced courses (completed all prerequisites)**
-
-```sql
-SELECT s.first_name, s.last_name
-FROM students s
-WHERE s.student_id NOT IN (
-    SELECT DISTINCT student_id
-    FROM enrollments
-    WHERE course_id IN ('CS101', 'CS201')
-    AND (grade IS NULL OR grade NOT IN ('A', 'A-', 'B+', 'B'))
-)
-AND s.student_id IN (
-    SELECT student_id
-    FROM enrollments
-    WHERE course_id = 'CS101'
-);
-```
-
-## Multiple-Row Subquery Best Practices
-
-### 1. Use IN for Simple Membership Tests
-
-**Good:**
-```sql
+-- Good
 WHERE student_id IN (SELECT student_id FROM enrollments)
 ```
 
-**Avoid:**
+**2. Always handle NULLs with NOT IN**
 ```sql
-WHERE student_id = ANY (SELECT student_id FROM enrollments)
+-- Add NULL filter or use NOT EXISTS
+WHERE id NOT IN (SELECT id FROM table WHERE id IS NOT NULL)
 ```
 
-### 2. Handle NULLs with NOT IN
-
-**Problematic:**
+**3. Prefer EXISTS for complex queries**
 ```sql
-WHERE id NOT IN (SELECT id FROM table WHERE condition)
--- Fails if subquery returns NULL
-```
-
-**Better:**
-```sql
-WHERE id NOT IN (SELECT id FROM table WHERE condition AND id IS NOT NULL)
-```
-
-**Best:**
-```sql
-WHERE NOT EXISTS (SELECT 1 FROM table WHERE table.id = outer.id AND condition)
-```
-
-### 3. Prefer EXISTS over IN for Complex Subqueries
-
-**IN approach:**
-```sql
-WHERE student_id IN (
-    SELECT student_id FROM enrollments WHERE ...
-)
-```
-
-**EXISTS approach (often faster):**
-```sql
+-- Often faster than IN
 WHERE EXISTS (
-    SELECT 1 FROM enrollments e WHERE e.student_id = students.student_id AND ...
+    SELECT 1 FROM enrollments e 
+    WHERE e.student_id = students.student_id
 )
 ```
 
-### 4. Use DISTINCT to Avoid Duplicates
-
+**4. Use DISTINCT to avoid duplicate processing**
 ```sql
-WHERE student_id IN (
-    SELECT DISTINCT student_id FROM enrollments
-)
+WHERE student_id IN (SELECT DISTINCT student_id FROM enrollments)
 ```
 
-## Common Errors and Solutions
+## Common Errors
 
-### Error 1: Subquery Returns NULL
-
-**Problem:**
-```sql
--- Returns no rows if any enrollment has NULL student_id
-SELECT * FROM students
-WHERE student_id NOT IN (SELECT student_id FROM enrollments);
-```
-
-**Solution:**
-```sql
-SELECT * FROM students
-WHERE student_id NOT IN (
-    SELECT student_id FROM enrollments WHERE student_id IS NOT NULL
-);
-```
-
-### Error 2: Using Single-Row Operator
-
-**Problem:**
+**Error 1: Using = with multiple rows**
 ```sql
 -- ERROR: subquery returns more than one row
-SELECT * FROM students
-WHERE gpa > (SELECT gpa FROM students WHERE major = 'Computer Science');
+WHERE gpa > (SELECT gpa FROM students WHERE major = 'Computer Science')
+
+-- Fix: Use ANY or ALL
+WHERE gpa > ALL (SELECT gpa FROM students WHERE major = 'Computer Science')
 ```
 
-**Solution:**
+**Error 2: Forgetting NULL handling**
 ```sql
-SELECT * FROM students
-WHERE gpa > ALL (SELECT gpa FROM students WHERE major = 'Computer Science');
+-- May return no rows
+WHERE id NOT IN (SELECT id FROM table)
+
+-- Fix
+WHERE id NOT IN (SELECT id FROM table WHERE id IS NOT NULL)
 ```
-
-### Error 3: Ambiguous ANY/ALL Logic
-
-**Problem:** Confusion about what ANY and ALL actually test.
-
-**Clarification:**
-- `> ANY` means "greater than at least one" (greater than minimum)
-- `> ALL` means "greater than every value" (greater than maximum)
-- `< ANY` means "less than at least one" (less than maximum)
-- `< ALL` means "less than every value" (less than minimum)
 
 ## Summary
 
-**Key Takeaways:**
+**Key Points:**
 
-1. **Multiple-row subqueries return zero or more rows** and require special operators: IN, NOT IN, ANY, ALL, or EXISTS.
+1. **Multiple-row subqueries** require special operators: IN, NOT IN, ANY, ALL
+2. **IN** checks for membership in a list (= ANY)
+3. **NOT IN** requires NULL handling - filter NULLs or use NOT EXISTS
+4. **ANY** returns TRUE if at least one comparison matches
+   - `> ANY` means "greater than minimum"
+   - `< ANY` means "less than maximum"
+5. **ALL** returns TRUE only if every comparison matches
+   - `> ALL` means "greater than maximum"
+   - `< ALL` means "less than minimum"
+6. **Best practice**: Use IN for simple cases, EXISTS for complex ones, always handle NULLs
 
-2. **IN operator checks for membership** in a list of values; functionally equivalent to = ANY.
-
-3. **NOT IN requires careful NULL handling** - always filter NULLs in the subquery or use NOT EXISTS instead.
-
-4. **ANY operator returns TRUE if at least one comparison matches** - use with >, <, =, etc.
-
-5. **ALL operator returns TRUE only if every comparison matches** - use to compare against the entire set.
-
-6. **Operator meanings**: > ANY (greater than min), > ALL (greater than max), < ANY (less than max), < ALL (less than min).
-
-7. **Best practices**: Use IN for simple membership, filter NULLs with NOT IN, prefer EXISTS for complex queries, use DISTINCT to avoid duplicates.
-
-8. **Common patterns**: finding related records, excluding subsets, comparing to ranges, and filtering based on aggregate conditions.
-
-Multiple-row subqueries provide powerful filtering capabilities for working with dynamic sets of data, enabling sophisticated queries that adapt to database contents.
-
+Multiple-row subqueries enable powerful filtering based on dynamic data sets.
