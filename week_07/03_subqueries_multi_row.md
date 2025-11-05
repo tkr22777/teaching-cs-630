@@ -341,19 +341,3 @@ WHERE id NOT IN (SELECT id FROM table)
 WHERE id NOT IN (SELECT id FROM table WHERE id IS NOT NULL)
 ```
 
-## Summary
-
-**Key Points:**
-
-1. **Multiple-row subqueries** require special operators: IN, NOT IN, ANY, ALL
-2. **IN** checks for membership in a list (= ANY)
-3. **NOT IN** requires NULL handling - filter NULLs or use NOT EXISTS
-4. **ANY** returns TRUE if at least one comparison matches
-   - `> ANY` means "greater than minimum"
-   - `< ANY` means "less than maximum"
-5. **ALL** returns TRUE only if every comparison matches
-   - `> ALL` means "greater than maximum"
-   - `< ALL` means "less than minimum"
-6. **Best practice**: Use IN for simple cases, EXISTS for complex ones, always handle NULLs
-
-Multiple-row subqueries enable powerful filtering based on dynamic data sets.

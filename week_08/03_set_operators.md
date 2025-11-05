@@ -421,17 +421,3 @@ SELECT instructor_name FROM instructors
 ORDER BY first_name;
 ```
 
-## Summary
-
-**Key Points:**
-
-1. **Set operators combine multiple queries**: UNION, UNION ALL, INTERSECT, MINUS
-2. **UNION** removes duplicates; **UNION ALL** keeps all rows (faster)
-3. **INTERSECT** returns common rows; **MINUS** returns difference (first - second)
-4. **Rules**: Same column count, compatible data types, ORDER BY only at end
-5. **Performance**: UNION ALL is faster than UNION
-6. **Use UNION ALL** when duplicates don't matter or don't exist
-7. **MINUS is Oracle-specific** - other databases use EXCEPT
-8. **Column names** come from first query
-
-Set operators provide powerful ways to combine and compare result sets from multiple queries.

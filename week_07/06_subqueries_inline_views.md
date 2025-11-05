@@ -331,16 +331,3 @@ JOIN enrollments e ON s.student_id = e.student_id;
 4. **Avoid unnecessary columns** - select only what you need
 5. **Consider materialized views** for frequently-used complex queries
 
-## Summary
-
-**Key Points:**
-
-1. **Inline views are subqueries in FROM clause** that act as temporary tables
-2. **Must have an alias** (required in Oracle SQL)
-3. **Use for multi-step logic**: aggregate then filter, calculate then use
-4. **Common patterns**: filtering aggregates, percentages, ranking, top-N queries
-5. **WITH clause alternative**: More readable for complex queries
-6. **Best practices**: Use aliases, avoid deep nesting, filter early
-7. **Performance**: Add indexes, minimize data, consider WITH clause
-
-Inline views simplify complex queries by breaking logic into manageable steps.

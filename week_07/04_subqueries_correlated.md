@@ -383,17 +383,3 @@ FROM students s LEFT JOIN counts c ON s.student_id = c.student_id;
 - Need multiple columns from related table (use JOIN)
 - Working with large datasets (optimize with indexes or JOINs)
 
-## Summary
-
-**Key Points:**
-
-1. **Correlated subqueries reference outer query columns** and execute once per outer row
-2. **Require table aliases** to distinguish inner/outer references (s1, s2)
-3. **Enable row-specific comparisons** like "above own group average"
-4. **Can appear in any clause**: SELECT, WHERE, HAVING
-5. **Performance**: Slower than non-correlated; add indexes on correlated columns
-6. **Common patterns**: Group comparisons, counting related records, finding latest records
-7. **Alternatives**: JOINs, analytic functions, materialized intermediate results
-8. **Best practices**: Use aliases, handle NULLs, avoid repeating identical subqueries
-
-Correlated subqueries provide powerful row-level analysis but should be used with attention to performance.

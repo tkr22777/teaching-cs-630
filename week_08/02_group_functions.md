@@ -470,18 +470,3 @@ SELECT COUNT(*) FROM students;  -- Returns: 5
 SELECT COUNT(major) FROM students;  -- Returns: 4
 ```
 
-## Summary
-
-**Key Points:**
-
-1. **Group functions** aggregate multiple rows into a single result
-2. **Common functions**: COUNT, SUM, AVG, MAX, MIN
-3. **COUNT(*)** includes all rows; **COUNT(column)** excludes NULLs
-4. **GROUP BY** divides rows into groups for aggregation
-5. **HAVING** filters groups (use after GROUP BY)
-6. **WHERE vs. HAVING**: WHERE filters rows before grouping, HAVING filters groups after
-7. **All columns** in SELECT must be in GROUP BY or be aggregate functions
-8. **NULL handling**: Most functions ignore NULLs (except COUNT(*))
-9. **Common patterns**: Conditional aggregation with CASE, multiple grouping columns
-
-Group functions are essential for data analysis and reporting in SQL.

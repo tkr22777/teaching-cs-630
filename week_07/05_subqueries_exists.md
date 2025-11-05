@@ -356,17 +356,3 @@ WHERE NOT EXISTS (SELECT 1 FROM table t WHERE t.id = outer.id)
 - Performing complex multi-table queries
 - Want more explicit relationship representation
 
-## Summary
-
-**Key Points:**
-
-1. **EXISTS tests for existence** of rows in a subquery (TRUE if any rows, FALSE if none)
-2. **Short-circuit evaluation** - stops at first match (efficient)
-3. **Always correlated** - references outer query columns
-4. **NULL-safe** - NOT EXISTS handles NULLs correctly (unlike NOT IN)
-5. **Common uses**: Finding related records, finding gaps, exclusion queries
-6. **Performance**: Often faster than IN for large datasets
-7. **Best practice**: Use `SELECT 1` in EXISTS subqueries
-8. **Prefer NOT EXISTS over NOT IN** - safer and clearer
-
-EXISTS provides an efficient, NULL-safe way to test relationships between tables.

@@ -549,17 +549,3 @@ WHERE student_id <= 3;
 2. `ROUND(..., 1)` rounds the result
 3. `TO_CHAR(enrollment_date, 'Month YYYY')` formats date
 
-## Summary
-
-**Key Points:**
-
-1. **Single-row functions** operate on one row at a time, returning one result per row
-2. **Character functions**: UPPER, LOWER, SUBSTR, CONCAT (||), TRIM
-3. **Numeric functions**: ROUND, TRUNC, MOD
-4. **Date functions**: SYSDATE, ADD_MONTHS, MONTHS_BETWEEN
-5. **Conversion functions**: TO_CHAR, TO_DATE
-6. **NULL handling**: NVL (2 values), COALESCE (multiple values)
-7. **Nesting**: Functions can be nested (inner executes first)
-8. **Common uses**: Formatting output, data cleaning, calculations, NULL handling
-
-Single-row functions are essential tools for data manipulation and presentation in SQL queries.

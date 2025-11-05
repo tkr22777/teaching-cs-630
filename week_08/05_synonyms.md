@@ -390,18 +390,3 @@ SELECT * FROM studs WHERE student_id = 1;  -- Using synonym
 
 The execution plan is the same for both queries.
 
-## Summary
-
-**Key Points:**
-
-1. **Synonyms are aliases** for database objects (tables, views, sequences)
-2. **Two types**: Private (one user) and Public (all users)
-3. **CREATE SYNONYM** to create, **DROP SYNONYM** to remove
-4. **Use like base object** - SELECT, INSERT, UPDATE, DELETE all work
-5. **Benefits**: Simplify names, hide locations, ease migrations
-6. **Name resolution order**: Local object → Private synonym → Public synonym
-7. **Dropping synonym** does NOT drop base object
-8. **Performance**: Minimal overhead (resolved at parse time)
-9. **Best practice**: Use for abstraction and environment independence
-
-Synonyms provide a simple yet powerful way to abstract and simplify database object references.

@@ -390,17 +390,3 @@ VALUES ('Test', 'User');
 
 **Recommendation:** Use Identity columns for new development (simpler), use sequences for backward compatibility or shared number generation.
 
-## Summary
-
-**Key Points:**
-
-1. **Sequences generate unique sequential numbers** for primary keys and other unique identifiers
-2. **NEXTVAL** advances and returns next value; **CURRVAL** returns current value in session
-3. **CREATE SEQUENCE** with START WITH, INCREMENT BY, CACHE options
-4. **Sequences are independent** of tables and can be shared
-5. **ALTER SEQUENCE** to modify (but cannot change START WITH)
-6. **Gaps are normal** due to rollbacks, caching, and multiple sessions
-7. **Identity columns** (Oracle 12c+) provide simpler auto-increment
-8. **Best practices**: Use caching for performance, accept gaps, use identity columns for new projects
-
-Sequences provide efficient, reliable unique number generation for database applications.
