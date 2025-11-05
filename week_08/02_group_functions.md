@@ -1,22 +1,20 @@
-# Group Functions (Aggregate Functions)
+# SQL Group Functions (Aggregate Functions)
 
 ## Overview
 
-**Group functions** (also called **aggregate functions**) operate on sets of rows to return a single result per group. Unlike single-row functions that process each row independently, group functions combine multiple rows to produce summary statistics like totals, averages, counts, and extremes.
+**Group functions** (also called aggregate functions) operate on multiple rows and return a single result. They're essential for statistical analysis, reporting, and data summarization.
 
 ## Key Terms
 
-**Group Function**: A function that operates on multiple rows and returns a single result for the group.
+**Group Function**: Function that operates on multiple rows and returns a single value.
 
-**Aggregate Function**: Another term for group function; emphasizes combining multiple values into one.
+**Aggregate Function**: Another name for group function.
 
-**GROUP BY Clause**: SQL clause that divides rows into groups for aggregate calculation.
+**GROUP BY**: Clause that divides rows into groups for aggregation.
 
-**HAVING Clause**: Filters groups after aggregation (analogous to WHERE for rows).
+**HAVING**: Clause that filters groups (used with GROUP BY).
 
 **NULL Handling**: Group functions ignore NULL values (except COUNT(*)).
-
-**DISTINCT**: Keyword to consider only unique values in aggregation.
 
 ## Sample Database Schema
 
@@ -125,43 +123,25 @@ COMMIT;
 
 ## Common Group Functions
 
-| Function | Purpose | NULL Handling |
-|----------|---------|---------------|
-| **COUNT** | Count number of rows/values | COUNT(*) includes NULLs, COUNT(column) excludes |
-| **SUM** | Calculate total of numeric values | Ignores NULLs |
-| **AVG** | Calculate average of numeric values | Ignores NULLs |
-| **MAX** | Find maximum value | Ignores NULLs |
-| **MIN** | Find minimum value | Ignores NULLs |
-| **STDDEV** | Calculate standard deviation | Ignores NULLs |
-| **VARIANCE** | Calculate variance | Ignores NULLs |
+| Function | Description | NULL Handling |
+|----------|-------------|---------------|
+| **COUNT(*)** | Count all rows | Includes NULLs |
+| **COUNT(column)** | Count non-NULL values | Ignores NULLs |
+| **SUM(column)** | Total of values | Ignores NULLs |
+| **AVG(column)** | Average of values | Ignores NULLs |
+| **MAX(column)** | Maximum value | Ignores NULLs |
+| **MIN(column)** | Minimum value | Ignores NULLs |
 
 ## COUNT Function
 
-Counts the number of rows or non-NULL values.
+**Purpose:** Count rows or non-NULL values.
 
-### Syntax Variations
+**Syntax:**
+- `COUNT(*)` - Count all rows (including NULLs)
+- `COUNT(column)` - Count non-NULL values in column
+- `COUNT(DISTINCT column)` - Count unique non-NULL values
 
-```sql
-COUNT(*)           -- Counts all rows (including NULLs)
-COUNT(column)      -- Counts non-NULL values in column
-COUNT(DISTINCT column)  -- Counts unique non-NULL values
-```
-
-### Examples
-
-**Example 1: Count All Rows**
-
-```sql
-SELECT COUNT(*) AS total_students
-FROM students;
-```
-
-**Result:**
-| total_students |
-|----------------|
-| 5 |
-
-**Example 2: Count Non-NULL Values**
+**Example:**
 
 ```sql
 SELECT 
@@ -176,30 +156,102 @@ FROM students;
 |----------------|---------------------|---------------|
 | 5 | 4 | 3 |
 
-**Explanation:** Charlie Davis has NULL major, so COUNT(major) returns 4 instead of 5.
+Charlie has NULL major, so `COUNT(major)` excludes him.
 
-**Example 3: Count with Conditions**
+## SUM Function
+
+**Purpose:** Calculate total of numeric values.
+
+**Syntax:** `SUM(column)`
+
+**Example:**
 
 ```sql
 SELECT 
-    COUNT(*) AS total_enrollments,
-    COUNT(grade) AS graded_enrollments,
-    COUNT(CASE WHEN grade = 'A' THEN 1 END) AS a_grades,
-    COUNT(CASE WHEN grade_points >= 3.0 THEN 1 END) AS passing_grades
-FROM enrollments;
+    SUM(credits) AS total_credits_offered,
+    SUM(CASE WHEN department = 'Computer Science' THEN credits ELSE 0 END) AS cs_credits
+FROM courses;
 ```
 
 **Result:**
-| total_enrollments | graded_enrollments | a_grades | passing_grades |
-|-------------------|--------------------| ---------|----------------|
-| 8 | 7 | 3 | 6 |
+| total_credits_offered | cs_credits |
+|----------------------|------------|
+| 21 | 10 |
 
-**Example 4: Count by Group**
+## AVG Function
+
+**Purpose:** Calculate average of numeric values.
+
+**Syntax:** `AVG(column)`
+
+**Example:**
+
+```sql
+SELECT 
+    AVG(gpa) AS overall_avg_gpa,
+    ROUND(AVG(gpa), 2) AS rounded_avg,
+    AVG(CASE WHEN major = 'Computer Science' THEN gpa END) AS cs_avg_gpa
+FROM students
+WHERE gpa IS NOT NULL;
+```
+
+**Result:**
+| overall_avg_gpa | rounded_avg | cs_avg_gpa |
+|-----------------|-------------|------------|
+| 3.48 | 3.48 | 3.5 |
+
+**Note:** AVG ignores NULL values automatically.
+
+## MAX and MIN Functions
+
+**Purpose:** Find maximum or minimum value.
+
+**Syntax:** `MAX(column)`, `MIN(column)`
+
+**Works with:** Numbers, dates, strings (alphabetical order)
+
+**Example:**
+
+```sql
+SELECT 
+    MAX(gpa) AS highest_gpa,
+    MIN(gpa) AS lowest_gpa,
+    MAX(enrollment_date) AS most_recent_enrollment,
+    MIN(last_name) AS first_alphabetically
+FROM students
+WHERE gpa IS NOT NULL;
+```
+
+**Result:**
+| highest_gpa | lowest_gpa | most_recent_enrollment | first_alphabetically |
+|-------------|------------|------------------------|----------------------|
+| 3.9 | 2.8 | 2024-09-01 | Brown |
+
+## GROUP BY Clause
+
+**Purpose:** Divide rows into groups and apply aggregate functions to each group.
+
+**Syntax:**
+```sql
+SELECT column, aggregate_function(column)
+FROM table
+WHERE conditions
+GROUP BY column
+ORDER BY column;
+```
+
+**Rules:**
+1. Every column in SELECT (except aggregate functions) must be in GROUP BY
+2. GROUP BY executes after WHERE
+3. Can group by multiple columns
+
+**Example 1: Count students by major**
 
 ```sql
 SELECT 
     major,
-    COUNT(*) AS student_count
+    COUNT(*) AS student_count,
+    AVG(gpa) AS avg_gpa
 FROM students
 WHERE major IS NOT NULL
 GROUP BY major
@@ -207,547 +259,20 @@ ORDER BY student_count DESC;
 ```
 
 **Result:**
-| major | student_count |
-|-------|---------------|
-| Computer Science | 2 |
-| Mathematics | 1 |
-| Physics | 1 |
-
-## SUM Function
-
-Calculates the total of numeric values.
-
-### Syntax
-
-```sql
-SUM(numeric_column)
-SUM(DISTINCT numeric_column)
-```
-
-### Examples
-
-**Example 1: Simple Sum**
-
-```sql
-SELECT 
-    SUM(credits) AS total_credits,
-    COUNT(*) AS number_of_courses
-FROM courses;
-```
-
-**Result:**
-| total_credits | number_of_courses |
-|---------------|-------------------|
-| 21 | 6 |
-
-**Example 2: Sum by Group**
-
-```sql
-SELECT 
-    department,
-    SUM(credits) AS total_credits,
-    COUNT(*) AS course_count
-FROM courses
-WHERE department IS NOT NULL
-GROUP BY department
-ORDER BY total_credits DESC;
-```
-
-**Result:**
-| department | total_credits | course_count |
-|------------|---------------|--------------|
-| Computer Science | 10 | 3 |
-| Mathematics | 4 | 1 |
-| Physics | 4 | 1 |
-| English | 3 | 1 |
-
-**Example 3: Sum with DISTINCT**
-
-```sql
-SELECT 
-    SUM(credits) AS total_credits,
-    SUM(DISTINCT credits) AS sum_unique_credits
-FROM courses;
-```
-
-**Result:**
-| total_credits | sum_unique_credits |
-|---------------|--------------------|
-| 21 | 7 |
-
-**Explanation:** Unique credit values are 3 and 4, so SUM(DISTINCT credits) = 7.
-
-**Example 4: Conditional Sum**
-
-```sql
-SELECT 
-    SUM(CASE WHEN grade = 'A' THEN credits ELSE 0 END) AS a_grade_credits,
-    SUM(CASE WHEN grade_points >= 3.0 THEN credits ELSE 0 END) AS passing_credits
-FROM enrollments e
-JOIN courses c ON e.course_id = c.course_id
-WHERE e.student_id = 1;
-```
-
-## AVG Function
-
-Calculates the average of numeric values.
-
-### Syntax
-
-```sql
-AVG(numeric_column)
-AVG(DISTINCT numeric_column)
-```
-
-### Examples
-
-**Example 1: Simple Average**
-
-```sql
-SELECT 
-    AVG(gpa) AS average_gpa,
-    MIN(gpa) AS lowest_gpa,
-    MAX(gpa) AS highest_gpa
-FROM students
-WHERE gpa IS NOT NULL;
-```
-
-**Result:**
-| average_gpa | lowest_gpa | highest_gpa |
-|-------------|------------|-------------|
-| 3.48 | 2.8 | 3.9 |
-
-**Example 2: Average by Group**
-
-```sql
-SELECT 
-    major,
-    COUNT(*) AS student_count,
-    AVG(gpa) AS average_gpa,
-    ROUND(AVG(gpa), 2) AS rounded_avg
-FROM students
-WHERE major IS NOT NULL AND gpa IS NOT NULL
-GROUP BY major
-ORDER BY average_gpa DESC;
-```
-
-**Result:**
-| major | student_count | average_gpa | rounded_avg |
-|-------|---------------|-------------|-------------|
-| Mathematics | 1 | 3.9 | 3.90 |
-| Physics | 1 | 3.7 | 3.70 |
-| Computer Science | 2 | 3.5 | 3.50 |
-
-**Example 3: Average vs. Median**
-
-```sql
-SELECT 
-    department,
-    AVG(credits) AS mean_credits,
-    MEDIAN(credits) AS median_credits
-FROM courses
-WHERE department IS NOT NULL
-GROUP BY department;
-```
-
-**Example 4: Weighted Average**
-
-```sql
--- Calculate weighted GPA based on course credits
-SELECT 
-    s.first_name,
-    s.last_name,
-    SUM(e.grade_points * c.credits) / SUM(c.credits) AS weighted_gpa
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id
-WHERE e.grade_points IS NOT NULL
-GROUP BY s.student_id, s.first_name, s.last_name;
-```
-
-**Result:**
-| first_name | last_name | weighted_gpa |
-|------------|-----------|--------------|
-| John | Smith | 3.60 |
-| Jane | Doe | 3.87 |
-| Bob | Wilson | 3.17 |
-| Alice | Brown | 4.00 |
-
-## MAX and MIN Functions
-
-Find maximum and minimum values.
-
-### Syntax
-
-```sql
-MAX(column)
-MIN(column)
-```
-
-### Examples
-
-**Example 1: Numeric MAX/MIN**
-
-```sql
-SELECT 
-    MAX(gpa) AS highest_gpa,
-    MIN(gpa) AS lowest_gpa,
-    MAX(gpa) - MIN(gpa) AS gpa_range
-FROM students
-WHERE gpa IS NOT NULL;
-```
-
-**Result:**
-| highest_gpa | lowest_gpa | gpa_range |
-|-------------|------------|-----------|
-| 3.9 | 2.8 | 1.1 |
-
-**Example 2: Date MAX/MIN**
-
-```sql
-SELECT 
-    MIN(enrollment_date) AS earliest_enrollment,
-    MAX(enrollment_date) AS latest_enrollment,
-    MAX(enrollment_date) - MIN(enrollment_date) AS days_span
-FROM students;
-```
-
-**Result:**
-| earliest_enrollment | latest_enrollment | days_span |
-|---------------------|-------------------|-----------|
-| 2023-09-01 | 2024-09-01 | 366 |
-
-**Example 3: String MAX/MIN (Alphabetical)**
-
-```sql
-SELECT 
-    MIN(last_name) AS first_alphabetically,
-    MAX(last_name) AS last_alphabetically
-FROM students;
-```
-
-**Result:**
-| first_alphabetically | last_alphabetically |
-|----------------------|---------------------|
-| Brown | Wilson |
-
-**Example 4: MAX/MIN by Group**
-
-```sql
-SELECT 
-    major,
-    MAX(gpa) AS top_gpa,
-    MIN(gpa) AS lowest_gpa
-FROM students
-WHERE major IS NOT NULL AND gpa IS NOT NULL
-GROUP BY major;
-```
-
-**Result:**
-| major | top_gpa | lowest_gpa |
-|-------|---------|------------|
-| Computer Science | 3.8 | 3.2 |
-| Mathematics | 3.9 | 3.9 |
-| Physics | 3.7 | 3.7 |
-
-## GROUP BY Clause
-
-Divides rows into groups for aggregate calculations.
-
-### Syntax
-
-```sql
-SELECT column(s), aggregate_function(column)
-FROM table
-WHERE condition
-GROUP BY column(s)
-HAVING group_condition
-ORDER BY column(s);
-```
-
-### Rules
-
-1. **All non-aggregated columns in SELECT must be in GROUP BY**
-2. **WHERE filters before grouping, HAVING filters after**
-3. **Can group by multiple columns**
-4. **NULL values form their own group**
-
-### Examples
-
-**Example 1: Single Column Grouping**
-
-```sql
-SELECT 
-    department,
-    COUNT(*) AS course_count,
-    AVG(credits) AS avg_credits
-FROM courses
-WHERE department IS NOT NULL
-GROUP BY department
-ORDER BY course_count DESC;
-```
-
-**Result:**
-| department | course_count | avg_credits |
-|------------|--------------|-------------|
-| Computer Science | 3 | 3.33 |
-| English | 1 | 3.00 |
-| Mathematics | 1 | 4.00 |
-| Physics | 1 | 4.00 |
-
-**Example 2: Multiple Column Grouping**
-
-```sql
-SELECT 
-    major,
-    CASE 
-        WHEN gpa >= 3.5 THEN 'High'
-        WHEN gpa >= 3.0 THEN 'Medium'
-        ELSE 'Low'
-    END AS gpa_category,
-    COUNT(*) AS student_count
-FROM students
-WHERE major IS NOT NULL AND gpa IS NOT NULL
-GROUP BY major, 
-         CASE 
-             WHEN gpa >= 3.5 THEN 'High'
-             WHEN gpa >= 3.0 THEN 'Medium'
-             ELSE 'Low'
-         END
-ORDER BY major, gpa_category;
-```
-
-**Example 3: Grouping with JOINs**
-
-```sql
-SELECT 
-    c.department,
-    c.course_name,
-    COUNT(e.enrollment_id) AS enrollment_count,
-    AVG(e.grade_points) AS average_grade
-FROM courses c
-LEFT JOIN enrollments e ON c.course_id = e.course_id
-GROUP BY c.department, c.course_name
-HAVING COUNT(e.enrollment_id) > 0
-ORDER BY enrollment_count DESC;
-```
-
-**Result:**
-| department | course_name | enrollment_count | average_grade |
-|------------|-------------|------------------|---------------|
-| Computer Science | Introduction to Programming | 3 | 3.57 |
-| Computer Science | Data Structures | 2 | 3.30 |
-| Computer Science | Database Systems | 1 | NULL |
-| Mathematics | Calculus I | 1 | 4.00 |
-| Physics | Physics I | 1 | 4.00 |
-
-**Example 4: Nested Grouping**
-
-```sql
-SELECT 
-    semester,
-    COUNT(DISTINCT student_id) AS unique_students,
-    COUNT(*) AS total_enrollments,
-    ROUND(AVG(grade_points), 2) AS avg_grade
-FROM enrollments
-WHERE grade_points IS NOT NULL
-GROUP BY semester
-ORDER BY semester;
-```
-
-**Result:**
-| semester | unique_students | total_enrollments | avg_grade |
-|----------|-----------------|-------------------|-----------|
-| Fall 2023 | 2 | 3 | 3.90 |
-| Spring 2024 | 3 | 4 | 3.33 |
-
-## HAVING Clause
-
-Filters groups after aggregation (WHERE filters before).
-
-### Syntax
-
-```sql
-SELECT columns, aggregate_function(column)
-FROM table
-GROUP BY columns
-HAVING aggregate_condition;
-```
-
-### Examples
-
-**Example 1: Filter by Aggregate Value**
-
-```sql
-SELECT 
-    major,
-    COUNT(*) AS student_count,
-    AVG(gpa) AS average_gpa
-FROM students
-WHERE major IS NOT NULL AND gpa IS NOT NULL
-GROUP BY major
-HAVING AVG(gpa) > 3.5
-ORDER BY average_gpa DESC;
-```
-
-**Result:**
-| major | student_count | average_gpa |
-|-------|---------------|-------------|
+| major | student_count | avg_gpa |
+|-------|---------------|---------|
+| Computer Science | 2 | 3.5 |
 | Mathematics | 1 | 3.9 |
 | Physics | 1 | 3.7 |
 
-**Example 2: Filter by Count**
-
-```sql
-SELECT 
-    course_id,
-    COUNT(*) AS enrollment_count
-FROM enrollments
-GROUP BY course_id
-HAVING COUNT(*) >= 2
-ORDER BY enrollment_count DESC;
-```
-
-**Result:**
-| course_id | enrollment_count |
-|-----------|------------------|
-| CS101 | 3 |
-| CS201 | 2 |
-
-**Example 3: Multiple HAVING Conditions**
-
-```sql
-SELECT 
-    department,
-    COUNT(*) AS course_count,
-    AVG(credits) AS avg_credits
-FROM courses
-WHERE department IS NOT NULL
-GROUP BY department
-HAVING COUNT(*) >= 1
-   AND AVG(credits) >= 3
-ORDER BY course_count DESC;
-```
-
-**Example 4: HAVING with Subquery**
-
-```sql
-SELECT 
-    major,
-    AVG(gpa) AS avg_gpa
-FROM students
-WHERE major IS NOT NULL AND gpa IS NOT NULL
-GROUP BY major
-HAVING AVG(gpa) > (SELECT AVG(gpa) FROM students WHERE gpa IS NOT NULL)
-ORDER BY avg_gpa DESC;
-```
-
-**Result:**
-| major | avg_gpa |
-|-------|---------|
-| Mathematics | 3.9 |
-| Physics | 3.7 |
-| Computer Science | 3.5 |
-
-## WHERE vs. HAVING
-
-Understanding the difference is crucial for correct queries.
-
-### Comparison Table
-
-| Aspect | WHERE | HAVING |
-|--------|-------|--------|
-| **Purpose** | Filters individual rows | Filters groups |
-| **When Applied** | Before grouping | After grouping |
-| **Can Use** | Column names, literals | Aggregate functions |
-| **Cannot Use** | Aggregate functions | N/A (can use anything) |
-
-### Example: Both WHERE and HAVING
-
-```sql
-SELECT 
-    major,
-    COUNT(*) AS student_count,
-    AVG(gpa) AS avg_gpa
-FROM students
-WHERE gpa >= 3.0              -- WHERE: Filter rows before grouping
-  AND major IS NOT NULL
-GROUP BY major
-HAVING COUNT(*) >= 1          -- HAVING: Filter groups after aggregation
-ORDER BY avg_gpa DESC;
-```
-
-**Execution Order:**
-1. WHERE filters individual students (gpa >= 3.0, major not null)
-2. GROUP BY groups remaining students by major
-3. COUNT and AVG calculated for each group
-4. HAVING filters groups (count >= 1)
-5. ORDER BY sorts final result
-
-## Advanced Group Function Patterns
-
-### Pattern 1: Statistical Summary
-
-```sql
-SELECT 
-    major,
-    COUNT(*) AS n,
-    MIN(gpa) AS min_gpa,
-    MAX(gpa) AS max_gpa,
-    AVG(gpa) AS mean_gpa,
-    STDDEV(gpa) AS std_dev,
-    VARIANCE(gpa) AS variance
-FROM students
-WHERE major IS NOT NULL AND gpa IS NOT NULL
-GROUP BY major;
-```
-
-### Pattern 2: Percentage Calculations
-
-```sql
-SELECT 
-    major,
-    COUNT(*) AS student_count,
-    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM students WHERE major IS NOT NULL), 2) AS percentage
-FROM students
-WHERE major IS NOT NULL
-GROUP BY major
-ORDER BY percentage DESC;
-```
-
-**Result:**
-| major | student_count | percentage |
-|-------|---------------|------------|
-| Computer Science | 2 | 50.00 |
-| Mathematics | 1 | 25.00 |
-| Physics | 1 | 25.00 |
-
-### Pattern 3: Rollup and Subtotals
-
-```sql
-SELECT 
-    department,
-    course_name,
-    COUNT(e.enrollment_id) AS enrollments
-FROM courses c
-LEFT JOIN enrollments e ON c.course_id = e.course_id
-WHERE c.department IS NOT NULL
-GROUP BY ROLLUP(department, course_name)
-ORDER BY department NULLS LAST, course_name NULLS LAST;
-```
-
-**Note:** ROLLUP creates subtotals and grand totals.
-
-### Pattern 4: Conditional Aggregation
+**Example 2: Enrollment statistics by semester**
 
 ```sql
 SELECT 
     semester,
     COUNT(*) AS total_enrollments,
-    SUM(CASE WHEN grade = 'A' THEN 1 ELSE 0 END) AS a_count,
-    SUM(CASE WHEN grade IN ('B', 'B+') THEN 1 ELSE 0 END) AS b_count,
-    SUM(CASE WHEN grade_points < 3.0 THEN 1 ELSE 0 END) AS below_b_count,
-    ROUND(AVG(grade_points), 2) AS avg_grade_points
+    COUNT(DISTINCT student_id) AS unique_students,
+    AVG(grade_points) AS avg_grade_points
 FROM enrollments
 WHERE grade IS NOT NULL
 GROUP BY semester
@@ -755,163 +280,208 @@ ORDER BY semester;
 ```
 
 **Result:**
-| semester | total_enrollments | a_count | b_count | below_b_count | avg_grade_points |
-|----------|-------------------|---------|---------|---------------|------------------|
-| Fall 2023 | 3 | 2 | 0 | 0 | 3.90 |
-| Spring 2024 | 4 | 1 | 3 | 0 | 3.40 |
+| semester | total_enrollments | unique_students | avg_grade_points |
+|----------|-------------------|-----------------|------------------|
+| Fall 2023 | 3 | 2 | 3.90 |
+| Spring 2024 | 4 | 3 | 3.40 |
 
-## NULL Handling in Group Functions
+## HAVING Clause
 
-### Important Rules
+**Purpose:** Filter groups after aggregation (WHERE filters rows before aggregation).
 
-1. **COUNT(*) includes NULLs** - counts all rows
-2. **COUNT(column) excludes NULLs** - counts non-NULL values
-3. **Other aggregates ignore NULLs** - SUM, AVG, MAX, MIN skip NULL values
-4. **Empty groups return NULL** - except COUNT which returns 0
+**Syntax:**
+```sql
+SELECT column, aggregate_function(column)
+FROM table
+WHERE row_conditions
+GROUP BY column
+HAVING group_conditions
+ORDER BY column;
+```
 
-### Examples
+**Example: Find majors with average GPA above 3.5**
 
 ```sql
 SELECT 
-    COUNT(*) AS all_enrollments,
-    COUNT(grade) AS graded_count,
-    COUNT(grade_points) AS points_count,
-    AVG(grade_points) AS avg_points,
-    SUM(grade_points) AS sum_points
-FROM enrollments;
+    major,
+    COUNT(*) AS student_count,
+    AVG(gpa) AS avg_gpa
+FROM students
+WHERE major IS NOT NULL
+GROUP BY major
+HAVING AVG(gpa) > 3.5
+ORDER BY avg_gpa DESC;
 ```
 
 **Result:**
-| all_enrollments | graded_count | points_count | avg_points | sum_points |
-|-----------------|--------------|--------------|------------|------------|
-| 8 | 7 | 7 | 3.61 | 25.3 |
+| major | student_count | avg_gpa |
+|-------|---------------|---------|
+| Mathematics | 1 | 3.9 |
+| Physics | 1 | 3.7 |
 
-**Explanation:** One enrollment has NULL grade, so COUNT(grade) = 7 instead of 8.
+Computer Science (3.5) is excluded because it's not > 3.5.
 
-## Practical Business Examples
+## WHERE vs. HAVING
 
-### Example 1: Course Performance Report
+| Aspect | WHERE | HAVING |
+|--------|-------|--------|
+| **Filters** | Individual rows | Groups |
+| **Executes** | Before GROUP BY | After GROUP BY |
+| **Can use aggregates** | No | Yes |
+| **Use for** | Row-level conditions | Group-level conditions |
+
+**Example using both:**
 
 ```sql
 SELECT 
-    c.course_id,
-    c.course_name,
-    COUNT(e.enrollment_id) AS total_enrolled,
-    COUNT(e.grade) AS graded,
-    ROUND(AVG(e.grade_points), 2) AS avg_grade,
-    MAX(e.grade) AS best_grade,
-    MIN(e.grade) AS worst_grade
+    c.department,
+    COUNT(*) AS course_count,
+    AVG(c.credits) AS avg_credits
 FROM courses c
-LEFT JOIN enrollments e ON c.course_id = e.course_id
-GROUP BY c.course_id, c.course_name
-HAVING COUNT(e.enrollment_id) > 0
-ORDER BY avg_grade DESC NULLS LAST;
+WHERE c.instructor_id IS NOT NULL  -- WHERE: filter rows
+GROUP BY c.department
+HAVING COUNT(*) >= 2               -- HAVING: filter groups
+ORDER BY course_count DESC;
 ```
 
-### Example 2: Enrollment Trends
+**Result:**
+| department | course_count | avg_credits |
+|------------|--------------|-------------|
+| Computer Science | 3 | 3.33 |
+
+**Explanation:**
+- WHERE removes ENG101 (NULL instructor)
+- GROUP BY creates groups
+- HAVING keeps only departments with 2+ courses
+
+## Advanced Patterns
+
+### Pattern 1: Conditional Aggregation
+
+**Count specific conditions within groups:**
+
+```sql
+SELECT 
+    major,
+    COUNT(*) AS total_students,
+    COUNT(CASE WHEN gpa >= 3.5 THEN 1 END) AS high_performers,
+    COUNT(CASE WHEN gpa < 3.0 THEN 1 END) AS at_risk
+FROM students
+WHERE major IS NOT NULL
+GROUP BY major;
+```
+
+**Result:**
+| major | total_students | high_performers | at_risk |
+|-------|----------------|-----------------|---------|
+| Computer Science | 2 | 1 | 0 |
+| Mathematics | 1 | 1 | 0 |
+| Physics | 1 | 0 | 0 |
+
+### Pattern 2: Multiple Grouping Columns
+
+**Group by semester and course:**
 
 ```sql
 SELECT 
     semester,
-    COUNT(DISTINCT student_id) AS unique_students,
-    COUNT(DISTINCT course_id) AS courses_offered,
-    COUNT(*) AS total_enrollments,
-    ROUND(COUNT(*) * 1.0 / COUNT(DISTINCT student_id), 2) AS avg_courses_per_student
-FROM enrollments
-GROUP BY semester
-ORDER BY semester;
+    c.department,
+    COUNT(*) AS enrollments,
+    AVG(e.grade_points) AS avg_grade
+FROM enrollments e
+JOIN courses c ON e.course_id = c.course_id
+WHERE e.grade IS NOT NULL
+GROUP BY semester, c.department
+ORDER BY semester, c.department;
 ```
 
-### Example 3: Instructor Workload
+**Result:**
+| semester | department | enrollments | avg_grade |
+|----------|------------|-------------|-----------|
+| Fall 2023 | Computer Science | 2 | 3.85 |
+| Fall 2023 | Mathematics | 1 | 4.0 |
+| Spring 2024 | Computer Science | 2 | 3.15 |
+| Spring 2024 | Physics | 1 | 4.0 |
+
+## NULL Handling in Group Functions
+
+**Important rules:**
+1. `COUNT(*)` includes all rows (even with NULLs)
+2. `COUNT(column)` ignores NULLs
+3. All other functions (SUM, AVG, MAX, MIN) ignore NULLs
+4. If all values are NULL, result is NULL (not 0)
+
+**Example:**
 
 ```sql
 SELECT 
-    i.instructor_name,
-    i.department,
-    COUNT(c.course_id) AS courses_teaching,
-    SUM(c.credits) AS total_credits,
-    COUNT(e.enrollment_id) AS total_students
-FROM instructors i
-LEFT JOIN courses c ON i.instructor_id = c.instructor_id
-LEFT JOIN enrollments e ON c.course_id = e.course_id
-GROUP BY i.instructor_id, i.instructor_name, i.department
-ORDER BY total_students DESC;
+    COUNT(*) AS total_enrollments,
+    COUNT(grade) AS graded_enrollments,
+    COUNT(grade_points) AS with_points,
+    AVG(grade_points) AS avg_points
+FROM enrollments;
 ```
 
-## Common Mistakes and Solutions
+**Result:**
+| total_enrollments | graded_enrollments | with_points | avg_points |
+|-------------------|--------------------| ------------|------------|
+| 8 | 7 | 7 | 3.53 |
 
-### Mistake 1: Missing GROUP BY Column
+**Explanation:** Enrollment 108 has NULL grade and grade_points, so it's excluded from counts of those columns and the average.
 
-**Problem:**
+## Common Mistakes
+
+**Mistake 1: Forgetting GROUP BY for non-aggregate columns**
+
 ```sql
--- ERROR: not a GROUP BY expression
-SELECT department, course_name, COUNT(*)
-FROM courses
-GROUP BY department;
+-- ERROR: major not in GROUP BY
+SELECT major, COUNT(*)
+FROM students;
+
+-- Correct
+SELECT major, COUNT(*)
+FROM students
+GROUP BY major;
 ```
 
-**Solution:**
-```sql
-SELECT department, course_name, COUNT(*)
-FROM courses
-GROUP BY department, course_name;
-```
+**Mistake 2: Using WHERE with aggregate functions**
 
-### Mistake 2: Using Aggregate in WHERE
-
-**Problem:**
 ```sql
--- ERROR: cannot use aggregate function in WHERE
+-- ERROR: Can't use aggregate in WHERE
 SELECT major, AVG(gpa)
 FROM students
 WHERE AVG(gpa) > 3.5
 GROUP BY major;
-```
 
-**Solution:**
-```sql
+-- Correct: Use HAVING
 SELECT major, AVG(gpa)
 FROM students
 GROUP BY major
 HAVING AVG(gpa) > 3.5;
 ```
 
-### Mistake 3: Forgetting NULL Handling
+**Mistake 3: Confusing COUNT(*) with COUNT(column)**
 
-**Problem:**
 ```sql
--- May give unexpected results with NULLs
-SELECT AVG(grade_points) FROM enrollments;
-```
+-- COUNT(*) includes NULLs
+SELECT COUNT(*) FROM students;  -- Returns: 5
 
-**Better:**
-```sql
--- Explicit NULL handling
-SELECT 
-    AVG(grade_points) AS avg_excluding_nulls,
-    AVG(NVL(grade_points, 0)) AS avg_treating_null_as_zero
-FROM enrollments;
+-- COUNT(column) excludes NULLs
+SELECT COUNT(major) FROM students;  -- Returns: 4
 ```
 
 ## Summary
 
-**Key Takeaways:**
+**Key Points:**
 
-1. **Group functions operate on sets of rows** to return single summary values per group (COUNT, SUM, AVG, MAX, MIN).
+1. **Group functions** aggregate multiple rows into a single result
+2. **Common functions**: COUNT, SUM, AVG, MAX, MIN
+3. **COUNT(*)** includes all rows; **COUNT(column)** excludes NULLs
+4. **GROUP BY** divides rows into groups for aggregation
+5. **HAVING** filters groups (use after GROUP BY)
+6. **WHERE vs. HAVING**: WHERE filters rows before grouping, HAVING filters groups after
+7. **All columns** in SELECT must be in GROUP BY or be aggregate functions
+8. **NULL handling**: Most functions ignore NULLs (except COUNT(*))
+9. **Common patterns**: Conditional aggregation with CASE, multiple grouping columns
 
-2. **COUNT has two forms**: COUNT(*) includes NULLs and counts all rows; COUNT(column) excludes NULLs and counts non-NULL values.
-
-3. **GROUP BY divides rows into groups** where each group shares common values in the GROUP BY columns; all non-aggregated SELECT columns must appear in GROUP BY.
-
-4. **HAVING filters groups after aggregation** while WHERE filters individual rows before grouping; HAVING can use aggregate functions, WHERE cannot.
-
-5. **Most aggregate functions ignore NULLs** except COUNT(*) which includes all rows regardless of NULL values.
-
-6. **DISTINCT keyword** in aggregate functions (e.g., COUNT(DISTINCT column)) considers only unique values.
-
-7. **Common patterns**: statistical summaries, percentage calculations, conditional aggregation with CASE, multi-level grouping, and filtering with HAVING.
-
-8. **Execution order**: WHERE → GROUP BY → Aggregation → HAVING → ORDER BY.
-
-Group functions are essential for data analysis, reporting, and generating summary statistics from large datasets.
-
+Group functions are essential for data analysis and reporting in SQL.

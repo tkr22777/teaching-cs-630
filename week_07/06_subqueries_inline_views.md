@@ -323,24 +323,6 @@ FROM (SELECT student_id FROM students) s
 JOIN enrollments e ON s.student_id = e.student_id;
 ```
 
-**Mistake 3: Overly complex nesting**
-```sql
--- Hard to read
-SELECT * FROM (
-    SELECT * FROM (
-        SELECT * FROM (
-            SELECT * FROM students
-        ) s1
-    ) s2
-) s3;
-
--- Better: Use WITH clause
-WITH step1 AS (SELECT * FROM students),
-     step2 AS (SELECT * FROM step1),
-     step3 AS (SELECT * FROM step2)
-SELECT * FROM step3;
-```
-
 ## Performance Tips
 
 1. **Add appropriate indexes** on columns used in WHERE/JOIN

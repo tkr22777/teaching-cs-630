@@ -1,24 +1,24 @@
-# Single-Row Functions
+# SQL Single-Row Functions
 
 ## Overview
 
-**Single-row functions** are SQL functions that operate on individual rows and return one result per row. They can manipulate data types, perform calculations, format output, and transform values. These functions are essential for data processing and presentation in SQL queries.
+**Single-row functions** operate on one row at a time and return one result per row. They can manipulate data types, perform calculations, and modify output format.
 
 ## Key Terms
 
-**Single-Row Function**: A function that processes one row at a time and returns one result per input row.
+**Single-Row Function**: Function that processes one row and returns one value per row.
 
-**String Function**: Functions that manipulate character data (UPPER, LOWER, SUBSTR, etc.).
+**Character Function**: Manipulates text/string data.
 
-**Numeric Function**: Functions that perform mathematical operations (ROUND, TRUNC, MOD, etc.).
+**Numeric Function**: Performs mathematical operations.
 
-**Date Function**: Functions that work with date and time values (SYSDATE, ADD_MONTHS, MONTHS_BETWEEN, etc.).
+**Date Function**: Works with date and time values.
 
-**Conversion Function**: Functions that convert data from one type to another (TO_CHAR, TO_DATE, TO_NUMBER).
+**Conversion Function**: Converts between data types.
 
-**Null Function**: Functions that handle NULL values (NVL, NVL2, COALESCE, NULLIF).
+**NULL Handling Function**: Manages NULL values in expressions.
 
-**Nesting**: Using the output of one function as input to another function.
+**Function Nesting**: Using one function's output as another function's input.
 
 ## Sample Database Schema
 
@@ -125,447 +125,241 @@ COMMIT;
 
 </details>
 
-## Categories of Single-Row Functions
+## Function Categories
+
+Single-row functions are organized into categories:
 
 | Category | Purpose | Examples |
 |----------|---------|----------|
-| **Character** | String manipulation | UPPER, LOWER, INITCAP, SUBSTR, LENGTH, CONCAT |
-| **Numeric** | Mathematical operations | ROUND, TRUNC, MOD, ABS, CEIL, FLOOR |
-| **Date** | Date/time operations | SYSDATE, ADD_MONTHS, MONTHS_BETWEEN, TRUNC |
-| **Conversion** | Data type conversion | TO_CHAR, TO_DATE, TO_NUMBER |
-| **NULL Handling** | Work with NULL values | NVL, NVL2, COALESCE, NULLIF |
-| **Conditional** | Conditional logic | CASE, DECODE |
+| **Character** | String manipulation | UPPER, LOWER, SUBSTR, CONCAT, TRIM |
+| **Numeric** | Mathematical operations | ROUND, TRUNC, MOD |
+| **Date** | Date/time operations | SYSDATE, ADD_MONTHS, MONTHS_BETWEEN |
+| **Conversion** | Data type conversion | TO_CHAR, TO_DATE |
+| **NULL Handling** | NULL value management | NVL, COALESCE |
 
-## Character (String) Functions
+## Character Functions
 
 ### UPPER, LOWER, INITCAP
 
-Transform case of text strings.
+**Purpose:** Change text case.
 
 **Syntax:**
-```sql
-UPPER(string)    -- Converts to uppercase
-LOWER(string)    -- Converts to lowercase
-INITCAP(string)  -- Capitalizes first letter of each word
-```
+- `UPPER(string)` - Converts to uppercase
+- `LOWER(string)` - Converts to lowercase
+- `INITCAP(string)` - Capitalizes first letter of each word
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
     first_name,
-    UPPER(first_name) AS uppercase,
-    LOWER(first_name) AS lowercase,
-    INITCAP(LOWER(email)) AS formatted_email
+    UPPER(first_name) AS upper_name,
+    LOWER(first_name) AS lower_name,
+    INITCAP(email) AS formatted_email
 FROM students
 WHERE student_id = 1;
 ```
 
 **Result:**
-| first_name | uppercase | lowercase | formatted_email |
-|------------|-----------|-----------|-----------------|
+| first_name | upper_name | lower_name | formatted_email |
+|------------|------------|------------|-----------------|
 | John | JOHN | john | John.Smith@University.Edu |
 
-**Use Cases:**
-- Case-insensitive searches: `WHERE UPPER(last_name) = 'SMITH'`
-- Standardizing data entry
-- Formatting output for reports
-
-### LENGTH and LENGTHB
-
-Calculate string length.
-
-**Syntax:**
+**Common use:** Case-insensitive searches:
 ```sql
-LENGTH(string)   -- Returns character length
-LENGTHB(string)  -- Returns byte length
+WHERE UPPER(major) = 'COMPUTER SCIENCE'
 ```
-
-**Examples:**
-
-```sql
-SELECT 
-    course_name,
-    LENGTH(course_name) AS char_length,
-    course_id,
-    LENGTH(course_id) AS id_length
-FROM courses;
-```
-
-**Result:**
-| course_name | char_length | course_id | id_length |
-|-------------|-------------|-----------|-----------|
-| Introduction to Programming | 27 | CS101 | 5 |
-| Data Structures | 15 | CS201 | 5 |
-
-**Use Cases:**
-- Data validation: `WHERE LENGTH(phone) = 10`
-- Finding long/short entries
-- Column width determination
 
 ### SUBSTR
 
-Extract substring from a string.
+**Purpose:** Extract part of a string.
 
-**Syntax:**
-```sql
-SUBSTR(string, start_position, length)
--- start_position: 1-based index (positive from start, negative from end)
--- length: optional, number of characters to extract
-```
+**Syntax:** `SUBSTR(string, start_position, length)`
+- `start_position`: Starting position (1-based)
+- `length`: Optional - number of characters
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
     course_id,
     course_name,
-    SUBSTR(course_id, 1, 2) AS department_code,
-    SUBSTR(course_id, 3) AS course_number,
-    SUBSTR(course_name, 1, 20) AS short_name
-FROM courses;
-```
-
-**Result:**
-| course_id | course_name | department_code | course_number | short_name |
-|-----------|-------------|-----------------|---------------|------------|
-| CS101 | Introduction to Programming | CS | 101 | Introduction to Prog |
-| MATH101 | Calculus I | MA | TH101 | Calculus I |
-
-**Additional Examples:**
-
-```sql
--- Extract from end of string
-SELECT SUBSTR('Hello World', -5) FROM DUAL;  -- Returns: World
-
--- Extract middle portion
-SELECT SUBSTR('Database Systems', 6, 4) FROM DUAL;  -- Returns: base
-
--- Extract email domain
-SELECT 
-    email,
-    SUBSTR(email, INSTR(email, '@') + 1) AS domain
-FROM students;
-```
-
-### CONCAT and || Operator
-
-Concatenate strings.
-
-**Syntax:**
-```sql
-CONCAT(string1, string2)  -- Joins two strings
-string1 || string2        -- Concatenation operator (can join multiple)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    first_name,
-    last_name,
-    CONCAT(first_name, last_name) AS name_concat,
-    first_name || ' ' || last_name AS full_name,
-    last_name || ', ' || first_name AS last_first
-FROM students;
-```
-
-**Result:**
-| first_name | last_name | name_concat | full_name | last_first |
-|------------|-----------|-------------|-----------|------------|
-| John | Smith | JohnSmith | John Smith | Smith, John |
-| Jane | Doe | JaneDoe | Jane Doe | Doe, Jane |
-
-### TRIM, LTRIM, RTRIM
-
-Remove spaces or characters from strings.
-
-**Syntax:**
-```sql
-TRIM(string)           -- Removes spaces from both ends
-LTRIM(string)          -- Removes leading spaces
-RTRIM(string)          -- Removes trailing spaces
-TRIM(char FROM string) -- Removes specific character
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    '|' || TRIM('  Hello  ') || '|' AS trimmed,
-    '|' || LTRIM('  Hello  ') || '|' AS left_trimmed,
-    '|' || RTRIM('  Hello  ') || '|' AS right_trimmed,
-    TRIM('.' FROM '...Hello...') AS trim_dots
-FROM DUAL;
-```
-
-**Result:**
-| trimmed | left_trimmed | right_trimmed | trim_dots |
-|---------|--------------|---------------|-----------|
-| \|Hello\| | \|Hello  \| | \|  Hello\| | Hello |
-
-### INSTR
-
-Find position of substring within a string.
-
-**Syntax:**
-```sql
-INSTR(string, substring, start_position, occurrence)
--- Returns position of substring (0 if not found)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    email,
-    INSTR(email, '@') AS at_position,
-    INSTR(email, '.', INSTR(email, '@')) AS dot_position
-FROM students
-WHERE student_id = 1;
-```
-
-**Result:**
-| email | at_position | dot_position |
-|-------|-------------|--------------|
-| john.smith@university.edu | 11 | 22 |
-
-**Practical Use - Extract Email Parts:**
-
-```sql
-SELECT 
-    email,
-    SUBSTR(email, 1, INSTR(email, '@') - 1) AS username,
-    SUBSTR(email, INSTR(email, '@') + 1) AS domain
-FROM students;
-```
-
-### REPLACE
-
-Replace occurrences of a substring.
-
-**Syntax:**
-```sql
-REPLACE(string, search_string, replacement_string)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    course_name,
-    REPLACE(course_name, 'Programming', 'Coding') AS updated_name,
-    REPLACE(course_id, 'CS', 'CSCI') AS new_id
+    SUBSTR(course_id, 1, 2) AS dept_code,
+    SUBSTR(course_id, 3) AS course_number
 FROM courses
 WHERE course_id LIKE 'CS%';
 ```
 
 **Result:**
-| course_name | updated_name | new_id |
-|-------------|--------------|--------|
-| Introduction to Programming | Introduction to Coding | CSCI101 |
-| Data Structures | Data Structures | CSCI201 |
+| course_id | course_name | dept_code | course_number |
+|-----------|-------------|-----------|---------------|
+| CS101 | Introduction to Programming | CS | 101 |
+| CS201 | Data Structures | CS | 201 |
+| CS301 | Database Systems | CS | 301 |
+
+### CONCAT and || Operator
+
+**Purpose:** Join strings together.
+
+**Syntax:**
+- `CONCAT(string1, string2)` - Joins two strings
+- `string1 || string2` - Concatenation operator (preferred, can chain)
+
+**Example:**
+
+```sql
+SELECT 
+    first_name || ' ' || last_name AS full_name,
+    CONCAT(first_name, last_name) AS no_space_name,
+    email || ' (' || major || ')' AS contact_info
+FROM students
+WHERE student_id <= 2;
+```
+
+**Result:**
+| full_name | no_space_name | contact_info |
+|-----------|---------------|--------------|
+| John Smith | JohnSmith | john.smith@university.edu (Computer Science) |
+| Jane Doe | JaneDoe | jane.doe@university.edu (Mathematics) |
+
+### TRIM, LTRIM, RTRIM
+
+**Purpose:** Remove spaces or characters.
+
+**Syntax:**
+- `TRIM(string)` - Remove spaces from both sides
+- `LTRIM(string)` - Remove from left
+- `RTRIM(string)` - Remove from right
+
+**Example:**
+
+```sql
+SELECT 
+    TRIM('  Computer Science  ') AS trimmed,
+    LTRIM('  Left spaces') AS left_trimmed,
+    RTRIM('Right spaces  ') AS right_trimmed
+FROM DUAL;
+```
+
+**Result:**
+| trimmed | left_trimmed | right_trimmed |
+|---------|--------------|---------------|
+| Computer Science | Left spaces | Right spaces |
 
 ## Numeric Functions
 
 ### ROUND
 
-Round numbers to specified decimal places.
+**Purpose:** Round numbers to specified decimal places.
 
-**Syntax:**
-```sql
-ROUND(number, decimal_places)
--- decimal_places: positive for decimals, negative for whole numbers
-```
+**Syntax:** `ROUND(number, decimal_places)`
+- Positive: decimal places
+- Negative: digits before decimal
+- Omitted: rounds to integer
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
+    first_name,
     gpa,
-    ROUND(gpa, 0) AS rounded_gpa,
+    ROUND(gpa) AS rounded_gpa,
     ROUND(gpa, 1) AS one_decimal,
-    ROUND(gpa * 100, -1) AS rounded_tens
+    ROUND(gpa * 100, -1) AS nearest_ten
 FROM students
-WHERE gpa IS NOT NULL;
+WHERE gpa IS NOT NULL
+ORDER BY student_id;
 ```
 
 **Result:**
-| gpa | rounded_gpa | one_decimal | rounded_tens |
-|-----|-------------|-------------|--------------|
-| 3.87 | 4 | 3.9 | 390 |
-| 3.23 | 3 | 3.2 | 320 |
-
-**More Examples:**
-
-```sql
-SELECT 
-    ROUND(3.14159, 2) AS two_decimals,      -- 3.14
-    ROUND(3.14159, 0) AS no_decimals,       -- 3
-    ROUND(3.14159, -1) AS round_tens,       -- 0
-    ROUND(156.789, -2) AS round_hundreds    -- 200
-FROM DUAL;
-```
+| first_name | gpa | rounded_gpa | one_decimal | nearest_ten |
+|------------|-----|-------------|-------------|-------------|
+| John | 3.8 | 4 | 3.8 | 380 |
+| Jane | 3.9 | 4 | 3.9 | 390 |
+| Bob | 3.2 | 3 | 3.2 | 320 |
 
 ### TRUNC
 
-Truncate numbers to specified decimal places (no rounding).
+**Purpose:** Truncate (chop off) numbers without rounding.
 
-**Syntax:**
-```sql
-TRUNC(number, decimal_places)
-```
+**Syntax:** `TRUNC(number, decimal_places)`
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
+    first_name,
     gpa,
-    TRUNC(gpa, 0) AS truncated_gpa,
+    TRUNC(gpa) AS truncated,
     TRUNC(gpa, 1) AS one_decimal,
-    ROUND(gpa, 1) AS rounded_comparison
+    gpa - TRUNC(gpa) AS decimal_part
 FROM students
-WHERE gpa IS NOT NULL;
+WHERE gpa IS NOT NULL
+AND student_id <= 3;
 ```
 
 **Result:**
-| gpa | truncated_gpa | one_decimal | rounded_comparison |
-|-----|---------------|-------------|--------------------|
-| 3.87 | 3 | 3.8 | 3.9 |
-| 3.23 | 3 | 3.2 | 3.2 |
-
-**Difference between ROUND and TRUNC:**
-
-```sql
-SELECT 
-    3.7 AS original,
-    ROUND(3.7) AS rounded,  -- 4
-    TRUNC(3.7) AS truncated -- 3
-FROM DUAL;
-```
+| first_name | gpa | truncated | one_decimal | decimal_part |
+|------------|-----|-----------|-------------|--------------|
+| John | 3.8 | 3 | 3.8 | 0.8 |
+| Jane | 3.9 | 3 | 3.9 | 0.9 |
+| Bob | 3.2 | 3 | 3.2 | 0.2 |
 
 ### MOD
 
-Calculate remainder of division.
+**Purpose:** Calculate remainder after division.
 
-**Syntax:**
-```sql
-MOD(dividend, divisor)
-```
+**Syntax:** `MOD(dividend, divisor)`
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
     student_id,
     first_name,
-    MOD(student_id, 2) AS odd_or_even,
+    MOD(student_id, 2) AS is_odd,
     CASE 
         WHEN MOD(student_id, 2) = 0 THEN 'Even'
         ELSE 'Odd'
     END AS parity
-FROM students;
+FROM students
+ORDER BY student_id;
 ```
 
 **Result:**
-| student_id | first_name | odd_or_even | parity |
-|------------|------------|-------------|--------|
+| student_id | first_name | is_odd | parity |
+|------------|------------|--------|--------|
 | 1 | John | 1 | Odd |
 | 2 | Jane | 0 | Even |
 | 3 | Bob | 1 | Odd |
-
-**Use Cases:**
-- Identifying even/odd numbers
-- Creating groups: `MOD(student_id, 5)` creates 5 groups
-- Scheduling rotations
-
-### ABS, CEIL, FLOOR
-
-Absolute value and rounding functions.
-
-**Syntax:**
-```sql
-ABS(number)    -- Absolute value (remove negative sign)
-CEIL(number)   -- Round up to nearest integer
-FLOOR(number)  -- Round down to nearest integer
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    3.2 AS original,
-    ABS(-3.2) AS absolute,
-    CEIL(3.2) AS ceiling,
-    FLOOR(3.2) AS floor,
-    CEIL(-3.2) AS ceil_negative,
-    FLOOR(-3.2) AS floor_negative
-FROM DUAL;
-```
-
-**Result:**
-| original | absolute | ceiling | floor | ceil_negative | floor_negative |
-|----------|----------|---------|-------|---------------|----------------|
-| 3.2 | 3.2 | 4 | 3 | -3 | -4 |
-
-### POWER and SQRT
-
-Exponents and square roots.
-
-**Syntax:**
-```sql
-POWER(base, exponent)
-SQRT(number)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    credits,
-    POWER(credits, 2) AS credits_squared,
-    SQRT(credits) AS credits_sqrt
-FROM courses
-WHERE course_id = 'CS201';
-```
-
-**Result:**
-| credits | credits_squared | credits_sqrt |
-|---------|-----------------|--------------|
-| 4 | 16 | 2 |
+| 4 | Alice | 0 | Even |
+| 5 | Charlie | 1 | Odd |
 
 ## Date Functions
 
-### SYSDATE and CURRENT_DATE
+### SYSDATE
 
-Get current date and time.
+**Purpose:** Get current date and time.
 
-**Syntax:**
-```sql
-SYSDATE         -- Current date and time (database server)
-CURRENT_DATE    -- Current date (session time zone)
-```
+**Syntax:** `SYSDATE` (no parentheses)
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
     SYSDATE AS current_datetime,
     TRUNC(SYSDATE) AS current_date,
-    TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') AS formatted
+    SYSDATE - TRUNC(SYSDATE) AS time_fraction
 FROM DUAL;
 ```
 
 ### ADD_MONTHS
 
-Add or subtract months from a date.
+**Purpose:** Add or subtract months from a date.
 
-**Syntax:**
-```sql
-ADD_MONTHS(date, number_of_months)
-```
+**Syntax:** `ADD_MONTHS(date, number_of_months)`
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
@@ -574,208 +368,89 @@ SELECT
     ADD_MONTHS(enrollment_date, 12) AS one_year_later,
     ADD_MONTHS(enrollment_date, -6) AS six_months_before
 FROM students
-WHERE student_id = 1;
+WHERE student_id <= 2;
 ```
 
 **Result:**
 | first_name | enrollment_date | one_year_later | six_months_before |
 |------------|-----------------|----------------|-------------------|
 | John | 2023-09-01 | 2024-09-01 | 2023-03-01 |
+| Jane | 2023-09-01 | 2024-09-01 | 2023-03-01 |
 
 ### MONTHS_BETWEEN
 
-Calculate months between two dates.
+**Purpose:** Calculate number of months between two dates.
 
-**Syntax:**
-```sql
-MONTHS_BETWEEN(date1, date2)
--- Returns fractional months (can be positive or negative)
-```
+**Syntax:** `MONTHS_BETWEEN(date1, date2)`
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
     first_name,
     enrollment_date,
     ROUND(MONTHS_BETWEEN(SYSDATE, enrollment_date)) AS months_enrolled,
-    ROUND(MONTHS_BETWEEN(SYSDATE, enrollment_date) / 12, 1) AS years_enrolled
-FROM students;
-```
-
-**Result:**
-| first_name | enrollment_date | months_enrolled | years_enrolled |
-|------------|-----------------|-----------------|----------------|
-| John | 2023-09-01 | 14 | 1.2 |
-| Charlie | 2024-09-01 | 2 | 0.2 |
-
-### NEXT_DAY and LAST_DAY
-
-Find next occurrence of a day or last day of month.
-
-**Syntax:**
-```sql
-NEXT_DAY(date, day_of_week)
-LAST_DAY(date)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    SYSDATE AS today,
-    NEXT_DAY(SYSDATE, 'MONDAY') AS next_monday,
-    LAST_DAY(SYSDATE) AS last_day_of_month,
-    TRUNC(LAST_DAY(SYSDATE)) - TRUNC(SYSDATE) AS days_left_in_month
-FROM DUAL;
-```
-
-### TRUNC (for dates)
-
-Truncate time portion from date.
-
-**Syntax:**
-```sql
-TRUNC(date, format)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    SYSDATE AS full_datetime,
-    TRUNC(SYSDATE) AS date_only,
-    TRUNC(SYSDATE, 'MONTH') AS first_day_of_month,
-    TRUNC(SYSDATE, 'YEAR') AS first_day_of_year
-FROM DUAL;
-```
-
-### Date Arithmetic
-
-Perform calculations with dates.
-
-**Operations:**
-```sql
-date + number      -- Add days
-date - number      -- Subtract days
-date1 - date2      -- Difference in days
-date + number/24   -- Add hours
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    enrollment_date,
-    enrollment_date + 7 AS one_week_later,
-    enrollment_date - 30 AS thirty_days_before,
-    SYSDATE - enrollment_date AS days_since_enrollment,
-    enrollment_date + 1/24 AS one_hour_later
+    TRUNC(MONTHS_BETWEEN(SYSDATE, enrollment_date) / 12) AS years_enrolled
 FROM students
-WHERE student_id = 1;
+WHERE enrollment_date IS NOT NULL
+ORDER BY enrollment_date;
 ```
 
 ## Conversion Functions
 
 ### TO_CHAR (Date to String)
 
-Convert dates to formatted strings.
+**Purpose:** Convert dates to formatted strings.
 
-**Syntax:**
-```sql
-TO_CHAR(date, format_mask)
-```
+**Syntax:** `TO_CHAR(date, format_mask)`
 
 **Common Format Masks:**
-| Mask | Meaning | Example |
-|------|---------|---------|
-| YYYY | 4-digit year | 2024 |
-| MM | Month (01-12) | 10 |
-| MON | Month abbreviation | OCT |
-| MONTH | Month full name | OCTOBER |
-| DD | Day of month | 29 |
-| DY | Day abbreviation | WED |
-| DAY | Day full name | WEDNESDAY |
-| HH24 | Hour (00-23) | 14 |
-| MI | Minute | 30 |
-| SS | Second | 45 |
+| Mask | Description | Example |
+|------|-------------|---------|
+| `YYYY` | 4-digit year | 2024 |
+| `MM` | 2-digit month | 09 |
+| `DD` | 2-digit day | 15 |
+| `MON` | Abbreviated month | SEP |
+| `MONTH` | Full month name | SEPTEMBER |
+| `DY` | Abbreviated day | MON |
+| `DAY` | Full day name | MONDAY |
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
+    first_name,
     enrollment_date,
-    TO_CHAR(enrollment_date, 'YYYY-MM-DD') AS iso_format,
+    TO_CHAR(enrollment_date, 'MM/DD/YYYY') AS us_format,
     TO_CHAR(enrollment_date, 'Month DD, YYYY') AS long_format,
-    TO_CHAR(enrollment_date, 'MM/DD/YY') AS short_format,
-    TO_CHAR(enrollment_date, 'Day, Month DD, YYYY') AS full_format
+    TO_CHAR(enrollment_date, 'DY, MON DD') AS short_format
 FROM students
-WHERE student_id = 1;
+WHERE student_id <= 2;
 ```
 
 **Result:**
-| enrollment_date | iso_format | long_format | short_format | full_format |
-|-----------------|------------|-------------|--------------|-------------|
-| 2023-09-01 | 2023-09-01 | September 01, 2023 | 09/01/23 | Friday, September 01, 2023 |
-
-### TO_CHAR (Number to String)
-
-Convert numbers to formatted strings.
-
-**Syntax:**
-```sql
-TO_CHAR(number, format_mask)
-```
-
-**Common Format Masks:**
-| Mask | Meaning | Example |
-|------|---------|---------|
-| 9 | Display digit (suppress leading zeros) | 9999 |
-| 0 | Display digit (show leading zeros) | 0999 |
-| $ | Dollar sign | $9999 |
-| . | Decimal point | 9999.99 |
-| , | Comma separator | 9,999 |
-| FM | Fill mode (removes padding) | FM9999 |
-
-**Examples:**
-
-```sql
-SELECT 
-    gpa,
-    TO_CHAR(gpa, '9.99') AS formatted_gpa,
-    TO_CHAR(gpa * 1000, '$9,999.99') AS as_currency,
-    TO_CHAR(student_id, '0000') AS padded_id
-FROM students
-WHERE student_id <= 3;
-```
-
-**Result:**
-| gpa | formatted_gpa | as_currency | padded_id |
-|-----|---------------|-------------|-----------|
-| 3.8 | 3.80 | $3,800.00 | 0001 |
-| 3.9 | 3.90 | $3,900.00 | 0002 |
-| 3.2 | 3.20 | $3,200.00 | 0003 |
+| first_name | enrollment_date | us_format | long_format | short_format |
+|------------|-----------------|-----------|-------------|--------------|
+| John | 2023-09-01 | 09/01/2023 | September 01, 2023 | FRI, SEP 01 |
+| Jane | 2023-09-01 | 09/01/2023 | September 01, 2023 | FRI, SEP 01 |
 
 ### TO_DATE
 
-Convert strings to dates.
+**Purpose:** Convert strings to dates.
 
-**Syntax:**
-```sql
-TO_DATE(string, format_mask)
-```
+**Syntax:** `TO_DATE(string, format_mask)`
 
-**Examples:**
+**Example:**
 
 ```sql
 SELECT 
-    TO_DATE('2024-10-29', 'YYYY-MM-DD') AS date1,
-    TO_DATE('10/29/2024', 'MM/DD/YYYY') AS date2,
-    TO_DATE('October 29, 2024', 'Month DD, YYYY') AS date3
+    TO_DATE('2024-12-25', 'YYYY-MM-DD') AS christmas,
+    TO_DATE('12/31/2024', 'MM/DD/YYYY') AS new_years_eve,
+    TO_DATE('January 1, 2025', 'Month DD, YYYY') AS new_year
 FROM DUAL;
 ```
 
-**Practical Use:**
+**Practical use:**
 
 ```sql
 -- Find students enrolled after a specific date
@@ -784,203 +459,107 @@ FROM students
 WHERE enrollment_date > TO_DATE('2024-01-01', 'YYYY-MM-DD');
 ```
 
-### TO_NUMBER
-
-Convert strings to numbers.
-
-**Syntax:**
-```sql
-TO_NUMBER(string, format_mask)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    TO_NUMBER('12345') AS simple_number,
-    TO_NUMBER('$1,234.56', '$9,999.99') AS from_currency,
-    TO_NUMBER('  123  ') AS with_spaces
-FROM DUAL;
-```
-
 ## NULL Handling Functions
 
 ### NVL
 
-Replace NULL with a value.
+**Purpose:** Replace NULL with a specified value.
 
-**Syntax:**
-```sql
-NVL(expression, replacement_value)
-```
+**Syntax:** `NVL(expression, replacement_value)`
 
-**Examples:**
-
-```sql
-SELECT 
-    first_name,
-    major,
-    NVL(major, 'Undeclared') AS major_display,
-    gpa,
-    NVL(gpa, 0.0) AS gpa_display
-FROM students;
-```
-
-**Result:**
-| first_name | major | major_display | gpa | gpa_display |
-|------------|-------|---------------|-----|-------------|
-| John | Computer Science | Computer Science | 3.8 | 3.8 |
-| Charlie | NULL | Undeclared | 2.8 | 2.8 |
-
-### NVL2
-
-Return different values based on whether expression is NULL.
-
-**Syntax:**
-```sql
-NVL2(expression, value_if_not_null, value_if_null)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    course_name,
-    instructor_id,
-    NVL2(instructor_id, 'Assigned', 'Unassigned') AS instructor_status,
-    NVL2(instructor_id, 'Instructor: ' || instructor_id, 'TBA') AS instructor_info
-FROM courses;
-```
-
-**Result:**
-| course_name | instructor_id | instructor_status | instructor_info |
-|-------------|---------------|-------------------|-----------------|
-| Introduction to Programming | 10 | Assigned | Instructor: 10 |
-| English Composition | NULL | Unassigned | TBA |
-
-### COALESCE
-
-Return first non-NULL value from a list.
-
-**Syntax:**
-```sql
-COALESCE(expr1, expr2, expr3, ...)
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    first_name,
-    major,
-    email,
-    COALESCE(major, 'Undeclared', 'Unknown') AS major_display,
-    COALESCE(NULL, NULL, gpa, 0) AS first_non_null
-FROM students;
-```
-
-**Practical Use - Fallback Values:**
-
-```sql
-SELECT 
-    student_id,
-    COALESCE(
-        email,
-        phone,
-        mailing_address,
-        'No contact info'
-    ) AS primary_contact
-FROM students;
-```
-
-### NULLIF
-
-Return NULL if two expressions are equal.
-
-**Syntax:**
-```sql
-NULLIF(expr1, expr2)
--- Returns NULL if expr1 = expr2, otherwise returns expr1
-```
-
-**Examples:**
-
-```sql
-SELECT 
-    course_id,
-    credits,
-    NULLIF(credits, 3) AS non_standard_credits
-FROM courses;
-```
-
-**Result:**
-| course_id | credits | non_standard_credits |
-|-----------|---------|----------------------|
-| CS101 | 3 | NULL |
-| CS201 | 4 | 4 |
-| PHYS101 | 4 | 4 |
-
-**Use Case - Avoid Division by Zero:**
-
-```sql
-SELECT 
-    total_points / NULLIF(attempts, 0) AS average
-FROM game_scores;
-```
-
-## Function Nesting
-
-Functions can be nested (output of one function used as input to another).
-
-**Examples:**
-
-```sql
-SELECT 
-    email,
-    UPPER(SUBSTR(email, 1, INSTR(email, '@') - 1)) AS username_upper,
-    REPLACE(LOWER(email), '@university.edu', '@alumni.edu') AS alumni_email
-FROM students
-WHERE student_id = 1;
-```
-
-**Result:**
-| email | username_upper | alumni_email |
-|-------|----------------|--------------|
-| john.smith@university.edu | JOHN.SMITH | john.smith@alumni.edu |
-
-**Complex Example:**
+**Example:**
 
 ```sql
 SELECT 
     first_name,
     last_name,
-    enrollment_date,
-    TO_CHAR(
-        ADD_MONTHS(enrollment_date, 48),
-        'Month DD, YYYY'
-    ) AS expected_graduation
-FROM students;
+    major,
+    NVL(major, 'Undeclared') AS major_status
+FROM students
+ORDER BY student_id;
 ```
+
+**Result:**
+| first_name | last_name | major | major_status |
+|------------|-----------|-------|--------------|
+| John | Smith | Computer Science | Computer Science |
+| Jane | Doe | Mathematics | Mathematics |
+| Bob | Wilson | Computer Science | Computer Science |
+| Alice | Brown | Physics | Physics |
+| Charlie | Davis | NULL | Undeclared |
+
+### COALESCE
+
+**Purpose:** Return first non-NULL value from a list.
+
+**Syntax:** `COALESCE(value1, value2, value3, ...)`
+
+**Example:**
+
+```sql
+SELECT 
+    e.enrollment_id,
+    e.course_id,
+    e.grade,
+    e.grade_points,
+    COALESCE(e.grade, 'IP') AS grade_status,
+    COALESCE(e.grade_points, 0) AS points_earned
+FROM enrollments e
+WHERE e.student_id = 1
+ORDER BY e.enrollment_id;
+```
+
+**Result:**
+| enrollment_id | course_id | grade | grade_points | grade_status | points_earned |
+|---------------|-----------|-------|--------------|--------------|---------------|
+| 101 | CS101 | A | 4.0 | A | 4.0 |
+| 102 | CS201 | B+ | 3.3 | B+ | 3.3 |
+| 108 | CS301 | NULL | NULL | IP | 0 |
+
+**Multiple values:**
+```sql
+SELECT COALESCE(NULL, NULL, 'First non-NULL', 'Another') AS result FROM DUAL;
+-- Returns: 'First non-NULL'
+```
+
+## Function Nesting
+
+Functions can be nested - the inner function executes first, and its result becomes input to the outer function.
+
+**Example: Formatted full name in uppercase**
+
+```sql
+SELECT 
+    UPPER(first_name || ' ' || last_name) AS formatted_name,
+    TO_CHAR(enrollment_date, 'Month YYYY') AS enrollment_month,
+    ROUND(NVL(gpa, 0), 1) AS safe_gpa
+FROM students
+WHERE student_id <= 3;
+```
+
+**Result:**
+| formatted_name | enrollment_month | safe_gpa |
+|----------------|------------------|----------|
+| JOHN SMITH | September 2023 | 3.8 |
+| JANE DOE | September 2023 | 3.9 |
+| BOB WILSON | January 2024 | 3.2 |
+
+**Execution order:** Inner to outer
+1. `NVL(gpa, 0)` replaces NULL with 0
+2. `ROUND(..., 1)` rounds the result
+3. `TO_CHAR(enrollment_date, 'Month YYYY')` formats date
 
 ## Summary
 
-**Key Takeaways:**
+**Key Points:**
 
-1. **Single-row functions process one row at a time** and return one result per row, enabling row-level data transformation.
+1. **Single-row functions** operate on one row at a time, returning one result per row
+2. **Character functions**: UPPER, LOWER, SUBSTR, CONCAT (||), TRIM
+3. **Numeric functions**: ROUND, TRUNC, MOD
+4. **Date functions**: SYSDATE, ADD_MONTHS, MONTHS_BETWEEN
+5. **Conversion functions**: TO_CHAR, TO_DATE
+6. **NULL handling**: NVL (2 values), COALESCE (multiple values)
+7. **Nesting**: Functions can be nested (inner executes first)
+8. **Common uses**: Formatting output, data cleaning, calculations, NULL handling
 
-2. **Character functions** (UPPER, LOWER, SUBSTR, CONCAT, TRIM, etc.) manipulate text strings for formatting, searching, and standardization.
-
-3. **Numeric functions** (ROUND, TRUNC, MOD, ABS, CEIL, FLOOR) perform mathematical operations and rounding on numbers.
-
-4. **Date functions** (SYSDATE, ADD_MONTHS, MONTHS_BETWEEN, TRUNC) enable date arithmetic and formatting for temporal data.
-
-5. **Conversion functions** (TO_CHAR, TO_DATE, TO_NUMBER) convert between data types with format masks for precise control.
-
-6. **NULL handling functions** (NVL, NVL2, COALESCE, NULLIF) manage NULL values to prevent errors and provide default values.
-
-7. **Functions can be nested** to perform complex transformations by using the output of one function as input to another.
-
-8. **Common patterns**: Case-insensitive searches with UPPER/LOWER, string parsing with SUBSTR and INSTR, date calculations with arithmetic, NULL replacement with NVL/COALESCE.
-
-Single-row functions are fundamental tools for data transformation, validation, formatting, and presentation in SQL queries.
-
+Single-row functions are essential tools for data manipulation and presentation in SQL queries.

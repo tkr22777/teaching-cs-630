@@ -1,24 +1,20 @@
-# Synonyms
+# SQL Synonyms
 
 ## Overview
 
-A **synonym** is an alias or alternative name for a database object such as a table, view, sequence, or another synonym. Synonyms provide location transparency and simplify SQL statements by allowing users to reference objects without knowing their complete qualified names or locations. They are particularly useful in distributed databases and for abstracting schema details from applications.
+A **synonym** is an alias for a database object (table, view, sequence, etc.). Synonyms provide location transparency and simplify object references, especially across schemas or databases.
 
 ## Key Terms
 
-**Synonym**: An alternative name for a database object that provides a layer of abstraction.
+**Synonym**: An alternative name for a database object.
 
-**Public Synonym**: A synonym accessible to all database users.
+**Private Synonym**: Synonym accessible only to the creating user.
 
-**Private Synonym**: A synonym accessible only to the user who created it (default).
+**Public Synonym**: Synonym accessible to all database users.
 
-**Schema**: A collection of database objects owned by a database user.
+**Base Object**: The actual object that a synonym references.
 
-**Qualified Name**: Full name of an object including schema (e.g., SCHEMA.TABLE_NAME).
-
-**Location Transparency**: Ability to access objects without knowing their physical location or schema.
-
-**Database Link**: Connection to a remote database, can be referenced through synonyms.
+**Name Resolution**: Process of resolving a synonym to its underlying object.
 
 ## Sample Database Schema
 
@@ -127,265 +123,168 @@ COMMIT;
 
 ## Why Use Synonyms?
 
-### Benefits
+**Benefits:**
+- **Simplify object names** - Use short names instead of `schema.object_name`
+- **Location transparency** - Hide actual location of objects
+- **Ease migrations** - Point to different objects without changing code
+- **Abstract complexity** - Hide schema organization from users
+- **Centralize changes** - Update one synonym instead of many references
 
-1. **Simplified References** - Use short names instead of schema.object_name
-2. **Location Transparency** - Hide object location from users
-3. **Schema Independence** - Applications don't need to know which schema owns objects
-4. **Easier Migration** - Change underlying objects without changing application code
-5. **Security** - Control access through synonyms instead of direct grants
-6. **Convenience** - Shorter names for frequently used objects
-7. **Remote Access** - Simplify references to objects in remote databases
-
-### Use Cases
-
-| Scenario | Benefit |
-|----------|---------|
-| **Multi-schema environment** | Hide schema names from users |
-| **Application deployment** | Same code works across dev/test/prod |
-| **Remote databases** | Simplify database link references |
-| **Long object names** | Create shorter aliases |
-| **Schema refactoring** | Change locations without breaking code |
-| **Security** | Control access layer |
+**Common use cases:**
+- Accessing tables from another schema
+- Simplifying long object names
+- Supporting multiple environments (dev, test, prod)
+- Providing backward compatibility after renaming objects
 
 ## Types of Synonyms
 
-### Private Synonyms
+| Type | Scope | Created By | Accessible By |
+|------|-------|------------|---------------|
+| **Private** | Single user | Current user | Only creator |
+| **Public** | All users | DBA (requires privilege) | All users |
 
-- Created in your own schema
-- Visible only to you (unless granted)
-- Default type when creating synonyms
-- No special privileges required
-
-### Public Synonyms
-
-- Created in public schema
-- Visible to all database users
-- Requires CREATE PUBLIC SYNONYM privilege
-- Use for widely-used objects
-
-### Comparison
-
-| Aspect | Private Synonym | Public Synonym |
-|--------|-----------------|----------------|
-| **Visibility** | Owner only | All users |
-| **Privilege Required** | CREATE SYNONYM | CREATE PUBLIC SYNONYM |
-| **Namespace** | User's schema | Public |
-| **Use Case** | Personal shortcuts | System-wide access |
-| **Dropped By** | Owner | Any user with DROP PUBLIC SYNONYM |
+**Name resolution order:**
+1. Local object in current schema
+2. Private synonym
+3. Public synonym
 
 ## Creating Synonyms
 
-### Private Synonym Syntax
+### Private Synonym
 
+**Syntax:**
 ```sql
-CREATE SYNONYM synonym_name
-FOR object_name;
+CREATE SYNONYM synonym_name FOR object_name;
 ```
 
-### Public Synonym Syntax
+**Example 1: Simple shorthand**
 
 ```sql
-CREATE PUBLIC SYNONYM synonym_name
-FOR object_name;
+-- Create synonym for local table
+CREATE SYNONYM studs FOR students;
+
+-- Use it
+SELECT * FROM studs WHERE student_id = 1;
 ```
 
-### Example 1: Simple Private Synonym
+**Example 2: Access another schema's table**
 
 ```sql
--- Create synonym for a table
-CREATE SYNONYM stud
-FOR students;
+-- Assuming HR schema has employees table
+CREATE SYNONYM emp FOR hr.employees;
 
--- Now can use either name
-SELECT * FROM students;   -- Original
-SELECT * FROM stud;       -- Synonym (same result)
-```
-
-### Example 2: Synonym for Another Schema's Object
-
-```sql
--- Full qualified name
-SELECT * FROM hr.employees;
-
--- Create synonym
-CREATE SYNONYM emp
-FOR hr.employees;
-
--- Simplified reference
+-- Use it (no need to specify HR schema)
 SELECT * FROM emp;
 ```
 
-### Example 3: Public Synonym
+### Public Synonym
 
+**Syntax:**
 ```sql
--- Create public synonym (requires privilege)
-CREATE PUBLIC SYNONYM courses
-FOR university.course_catalog;
-
--- All users can now access
-SELECT * FROM courses;  -- Works for all users
+CREATE PUBLIC SYNONYM synonym_name FOR object_name;
 ```
 
-### Example 4: Synonym for a View
+**Requires:** `CREATE PUBLIC SYNONYM` privilege (typically DBA)
+
+**Example:**
 
 ```sql
--- Create view
+-- Create public synonym accessible to all users
+CREATE PUBLIC SYNONYM all_students FOR students;
+
+-- Any user can now use
+SELECT * FROM all_students;
+```
+
+### Synonyms for Other Objects
+
+**Synonyms work for:**
+- Tables
+- Views
+- Sequences
+- Other synonyms (synonym chains)
+
+**Example: Synonym for a view**
+
+```sql
+-- Create a view
 CREATE VIEW active_students AS
-SELECT student_id, first_name, last_name, major
-FROM students
-WHERE enrollment_date >= ADD_MONTHS(SYSDATE, -12);
+SELECT * FROM students WHERE enrollment_date > DATE '2024-01-01';
 
--- Create synonym for view
-CREATE SYNONYM active_stud
-FOR active_students;
+-- Create synonym for the view
+CREATE SYNONYM active_studs FOR active_students;
 
--- Use synonym
-SELECT * FROM active_stud;
+-- Use it
+SELECT * FROM active_studs;
 ```
 
-### Example 5: Synonym for a Sequence
+**Example: Synonym for a sequence**
 
 ```sql
--- Create synonym for sequence
-CREATE SYNONYM stud_seq
-FOR student_id_sequence;
-
--- Use synonym to generate values
-INSERT INTO students (student_id, first_name, last_name)
-VALUES (stud_seq.NEXTVAL, 'John', 'Doe');
-```
-
-### Example 6: Synonym for Remote Database Object
-
-```sql
--- Remote table via database link
-SELECT * FROM employees@remote_db;
+-- Create sequence
+CREATE SEQUENCE student_id_seq START WITH 100;
 
 -- Create synonym
-CREATE SYNONYM remote_emp
-FOR employees@remote_db;
+CREATE SYNONYM next_student_id FOR student_id_seq;
 
--- Simplified access
-SELECT * FROM remote_emp;
+-- Use it
+SELECT next_student_id.NEXTVAL FROM DUAL;
 ```
 
 ## Using Synonyms
 
-### In SELECT Statements
+Once created, use synonyms exactly like the base object:
 
 ```sql
--- Original table name
-SELECT * FROM university.students WHERE major = 'Computer Science';
+-- SELECT
+SELECT * FROM studs;
 
--- With synonym
-CREATE SYNONYM stud FOR university.students;
-SELECT * FROM stud WHERE major = 'Computer Science';
-```
+-- INSERT
+INSERT INTO studs (student_id, first_name, last_name, email, major, enrollment_date, gpa)
+VALUES (100, 'Test', 'User', 'test@email.com', 'CS', SYSDATE, 3.0);
 
-### In INSERT Statements
+-- UPDATE
+UPDATE studs SET gpa = 3.5 WHERE student_id = 100;
 
-```sql
--- Using synonym
-INSERT INTO stud (student_id, first_name, last_name, email)
-VALUES (1001, 'Alice', 'Johnson', 'alice.j@university.edu');
-```
+-- DELETE
+DELETE FROM studs WHERE student_id = 100;
 
-### In UPDATE Statements
-
-```sql
--- Using synonym
-UPDATE stud
-SET major = 'Computer Engineering'
-WHERE student_id = 1001;
-```
-
-### In DELETE Statements
-
-```sql
--- Using synonym
-DELETE FROM stud
-WHERE student_id = 1001;
-```
-
-### In JOINs
-
-```sql
--- Original
+-- JOINs
 SELECT s.first_name, e.course_id
-FROM university.students s
-JOIN university.enrollments e ON s.student_id = e.student_id;
-
--- With synonyms
-CREATE SYNONYM stud FOR university.students;
-CREATE SYNONYM enroll FOR university.enrollments;
-
-SELECT s.first_name, e.course_id
-FROM stud s
-JOIN enroll e ON s.student_id = e.student_id;
+FROM studs s
+JOIN enrollments e ON s.student_id = e.student_id;
 ```
 
 ## Viewing Synonyms
 
-### Query User Synonyms
+**Query your private synonyms:**
 
 ```sql
--- View your private synonyms
-SELECT 
-    synonym_name,
-    table_owner,
-    table_name,
-    db_link
+SELECT synonym_name, table_owner, table_name
 FROM user_synonyms
 ORDER BY synonym_name;
 ```
 
-**Example Result:**
-| synonym_name | table_owner | table_name | db_link |
-|--------------|-------------|------------|---------|
-| STUD | UNIVERSITY | STUDENTS | NULL |
-| EMP | HR | EMPLOYEES | NULL |
-| REMOTE_EMP | HR | EMPLOYEES | REMOTE_DB |
-
-### Query All Synonyms
+**Query all synonyms (including public):**
 
 ```sql
--- View all synonyms you have access to
-SELECT 
-    owner,
-    synonym_name,
-    table_owner,
-    table_name
+SELECT owner, synonym_name, table_owner, table_name
 FROM all_synonyms
-WHERE table_owner = 'UNIVERSITY'
-ORDER BY synonym_name;
+WHERE table_name = 'STUDENTS'
+ORDER BY owner, synonym_name;
 ```
 
-### Query Public Synonyms
+**Check if synonym exists:**
 
 ```sql
--- View public synonyms
-SELECT 
-    synonym_name,
-    table_owner,
-    table_name
-FROM dba_synonyms
-WHERE owner = 'PUBLIC'
-ORDER BY synonym_name;
-```
-
-### Check if Synonym Exists
-
-```sql
--- Check before creating
-SELECT COUNT(*) 
-FROM user_synonyms 
-WHERE synonym_name = 'STUD';
+SELECT COUNT(*)
+FROM user_synonyms
+WHERE synonym_name = 'STUDS';
 ```
 
 ## Dropping Synonyms
 
-### Drop Private Synonym
+**Drop private synonym:**
 
 ```sql
 DROP SYNONYM synonym_name;
@@ -393,10 +292,10 @@ DROP SYNONYM synonym_name;
 
 **Example:**
 ```sql
-DROP SYNONYM stud;
+DROP SYNONYM studs;
 ```
 
-### Drop Public Synonym
+**Drop public synonym:**
 
 ```sql
 DROP PUBLIC SYNONYM synonym_name;
@@ -404,387 +303,105 @@ DROP PUBLIC SYNONYM synonym_name;
 
 **Example:**
 ```sql
-DROP PUBLIC SYNONYM courses;
+DROP PUBLIC SYNONYM all_students;
 ```
 
-### Drop if Exists (Oracle 23c+)
+**Important notes:**
+- Dropping a synonym does NOT drop the base object
+- Dropping the base object does NOT drop synonyms (they become invalid)
+- In Oracle 23c+, can use `DROP SYNONYM IF EXISTS`
 
-```sql
-DROP SYNONYM IF EXISTS stud;
-DROP PUBLIC SYNONYM IF EXISTS courses;
-```
+## Practical Example: Multi-Environment Setup
 
-### Important Notes
+**Problem:** Different table names in dev, test, and prod environments.
 
-- Dropping a synonym does **not** delete the underlying object
-- Only the alias is removed
-- Users referencing the synonym will get errors after drop
-- Must recreate synonym if needed again
-
-## Synonym Resolution
-
-### Name Resolution Order
-
-When you reference an object name, Oracle searches in this order:
-
-1. **Local objects** - Tables, views in your schema
-2. **Private synonyms** - Synonyms you created
-3. **Public synonyms** - Public synonyms
-
-### Example: Resolution Priority
-
-```sql
--- Assume three objects named "employees"
--- 1. Your table: employees
--- 2. Your private synonym: employees → hr.employees
--- 3. Public synonym: employees → company.employees
-
-SELECT * FROM employees;
--- Uses: Your table (highest priority)
-
--- To use synonym, drop or rename your table
-DROP TABLE employees;
-SELECT * FROM employees;
--- Now uses: Your private synonym
-
--- To use public synonym, drop both
-DROP SYNONYM employees;
-SELECT * FROM employees;
--- Now uses: Public synonym
-```
-
-## Practical Examples
-
-### Example 1: Multi-Environment Deployment
-
-**Problem:** Application needs to work across dev, test, and production with different schemas.
-
-**Solution:**
+**Solution:** Use synonyms to abstract the environment.
 
 ```sql
 -- Development environment
-CREATE SYNONYM app_users FOR dev_schema.users;
-CREATE SYNONYM app_orders FOR dev_schema.orders;
+CREATE SYNONYM app_students FOR dev_students;
 
--- Production environment (same synonym names, different targets)
-CREATE SYNONYM app_users FOR prod_schema.users;
-CREATE SYNONYM app_orders FOR prod_schema.orders;
+-- Test environment
+CREATE SYNONYM app_students FOR test_students;
 
--- Application code (works in all environments)
-SELECT * FROM app_users;
-SELECT * FROM app_orders;
+-- Production environment
+CREATE SYNONYM app_students FOR prod_students;
+
+-- Application code always uses
+SELECT * FROM app_students;
 ```
 
-### Example 2: Schema Migration
+The application code stays the same across environments.
 
-**Scenario:** Moving tables from old_schema to new_schema without breaking applications.
+## Common Mistakes
 
-```sql
--- Step 1: Create synonyms pointing to old location
-CREATE PUBLIC SYNONYM customers FOR old_schema.customers;
-CREATE PUBLIC SYNONYM orders FOR old_schema.orders;
-
--- Applications continue working
-SELECT * FROM customers;  -- Uses old_schema.customers
-
--- Step 2: Migrate data to new schema
--- (copy data, test thoroughly)
-
--- Step 3: Update synonyms
-DROP PUBLIC SYNONYM customers;
-CREATE PUBLIC SYNONYM customers FOR new_schema.customers;
-
-DROP PUBLIC SYNONYM orders;
-CREATE PUBLIC SYNONYM orders FOR new_schema.orders;
-
--- Applications still work, now using new_schema
-SELECT * FROM customers;  -- Now uses new_schema.customers
-```
-
-### Example 3: Simplified Remote Access
+**Mistake 1: Dropping base object**
 
 ```sql
--- Create database link
-CREATE DATABASE LINK remote_warehouse
-CONNECT TO warehouse_user IDENTIFIED BY password
-USING 'warehouse_db';
+-- Create synonym
+CREATE SYNONYM studs FOR students;
 
--- Without synonym (complex)
-SELECT * FROM inventory@remote_warehouse;
-UPDATE product_stock@remote_warehouse SET quantity = 100;
-
--- With synonym (simple)
-CREATE SYNONYM inventory FOR inventory@remote_warehouse;
-
-SELECT * FROM inventory;
-UPDATE inventory SET quantity = 100;
-```
-
-### Example 4: Long Object Names
-
-```sql
--- Original long name
-CREATE TABLE employee_performance_review_history (
-    review_id NUMBER PRIMARY KEY,
-    employee_id NUMBER,
-    review_date DATE,
-    rating NUMBER
-);
-
--- Create synonym with shorter name
-CREATE SYNONYM emp_reviews FOR employee_performance_review_history;
-
--- Much easier to use
-SELECT * FROM emp_reviews WHERE rating >= 4;
-```
-
-### Example 5: Backward Compatibility
-
-```sql
--- Old table name
-CREATE TABLE old_customer_table (
-    customer_id NUMBER,
-    customer_name VARCHAR2(100)
-);
-
--- Rename table
-RENAME old_customer_table TO customers;
-
--- Create synonym for backward compatibility
-CREATE SYNONYM old_customer_table FOR customers;
-
--- Old code still works
-SELECT * FROM old_customer_table;  -- Still works via synonym
-
--- New code uses better name
-SELECT * FROM customers;           -- Direct access
-```
-
-## Synonyms and Security
-
-### Controlling Access Through Synonyms
-
-```sql
--- Schema owner creates view with filtered data
-CREATE VIEW public_employee_data AS
-SELECT employee_id, first_name, last_name, department
-FROM employees;  -- Excludes salary, SSN, etc.
-
--- Create public synonym
-CREATE PUBLIC SYNONYM employees FOR public_employee_data;
-
--- Grant access to synonym
-GRANT SELECT ON public_employee_data TO PUBLIC;
-
--- Users see filtered data
-SELECT * FROM employees;  -- Can only see safe columns
-```
-
-### Hiding Schema Complexity
-
-```sql
--- Complex schema structure
-CREATE TABLE dept_emp_v2_prod (
-    emp_id NUMBER,
-    dept_code VARCHAR2(10)
-);
-
--- Simple public synonym
-CREATE PUBLIC SYNONYM employee_departments FOR dept_emp_v2_prod;
-
--- Users don't need to know complex naming
-SELECT * FROM employee_departments;
-```
-
-## Synonyms vs. Other Alternatives
-
-### Comparison Table
-
-| Feature | Synonym | View | Database Link |
-|---------|---------|------|---------------|
-| **Purpose** | Alias for objects | Virtual table | Remote connection |
-| **Performance** | No overhead | Can have overhead | Network latency |
-| **Flexibility** | Points to single object | Can join multiple | Accesses remote DB |
-| **Security** | Pass-through | Row-level filtering | Separate credentials |
-| **Use Case** | Naming simplification | Data abstraction | Distributed data |
-
-### When to Use Each
-
-**Use Synonym when:**
-- You need a simpler name
-- You want location transparency
-- You're abstracting schema names
-
-**Use View when:**
-- You need to filter or transform data
-- You want to hide columns
-- You need to join multiple tables
-
-**Use Database Link when:**
-- Accessing remote databases
-- Data is physically distributed
-- Different database instances
-
-## Common Mistakes and Solutions
-
-### Mistake 1: Circular References
-
-**Problem:**
-```sql
-CREATE SYNONYM syn1 FOR syn2;
-CREATE SYNONYM syn2 FOR syn1;
--- Creates circular reference
-```
-
-**Solution:** Synonyms should point to actual objects, not other synonyms.
-
-### Mistake 2: Synonym Name Conflicts
-
-**Problem:**
-```sql
--- You have a table named "employees"
-CREATE SYNONYM employees FOR hr.employees;
--- ERROR: Name already used
-```
-
-**Solution:** Use different name or drop/rename existing object.
-
-### Mistake 3: Dropping Underlying Object
-
-**Problem:**
-```sql
-CREATE SYNONYM stud FOR students;
+-- Drop base table
 DROP TABLE students;
--- Synonym still exists but points to nothing
-SELECT * FROM stud;  -- ERROR: table or view does not exist
+
+-- Synonym still exists but is invalid
+SELECT * FROM studs;  -- ERROR: table or view does not exist
 ```
 
-**Solution:** Drop synonym when dropping underlying object, or recreate base object.
+**Fix:** Drop synonym when dropping base object, or document the dependency.
 
-### Mistake 4: Insufficient Privileges
+**Mistake 2: Circular references**
 
-**Problem:**
 ```sql
-CREATE SYNONYM emp FOR hr.employees;
-SELECT * FROM emp;
--- ERROR: table or view does not exist
+-- Don't create circular chains
+CREATE SYNONYM syn1 FOR syn2;
+CREATE SYNONYM syn2 FOR syn1;  -- Creates infinite loop
 ```
 
-**Explanation:** Synonym exists, but you lack SELECT privilege on hr.employees.
+**Mistake 3: Name conflicts**
 
-**Solution:**
 ```sql
--- HR must grant you access
-GRANT SELECT ON hr.employees TO your_username;
+-- If both table and synonym exist with same name
+CREATE TABLE emp (...);
+CREATE SYNONYM emp FOR hr.employees;  -- ERROR: name already used
+
+-- Resolution: Use different names
+CREATE SYNONYM emp_data FOR hr.employees;
 ```
-
-### Mistake 5: Public vs. Private Confusion
-
-**Problem:**
-```sql
--- Create private synonym
-CREATE SYNONYM courses FOR university.courses;
-
--- Other users try to use it
--- ERROR: table or view does not exist
-```
-
-**Solution:** Use CREATE PUBLIC SYNONYM for shared access.
 
 ## Best Practices
 
-### 1. Naming Conventions
+1. **Use descriptive names** - Make synonym purpose clear
+2. **Document synonym mappings** - Maintain list of synonyms and their base objects
+3. **Minimize public synonyms** - Use private synonyms when possible
+4. **Clean up unused synonyms** - Remove when no longer needed
+5. **Use for abstraction** - Not just for convenience; use with purpose
+6. **Avoid long chains** - synonym → synonym → table is confusing
+
+## Performance
+
+**Good news:** Synonyms have minimal performance overhead. Oracle resolves them at parse time.
 
 ```sql
--- Good: Descriptive, clear
-CREATE SYNONYM emp FOR employees;
-CREATE SYNONYM stud FOR students;
-
--- Avoid: Ambiguous or cryptic
-CREATE SYNONYM x FOR employees;
-CREATE SYNONYM s1 FOR students;
+-- These perform identically
+SELECT * FROM students WHERE student_id = 1;
+SELECT * FROM studs WHERE student_id = 1;  -- Using synonym
 ```
 
-### 2. Documentation
-
-```sql
--- Document synonyms in comments
-COMMENT ON TABLE stud IS 'Synonym for students table in university schema';
-```
-
-### 3. Consistent Usage
-
-```sql
--- Choose one approach per application
--- Option 1: Always use synonyms
-SELECT * FROM stud;
-SELECT * FROM courses;
-
--- Option 2: Always use qualified names
-SELECT * FROM university.students;
-SELECT * FROM university.courses;
-
--- Don't mix both in same application
-```
-
-### 4. Minimize Public Synonyms
-
-- Use private synonyms when possible
-- Reserve public synonyms for truly shared objects
-- Reduces namespace pollution
-
-### 5. Clean Up Unused Synonyms
-
-```sql
--- Periodically review and drop unused synonyms
-SELECT synonym_name, table_name
-FROM user_synonyms
-WHERE table_name NOT IN (SELECT table_name FROM user_tables);
-```
-
-## Performance Considerations
-
-### Synonyms Have Minimal Overhead
-
-- Synonyms are resolved at parse time
-- No runtime performance impact
-- Essentially zero overhead compared to direct access
-
-### Example: Performance Equivalence
-
-```sql
--- These have identical performance
-SELECT * FROM university.students WHERE student_id = 1;
-SELECT * FROM stud WHERE student_id = 1;  -- Using synonym
-```
-
-### When Synonyms May Matter
-
-- **Remote synonyms**: Network latency from database link
-- **Synonym chains**: Synonym → Synonym → Object (avoid this)
-- **Name resolution**: Very slight overhead during parse phase (negligible)
+The execution plan is the same for both queries.
 
 ## Summary
 
-**Key Takeaways:**
+**Key Points:**
 
-1. **Synonyms are aliases for database objects** (tables, views, sequences, etc.) that provide simpler names and location transparency.
+1. **Synonyms are aliases** for database objects (tables, views, sequences)
+2. **Two types**: Private (one user) and Public (all users)
+3. **CREATE SYNONYM** to create, **DROP SYNONYM** to remove
+4. **Use like base object** - SELECT, INSERT, UPDATE, DELETE all work
+5. **Benefits**: Simplify names, hide locations, ease migrations
+6. **Name resolution order**: Local object → Private synonym → Public synonym
+7. **Dropping synonym** does NOT drop base object
+8. **Performance**: Minimal overhead (resolved at parse time)
+9. **Best practice**: Use for abstraction and environment independence
 
-2. **Two types**: Private synonyms (visible to creator only) and public synonyms (visible to all users, requires special privilege).
-
-3. **Main benefits**: Simplified references, schema independence, easier migrations, location transparency, and security abstraction.
-
-4. **Common pattern**: Create synonyms to hide schema names, allowing `SELECT * FROM emp` instead of `SELECT * FROM hr.employees`.
-
-5. **Resolution order**: Local objects → Private synonyms → Public synonyms (Oracle searches in this order).
-
-6. **Synonyms don't copy data** - they're just alternative names pointing to the actual object; dropping a synonym doesn't affect the base object.
-
-7. **Use cases**: Multi-environment deployment (dev/test/prod), schema migrations, remote database access, shortening long names, backward compatibility.
-
-8. **Performance**: Synonyms have essentially zero runtime overhead; they're resolved during query parsing.
-
-9. **Best practices**: Use descriptive names, prefer private over public, document usage, clean up unused synonyms, avoid synonym chains.
-
-Synonyms are powerful tools for creating abstraction layers in database applications, enabling cleaner code and easier maintenance by hiding physical schema details from users and applications.
-
+Synonyms provide a simple yet powerful way to abstract and simplify database object references.
