@@ -2,13 +2,13 @@
 
 ## Overview
 
-This guide covers advanced join patterns, composite joins, performance optimization, and best practices for writing efficient and maintainable SQL joins.
+Advanced join patterns, composite joins, and performance optimization techniques.
 
 ## Composite Joins
 
 ### What is a Composite Join?
 
-A **composite join** uses multiple columns in the join condition. This is necessary when the relationship between tables requires more than one column to uniquely identify matching rows.
+A **composite join** uses multiple columns in the join condition to uniquely identify matching rows.
 
 ### When to Use Composite Joins
 
@@ -86,13 +86,7 @@ ORDER BY se.year, se.semester, s.last_name;
 | John | Smith | CS201 | Spring | 2024 | A | Room 103 | Dr. Johnson | B+ |
 | Bob | Wilson | CS101 | Spring | 2024 | A | Room 101 | Dr. Johnson | B |
 
-**Explanation:**
-- Four columns required to uniquely identify a section
-- Multiple AND conditions in ON clause
-- Each enrollment matches its specific section
-- Essential for systems with multiple offerings of same course
-
-## Common Join Patterns (minimal set)
+## Common Join Patterns
 
 ### Pattern 1: Master-Detail Relationship
 
@@ -131,12 +125,6 @@ ORDER BY gpa DESC NULLS LAST;
 | 3 | Bob Wilson | Computer Science | 2 | Data Structures, Introduction to Programming | 3.15 |
 | 5 | Charlie Davis | NULL | 0 | NULL | NULL |
 
-**Explanation:**
-- LEFT JOIN preserves all students
-- Aggregates detail records (enrollments)
-- LISTAGG creates comma-separated list
-- Calculates GPA from grades
-
 ### Pattern 2: Many-to-Many Through Junction Table
 
 **Use Case:** Two entities connected via intermediate table.
@@ -163,11 +151,6 @@ ORDER BY total_enrollments DESC;
 | Computer Science | 2 | 3 | 5 | 3.6 |
 | Mathematics | 1 | 2 | 2 | 3.5 |
 | Physics | 1 | 1 | 1 | 4.0 |
-
-**Explanation:**
-- Students ↔ Courses through Enrollments junction table
-- Multiple levels of aggregation
-- DISTINCT prevents double-counting
 
 ### Pattern 3: Finding Unmatched Records
 
@@ -219,12 +202,7 @@ ORDER BY issue_type, student_id, course_id;
 | No Enrollments | NULL | English Composition | NULL | ENG101 |
 | No Instructor | NULL | English Composition | NULL | ENG101 |
 
-**Explanation:**
-- Uses UNION ALL to combine multiple checks
-- LEFT JOIN + IS NULL pattern finds missing relationships
-- Useful for data quality audits
-
-###
+### Pattern 4: Latest Record Per Group
 
 **Use Case:** Get the most recent record for each entity.
 
@@ -258,44 +236,7 @@ ORDER BY s.student_id;
 | 3 | Bob | Wilson | Data Structures | Spring 2024 | B+ |
 | 4 | Alice | Brown | Physics I | Spring 2024 | A |
 
-**Explanation:**
-- ROW_NUMBER() ranks enrollments per student
-- PARTITION BY creates separate ranking per student
-- Filter WHERE rn = 1 gets the latest only
-- Alternative: MAX(enrollment_id) with subquery
-
-###
-
-**Use Case:** Join based on complex conditions.
-
-**Query:** Find grade improvements (students who retook courses).
-
-```sql
-SELECT s.first_name,
-       s.last_name,
-       c.course_name,
-       e1.semester AS first_attempt_semester,
-       e1.grade AS first_grade,
-       e2.semester AS second_attempt_semester,
-       e2.grade AS second_grade,
-       CASE 
-           WHEN e2.grade > e1.grade THEN 'Improved'
-           WHEN e2.grade = e1.grade THEN 'Same'
-           ELSE 'Declined'
-       END AS grade_change
-FROM enrollments e1
-INNER JOIN enrollments e2 
-    ON e1.student_id = e2.student_id
-    AND e1.course_id = e2.course_id
-    AND e1.enrollment_id < e2.enrollment_id
-INNER JOIN students s ON e1.student_id = s.student_id
-INNER JOIN courses c ON e1.course_id = c.course_id
-ORDER BY s.last_name, c.course_name;
-```
-
-**Note:** Our sample data doesn't have retakes, but this pattern is useful when students retake courses.
-
-### Pattern 4: Filtered Joins (Semi-Join Pattern)
+### Pattern 5: Filtered Joins (Semi-Join Pattern)
 
 **Use Case:** Filter main table based on existence in related table.
 

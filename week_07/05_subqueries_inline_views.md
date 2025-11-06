@@ -78,63 +78,7 @@ ORDER BY enrollment_count DESC;
 
 **Why inline view:** Allows filtering on the aggregated `enrollment_count`.
 
-### Example 2: Calculate Percentages
-
-**Show each major's percentage of total students:**
-
-```sql
-SELECT 
-    major,
-    student_count,
-    ROUND(student_count * 100.0 / total_students, 2) AS percentage
-FROM (
-    SELECT major, COUNT(*) AS student_count
-    FROM students
-    WHERE major IS NOT NULL
-    GROUP BY major
-) major_counts
-CROSS JOIN (
-    SELECT COUNT(*) AS total_students
-    FROM students
-    WHERE major IS NOT NULL
-) totals
-ORDER BY student_count DESC;
-```
-
-**Result:**
-| major | student_count | percentage |
-|-------|---------------|------------|
-| Computer Science | 2 | 50.00 |
-| Mathematics | 1 | 25.00 |
-| Physics | 1 | 25.00 |
-
-### Example 3: Ranking with ROW_NUMBER
-
-**Get top 3 most enrolled courses:**
-
-```sql
-SELECT course_id, course_name, enrollment_count
-FROM (
-    SELECT 
-        c.course_id,
-        c.course_name,
-        COUNT(e.enrollment_id) AS enrollment_count,
-        ROW_NUMBER() OVER (ORDER BY COUNT(e.enrollment_id) DESC) AS rank
-    FROM courses c
-    LEFT JOIN enrollments e ON c.course_id = e.course_id
-    GROUP BY c.course_id, c.course_name
-) ranked_courses
-WHERE rank <= 3;
-```
-
-**Result:**
-| course_id | course_name | enrollment_count |
-|-----------|-------------|------------------|
-| CS101 | Introduction to Programming | 3 |
-| CS201 | Data Structures | 2 |
-| CS301 | Database Systems | 1 |
-
-### Example 4: Joining with Inline View
+### Example 2: Joining with Inline View
 
 **Show students with their enrollment count:**
 
@@ -229,6 +173,4 @@ JOIN enrollments e ON s.student_id = e.student_id;
 1. **Add appropriate indexes** on columns used in WHERE/JOIN
 2. **Minimize inline view size** - filter early
 3. **Use WITH clause** for better optimization by Oracle
-4. **Avoid unnecessary columns** - select only what you need
-5. **Consider materialized views** for frequently-used complex queries
 

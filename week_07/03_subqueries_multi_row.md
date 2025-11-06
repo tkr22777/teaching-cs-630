@@ -16,9 +16,7 @@ A **multiple-row subquery** returns zero or more rows. These require special ope
 
 ## Sample Database Schema
 
-This module uses the university enrollment system.
-
-**Note:** The complete database setup script is available in `00_initialization.md` in this directory.
+University enrollment system. Setup: `00_initialization.md`
 
 ## Multiple-Row Operators
 
@@ -36,8 +34,6 @@ This module uses the university enrollment system.
 - `> ALL` means "greater than maximum"
 
 ## IN Operator
-
-Tests if a value matches any value in the subquery result.
 
 **Syntax:**
 ```sql
@@ -64,13 +60,7 @@ WHERE student_id IN (
 | Jane | Doe | Mathematics |
 | Bob | Wilson | Computer Science |
 
-**How it works:**
-1. Inner query returns student IDs: `(1, 2, 3)`
-2. Outer query finds students where `student_id` matches any of these values
-
 ## NOT IN Operator
-
-Tests if a value does NOT match any value in the list.
 
 **Syntax:**
 ```sql
@@ -119,8 +109,6 @@ WHERE NOT EXISTS (
 
 ## ANY Operator
 
-Compares a value to each subquery result. Returns TRUE if ANY comparison is true.
-
 **Syntax:**
 ```sql
 WHERE column operator ANY (subquery)
@@ -147,11 +135,6 @@ WHERE gpa > ANY (
 AND major != 'Computer Science';
 ```
 
-**Logic:**
-- Subquery returns: `(3.8, 3.2)`
-- `> ANY (3.8, 3.2)` means `> 3.2`
-- Returns non-CS students with GPA > 3.2
-
 **Result:**
 | first_name | last_name | major | gpa |
 |------------|-----------|-------|-----|
@@ -159,8 +142,6 @@ AND major != 'Computer Science';
 | Alice | Brown | Physics | 3.7 |
 
 ## ALL Operator
-
-Compares a value to each subquery result. Returns TRUE only if ALL comparisons are true.
 
 **Syntax:**
 ```sql
@@ -196,10 +177,9 @@ WHERE gpa = (SELECT MAX(gpa) FROM students);
 
 ## Best Practices
 
-**1. Use IN for simple membership tests**
+**1. Use IN for simple membership tests (add DISTINCT if needed)**
 ```sql
--- Good
-WHERE student_id IN (SELECT student_id FROM enrollments)
+WHERE student_id IN (SELECT DISTINCT student_id FROM enrollments)
 ```
 
 **2. Always handle NULLs with NOT IN**
@@ -215,11 +195,6 @@ WHERE EXISTS (
     SELECT 1 FROM enrollments e 
     WHERE e.student_id = students.student_id
 )
-```
-
-**4. Use DISTINCT to avoid duplicate processing**
-```sql
-WHERE student_id IN (SELECT DISTINCT student_id FROM enrollments)
 ```
 
 ## Common Errors

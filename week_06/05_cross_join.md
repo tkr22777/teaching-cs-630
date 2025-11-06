@@ -2,9 +2,7 @@
 
 ## Overview
 
-A **CROSS JOIN** produces the Cartesian product of two tables, meaning every row from the first table is combined with every row from the second table. If table A has M rows and table B has N rows, the result will have M × N rows.
-
-CROSS JOIN is unique because it doesn't require a join condition - it simply combines all possible pairs.
+A **CROSS JOIN** produces the Cartesian product of two tables: every row from the first table combined with every row from the second. If table A has M rows and table B has N rows, the result has M × N rows. No join condition required.
 
 ## Syntax
 
@@ -70,11 +68,6 @@ FETCH FIRST 10 ROWS ONLY;
 | 2 | Jane | Doe | CS301 | Database Systems |
 | 2 | Jane | Doe | ENG101 | English Composition |
 
-**Explanation:**
-- 5 students × 6 courses = 30 total rows
-- Each student paired with each course
-- No relationship required - all combinations generated
-
 ###
 
 **Query:** How many possible student-course pairings exist?
@@ -92,9 +85,7 @@ CROSS JOIN courses;
 |--------------------|---------------|--------------|
 | 30 | 5 | 6 |
 
-**Explanation:** 5 × 6 = 30 possible combinations
-
-## CROSS JOIN with WHERE Clause (filtering the product)
+## CROSS JOIN with WHERE Clause
 
 ### Example 2: Filter Combinations
 
@@ -124,11 +115,6 @@ ORDER BY s.last_name, c.course_id;
 | Bob | Wilson | Computer Science | CS201 | Data Structures | Computer Science |
 | Bob | Wilson | Computer Science | CS301 | Database Systems | Computer Science |
 
-**Explanation:**
-- 2 CS students × 3 CS courses = 6 rows
-- WHERE clause filters after Cartesian product is generated
-- Useful for seeing all possible valid pairings
-
 ### Example 3: Finding Potential Enrollments
 
 **Query:** Show CS students and courses they're NOT currently enrolled in.
@@ -156,13 +142,7 @@ ORDER BY s.student_id, c.course_id;
 |------------|--------------|-----------|-------------|
 | 3 | Bob Wilson | CS301 | Database Systems |
 
-**Explanation:**
-- Generates all possible CS student-course pairs
-- Filters out existing enrollments
-- Shows courses Bob Wilson could still enroll in
-- John Smith is enrolled in all 3 CS courses (doesn't appear)
-
-## Practical Use Case
+## Practical Use Cases
 
 ### Use Case: Generating Date/Time Combinations
 
@@ -205,9 +185,7 @@ ORDER BY d.date_value, t.slot_time;
 | 2024-10-23 | 14:00:00 | Afternoon | 2024-10-23 14:00:00 |
 | 2024-10-23 | 19:00:00 | Evening | 2024-10-23 19:00:00 |
 
-**Explanation:** Creates 9 appointment slots (3 days × 3 time slots)
-
-###
+### Use Case: Product Variants
 
 **Setup:**
 ```sql
@@ -242,86 +220,6 @@ ORDER BY p.product_name, s.size_code, c.color_code;
 | Hoodie | Medium | Black | Hoodie - Medium - Black |
 | ... | ... | ... | ... |
 | T-Shirt | Large | Red | T-Shirt - Large - Red |
-
-**Explanation:** 2 products × 3 sizes × 3 colors = 18 variants
-
-###
-
-**Query:** Create test enrollment data for all possible student-course pairs.
-
-```sql
-CREATE TABLE test_enrollments AS
-SELECT s.student_id,
-       c.course_id,
-       'Spring 2025' AS semester,
-       NULL AS grade
-FROM students s
-CROSS JOIN courses c
-WHERE s.major = c.department;
-
--- Check results
-SELECT * FROM test_enrollments
-ORDER BY student_id, course_id
-FETCH FIRST 5 ROWS ONLY;
-```
-
-**Result:**
-| student_id | course_id | semester | grade |
-|------------|-----------|----------|-------|
-| 1 | CS101 | Spring 2025 | NULL |
-| 1 | CS201 | Spring 2025 | NULL |
-| 1 | CS301 | Spring 2025 | NULL |
-| 2 | MATH101 | Spring 2025 | NULL |
-| 3 | CS101 | Spring 2025 | NULL |
-
-**Explanation:** Creates test enrollments matching students with their department courses
-
-###
-
-**Setup:**
-```sql
-CREATE TABLE products_simple (product VARCHAR2(50), base_price NUMBER(10,2));
-CREATE TABLE discount_tiers (tier VARCHAR2(20), discount_pct NUMBER(5,2));
-
-INSERT INTO products_simple VALUES 
-    ('Laptop', 999.99),
-    ('Mouse', 25.50),
-    ('Keyboard', 75.00);
-
-INSERT INTO discount_tiers VALUES 
-    ('Regular', 0),
-    ('Student', 10),
-    ('Corporate', 15);
-```
-
-**Query:** Generate price matrix for all products and discount tiers.
-
-```sql
-SELECT p.product,
-       p.base_price,
-       d.tier,
-       d.discount_pct,
-       ROUND(p.base_price * (1 - d.discount_pct / 100), 2) AS final_price,
-       ROUND(p.base_price * d.discount_pct / 100, 2) AS savings
-FROM products_simple p
-CROSS JOIN discount_tiers d
-ORDER BY p.product, d.discount_pct;
-```
-
-**Result:**
-| product | base_price | tier | discount_pct | final_price | savings |
-|---------|------------|------|--------------|-------------|---------|
-| Keyboard | 75.00 | Regular | 0 | 75.00 | 0.00 |
-| Keyboard | 75.00 | Student | 10 | 67.50 | 7.50 |
-| Keyboard | 75.00 | Corporate | 15 | 63.75 | 11.25 |
-| Laptop | 999.99 | Regular | 0 | 999.99 | 0.00 |
-| Laptop | 999.99 | Student | 10 | 899.99 | 100.00 |
-| Laptop | 999.99 | Corporate | 15 | 849.99 | 150.00 |
-| Mouse | 25.50 | Regular | 0 | 25.50 | 0.00 |
-| Mouse | 25.50 | Student | 10 | 22.95 | 2.55 |
-| Mouse | 25.50 | Corporate | 15 | 21.68 | 3.83 |
-
-**Explanation:** Creates pricing table for all product/discount combinations
 
 ## When to Use CROSS JOIN
 

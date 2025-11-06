@@ -2,7 +2,7 @@
 
 ## Overview
 
-A **correlated subquery** references columns from the outer query and executes once for each row processed by the outer query. This enables powerful row-by-row comparisons but is more computationally intensive than non-correlated subqueries.
+A **correlated subquery** references columns from the outer query and executes once for each row processed by the outer query.
 
 ## Key Terms
 
@@ -14,9 +14,7 @@ A **correlated subquery** references columns from the outer query and executes o
 
 ## Sample Database Schema
 
-This module uses the university enrollment system.
-
-**Note:** The complete database setup script is available in `00_initialization.md` in this directory.
+University enrollment system. Setup: `00_initialization.md`
 
 ## Key Characteristics
 
@@ -37,12 +35,6 @@ WHERE outer.value = (
     WHERE inner.id = outer.id  -- Correlation
 );
 ```
-
-**Steps:**
-1. Outer query reads first row
-2. Inner query executes with that row's values
-3. Result evaluates WHERE condition
-4. Repeat for each outer row
 
 ## Correlated vs. Non-Correlated
 
@@ -100,8 +92,6 @@ ORDER BY s.major, s.gpa DESC;
 |------------|-----------|-------|-----|-----------|
 | John | Smith | Computer Science | 3.8 | 3.5 |
 
-Only John's GPA (3.8) exceeds his major's average (3.5).
-
 ### Pattern 2: Count Related Records
 
 **Show each course with its enrollment count:**
@@ -152,7 +142,7 @@ WHERE e.enrollment_id = (
 
 ## Using in Different Clauses
 
-### In SELECT Clause (Calculated Columns)
+**In SELECT Clause:**
 
 ```sql
 SELECT 
@@ -167,7 +157,7 @@ SELECT
 FROM students s;
 ```
 
-### In WHERE Clause (Row Filtering)
+**In WHERE Clause:**
 
 ```sql
 SELECT s.first_name, s.last_name, s.major, s.gpa
@@ -180,7 +170,7 @@ WHERE s.gpa > (
 AND s.major IS NOT NULL;
 ```
 
-### In HAVING Clause (Group Filtering)
+**In HAVING Clause:**
 
 ```sql
 SELECT s.major, AVG(s.gpa) AS major_avg_gpa
@@ -203,10 +193,7 @@ HAVING AVG(s.gpa) > (
 
 ## Performance Considerations
 
-**Why correlated subqueries can be slow:**
-- Execute once per outer row
-- No result caching between executions
-- Performance depends heavily on indexes
+Correlated subqueries execute once per outer row with no result caching, making them slower than alternatives.
 
 **Optimization strategies:**
 
@@ -272,15 +259,7 @@ FROM students s LEFT JOIN counts c ON s.student_id = c.student_id;
 
 ## When to Use Correlated Subqueries
 
-**Good use cases:**
-- Row-specific comparisons (e.g., above own group average)
-- Calculated columns in SELECT
-- Existence checks with EXISTS
-- Complex row-level filtering
+**Use for:** Row-specific comparisons, calculated columns, existence checks, complex filtering
 
-**Consider alternatives when:**
-- Query performance is critical
-- Simple global comparisons (use non-correlated)
-- Need multiple columns from related table (use JOIN)
-- Working with large datasets (optimize with indexes or JOINs)
+**Avoid when:** Performance critical, simple global comparisons, or need multiple columns (use JOINs instead)
 
