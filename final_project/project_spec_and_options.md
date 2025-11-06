@@ -62,6 +62,24 @@ Folder names can vary by framework (routes/, services/, repositories/, etc.) but
 
 ---
 
+### Business Analytics Track (DB-only option)
+
+For Business Analytics students, implementing a backend service is not required.
+
+Deliverables:
+- ER Diagram (min 3NF)
+- `sql/schema.sql` with CREATE TABLE statements, PK/FK/constraints
+- `sql/sample_data.sql` with representative rows
+- `docs/ANALYTICS_QUERIES.md` containing SQL that demonstrates:
+  - Core operations (INSERT/UPDATE/DELETE where relevant)
+  - Analysis: JOINs, GROUP BY aggregates, window functions, subqueries/CTEs
+  - Views (or materialized views if supported) for reusable analytics
+  - Brief notes on indexing and one EXPLAIN/EXPLAIN ANALYZE discussion
+
+Demo: run the SQL scripts and analytics queries live in the last class and explain results.
+
+---
+
 ## Project Ideas
 
 Choose one project. Each includes **5 core features** - you must design and implement **5 additional features** based on real-world needs.
@@ -235,6 +253,7 @@ Choose one project. Each includes **5 core features** - you must design and impl
 - ER diagram in `docs/DATABASE_DESIGN.md`
 - SQL scripts in `sql/` folder with sample data for multiple organizations/users
 - Live demo of the running project during the last class
+  - For Business Analytics track: demo the SQL schema and analytics queries live (no backend required)
 
 ---
 
