@@ -123,85 +123,9 @@ JOIN employees e2 ON e1.manager_id = e2.employee_id;
 
 ## Sample Database Schema
 
-For all examples in this course module, we'll use a university enrollment system:
+For all examples in this course module, we'll use a university enrollment system. 
 
-<details>
-<summary>Click to expand: Database setup script</summary>
-
-```sql
--- Create Students table
-CREATE TABLE students (
-    student_id INTEGER PRIMARY KEY,
-    first_name VARCHAR2(50) NOT NULL,
-    last_name VARCHAR2(50) NOT NULL,
-    email VARCHAR2(100) UNIQUE NOT NULL,
-    major VARCHAR2(50),
-    enrollment_date DATE DEFAULT SYSDATE
-);
-
--- Create Instructors table
-CREATE TABLE instructors (
-    instructor_id INTEGER PRIMARY KEY,
-    instructor_name VARCHAR2(100) NOT NULL,
-    department VARCHAR2(50),
-    hire_date DATE
-);
-
--- Create Courses table
-CREATE TABLE courses (
-    course_id VARCHAR2(10) PRIMARY KEY,
-    course_name VARCHAR2(100) NOT NULL,
-    department VARCHAR2(50),
-    credits INTEGER,
-    instructor_id INTEGER REFERENCES instructors(instructor_id)
-);
-
--- Create Enrollments table (junction table)
-CREATE TABLE enrollments (
-    enrollment_id INTEGER PRIMARY KEY,
-    student_id INTEGER REFERENCES students(student_id),
-    course_id VARCHAR2(10) REFERENCES courses(course_id),
-    semester VARCHAR2(20),
-    grade VARCHAR2(5)
-);
-
--- Insert Students
-INSERT INTO students (student_id, first_name, last_name, email, major, enrollment_date) VALUES
-(1, 'John', 'Smith', 'john.smith@university.edu', 'Computer Science', '2023-09-01'),
-(2, 'Jane', 'Doe', 'jane.doe@university.edu', 'Mathematics', '2023-09-01'),
-(3, 'Bob', 'Wilson', 'bob.wilson@university.edu', 'Computer Science', '2024-01-15'),
-(4, 'Alice', 'Brown', 'alice.brown@university.edu', 'Physics', '2024-01-15'),
-(5, 'Charlie', 'Davis', 'charlie.davis@university.edu', NULL, '2024-09-01');
-
--- Insert Instructors
-INSERT INTO instructors (instructor_id, instructor_name, department, hire_date) VALUES
-(10, 'Dr. Johnson', 'Computer Science', '2018-08-15'),
-(11, 'Dr. Lee', 'Mathematics', '2019-01-10'),
-(12, 'Dr. Martinez', 'Physics', '2020-09-01'),
-(13, 'Dr. Taylor', 'Chemistry', '2021-06-15');
-
--- Insert Courses
-INSERT INTO courses (course_id, course_name, department, credits, instructor_id) VALUES
-('CS101', 'Introduction to Programming', 'Computer Science', 3, 10),
-('CS201', 'Data Structures', 'Computer Science', 4, 10),
-('MATH101', 'Calculus I', 'Mathematics', 4, 11),
-('PHYS101', 'Physics I', 'Physics', 4, 12),
-('CS301', 'Database Systems', 'Computer Science', 3, 10),
-('ENG101', 'English Composition', 'English', 3, NULL);
-
--- Insert Enrollments
-INSERT INTO enrollments (enrollment_id, student_id, course_id, semester, grade) VALUES
-(101, 1, 'CS101', 'Fall 2023', 'A'),
-(102, 1, 'CS201', 'Spring 2024', 'B+'),
-(103, 2, 'MATH101', 'Fall 2023', 'A'),
-(104, 2, 'CS101', 'Fall 2023', 'A-'),
-(105, 3, 'CS101', 'Spring 2024', 'B'),
-(106, 3, 'CS201', 'Spring 2024', 'B+'),
-(107, 4, 'PHYS101', 'Spring 2024', 'A'),
-(108, 1, 'CS301', 'Fall 2024', NULL);
-```
-
-</details>
+**Note:** The complete database setup script is available in `00_initialization.md` in this directory.
 
 ### Students Table
 | student_id | first_name | last_name | email | major | enrollment_date |
