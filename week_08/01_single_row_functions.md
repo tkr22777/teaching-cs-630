@@ -22,9 +22,7 @@
 
 ## Sample Database Schema
 
-This module uses the university enrollment system.
-
-**Note:** The complete database setup script is available in `00_initialization.md` in this directory.
+University enrollment system. Setup: `00_initialization.md`
 
 ## Function Categories
 
@@ -41,8 +39,6 @@ Single-row functions are organized into categories:
 ## Character Functions
 
 ### UPPER, LOWER, INITCAP
-
-**Purpose:** Change text case.
 
 **Syntax:**
 - `UPPER(string)` - Converts to uppercase
@@ -66,18 +62,11 @@ WHERE student_id = 1;
 |------------|------------|------------|-----------------|
 | John | JOHN | john | John.Smith@University.Edu |
 
-**Common use:** Case-insensitive searches:
-```sql
-WHERE UPPER(major) = 'COMPUTER SCIENCE'
-```
-
 ### SUBSTR
 
-**Purpose:** Extract part of a string.
+Extracts part of a string.
 
 **Syntax:** `SUBSTR(string, start_position, length)`
-- `start_position`: Starting position (1-based)
-- `length`: Optional - number of characters
 
 **Example:**
 
@@ -100,11 +89,11 @@ WHERE course_id LIKE 'CS%';
 
 ### CONCAT and || Operator
 
-**Purpose:** Join strings together.
+Joins strings together.
 
 **Syntax:**
 - `CONCAT(string1, string2)` - Joins two strings
-- `string1 || string2` - Concatenation operator (preferred, can chain)
+- `string1 || string2` - Concatenation operator (can chain multiple values)
 
 **Example:**
 
@@ -125,12 +114,9 @@ WHERE student_id <= 2;
 
 ### TRIM, LTRIM, RTRIM
 
-**Purpose:** Remove spaces or characters.
+Removes spaces or characters.
 
-**Syntax:**
-- `TRIM(string)` - Remove spaces from both sides
-- `LTRIM(string)` - Remove from left
-- `RTRIM(string)` - Remove from right
+**Syntax:** `TRIM(string)`, `LTRIM(string)`, `RTRIM(string)`
 
 **Example:**
 
@@ -151,12 +137,9 @@ FROM DUAL;
 
 ### ROUND
 
-**Purpose:** Round numbers to specified decimal places.
+Rounds numbers to specified decimal places.
 
 **Syntax:** `ROUND(number, decimal_places)`
-- Positive: decimal places
-- Negative: digits before decimal
-- Omitted: rounds to integer
 
 **Example:**
 
@@ -181,7 +164,7 @@ ORDER BY student_id;
 
 ### TRUNC
 
-**Purpose:** Truncate (chop off) numbers without rounding.
+Truncates numbers without rounding.
 
 **Syntax:** `TRUNC(number, decimal_places)`
 
@@ -208,7 +191,7 @@ AND student_id <= 3;
 
 ### MOD
 
-**Purpose:** Calculate remainder after division.
+Calculates remainder after division.
 
 **Syntax:** `MOD(dividend, divisor)`
 
@@ -240,9 +223,9 @@ ORDER BY student_id;
 
 ### SYSDATE
 
-**Purpose:** Get current date and time.
+Returns current date and time.
 
-**Syntax:** `SYSDATE` (no parentheses)
+**Syntax:** `SYSDATE`
 
 **Example:**
 
@@ -256,7 +239,7 @@ FROM DUAL;
 
 ### ADD_MONTHS
 
-**Purpose:** Add or subtract months from a date.
+Adds or subtracts months from a date.
 
 **Syntax:** `ADD_MONTHS(date, number_of_months)`
 
@@ -280,7 +263,7 @@ WHERE student_id <= 2;
 
 ### MONTHS_BETWEEN
 
-**Purpose:** Calculate number of months between two dates.
+Calculates number of months between two dates.
 
 **Syntax:** `MONTHS_BETWEEN(date1, date2)`
 
@@ -299,9 +282,9 @@ ORDER BY enrollment_date;
 
 ## Conversion Functions
 
-### TO_CHAR (Date to String)
+### TO_CHAR
 
-**Purpose:** Convert dates to formatted strings.
+Converts dates to formatted strings.
 
 **Syntax:** `TO_CHAR(date, format_mask)`
 
@@ -337,7 +320,7 @@ WHERE student_id <= 2;
 
 ### TO_DATE
 
-**Purpose:** Convert strings to dates.
+Converts strings to dates.
 
 **Syntax:** `TO_DATE(string, format_mask)`
 
@@ -351,20 +334,11 @@ SELECT
 FROM DUAL;
 ```
 
-**Practical use:**
-
-```sql
--- Find students enrolled after a specific date
-SELECT first_name, last_name, enrollment_date
-FROM students
-WHERE enrollment_date > TO_DATE('2024-01-01', 'YYYY-MM-DD');
-```
-
 ## NULL Handling Functions
 
 ### NVL
 
-**Purpose:** Replace NULL with a specified value.
+Replaces NULL with a specified value.
 
 **Syntax:** `NVL(expression, replacement_value)`
 
@@ -391,7 +365,7 @@ ORDER BY student_id;
 
 ### COALESCE
 
-**Purpose:** Return first non-NULL value from a list.
+Returns first non-NULL value from a list.
 
 **Syntax:** `COALESCE(value1, value2, value3, ...)`
 
@@ -417,12 +391,6 @@ ORDER BY e.enrollment_id;
 | 102 | CS201 | B+ | 3.3 | B+ | 3.3 |
 | 108 | CS301 | NULL | NULL | IP | 0 |
 
-**Multiple values:**
-```sql
-SELECT COALESCE(NULL, NULL, 'First non-NULL', 'Another') AS result FROM DUAL;
--- Returns: 'First non-NULL'
-```
-
 ## Function Nesting
 
 Functions can be nested - the inner function executes first, and its result becomes input to the outer function.
@@ -444,9 +412,4 @@ WHERE student_id <= 3;
 | JOHN SMITH | September 2023 | 3.8 |
 | JANE DOE | September 2023 | 3.9 |
 | BOB WILSON | January 2024 | 3.2 |
-
-**Execution order:** Inner to outer
-1. `NVL(gpa, 0)` replaces NULL with 0
-2. `ROUND(..., 1)` rounds the result
-3. `TO_CHAR(enrollment_date, 'Month YYYY')` formats date
 
