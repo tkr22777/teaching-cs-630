@@ -5,6 +5,7 @@
 !.gitignore
 !README.md
 !normalization_notes_and_details.md
+!final_project/
 !final_project/*
 
 # Keep week directories and files
