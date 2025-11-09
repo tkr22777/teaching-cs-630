@@ -13,7 +13,7 @@ Select the track that matches your major and review the detailed requirements:
 | Track | Description | Details |
 |-------|-------------|---------|
 | **Computer Science** | Full-stack implementation with UI, backend, and database | [CS_TRACK.md](CS_TRACK.md) |
-| **Data Science** | TBD | [DS_TRACK.md](DS_TRACK.md) |
+| **Data Science** | Database design with large-scale data population and analysis | [DS_TRACK.md](DS_TRACK.md) |
 | **Business Analytics** | Database design and analytics queries (no backend required) | [BA_TRACK.md](BA_TRACK.md) |
 
 ---
@@ -139,12 +139,17 @@ Choose one project: **5 core features + 5 additional features** (10 total).
 **November 26th - ERD Design Presentation**
 - Submit your ER diagram
 - Present and describe your ERD design (5 minutes)
+- Explain design choices and how your design is important/required for your project scope
 - Discuss 1-2 key design decisions
-- All tracks required
 
-**Final Class - Project Demo**
-- Live demonstration of complete project
+**December 9th (EOD) - Final Project Submission**
+- GitHub repository URL with all deliverables
+- Complete documentation and code
 - See track-specific requirements
+
+**December 10th - Project Demo (In Class)**
+- Live demonstration of complete project
+- Be prepared to explain design decisions
 
 ---
 

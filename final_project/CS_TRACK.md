@@ -27,9 +27,15 @@ project/
 │   └── USER_GUIDE.md
 ├── sql/
 │   ├── schema.sql
-│   └── sample_data.sql
+│   ├── sample_data.sql
+│   └── reset.sql
 └── README.md
 ```
+
+Required SQL files:
+- `schema.sql` - DDL with CREATE TABLE statements, PKs/FKs/constraints
+- `sample_data.sql` - INSERT statements with representative data
+- `reset.sql` - DROP/TRUNCATE statements to reset database
 
 ### 4. Code Architecture
 
@@ -45,11 +51,14 @@ Required layers:
 - **Database**: Oracle (use provided credentials)
 - **SQL**: Direct SQL queries - **NO ORMs**
 
-### 6. AI Tools
+### 6. Initial Focus
 
-- Use AI assistants (Copilot, Cursor, etc.)
-- **CRITICAL**: Understand all generated code
-- Must explain design decisions during demo
+Start with:
+1. ERD design
+2. DDL design (CREATE TABLE statements)
+3. Sample INSERT queries
+
+**Note:** Use AI assistants but understand all generated code. Must explain design decisions during demo.
 
 ---
 
@@ -66,10 +75,15 @@ Required layers:
 **November 26th - ERD Design Presentation**
 - Submit ER diagram
 - Present and describe design (5 minutes)
+- Explain design choices and how your design is important/required for your project scope
 - Discuss 1-2 key design decisions
 
-**Final Class - Project Demo**
+**December 9th (EOD) - Final Submission**
 - GitHub repository URL
 - Complete `docs/` folder and `sql/` scripts
+- All code and documentation
+
+**December 10th - Project Demo (In Class)**
 - Live demonstration
+- Explain design decisions and architecture
 
