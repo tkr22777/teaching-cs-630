@@ -4,6 +4,28 @@ Database design with large-scale data population and analysis.
 
 ---
 
+## Important Dates
+
+**November 26th - ERD Design Presentation**
+- Submit ER diagram
+- Present and describe design (5 minutes)
+- Explain design choices and how your design is important/required for your project scope
+- Discuss 1-2 key design decisions
+
+**December 9th (EOD) - Final Submission**
+- GitHub repository URL
+- `docs/DATABASE_DESIGN.md` with ER diagram
+- SQL scripts in `sql/` folder
+- Data population scripts in `scripts/` folder
+- `docs/ANALYSIS.md` with methodology and queries
+
+**December 10th - Project Demo (In Class)**
+- Live demonstration of data population scripts
+- Show analytical queries and results
+- Explain design decisions and data analysis approach
+
+---
+
 ## Requirements
 
 ### 1. Database Design
@@ -56,24 +78,4 @@ Start with:
 2. **Data Population (25%)** - Script quality, data volume, reproducibility
 3. **SQL & Analysis (30%)** - Query complexity, analytical depth
 4. **Documentation (20%)** - Clear explanations, methodology
-
-## Important Dates
-
-**November 26th - ERD Design Presentation**
-- Submit ER diagram
-- Present and describe design (5 minutes)
-- Explain design choices and how your design is important/required for your project scope
-- Discuss 1-2 key design decisions
-
-**December 9th (EOD) - Final Submission**
-- GitHub repository URL
-- `docs/DATABASE_DESIGN.md` with ER diagram
-- SQL scripts in `sql/` folder
-- Data population scripts in `scripts/` folder
-- `docs/ANALYSIS.md` with methodology and queries
-
-**December 10th - Project Demo (In Class)**
-- Live demonstration of data population scripts
-- Show analytical queries and results
-- Explain design decisions and data analysis approach
 

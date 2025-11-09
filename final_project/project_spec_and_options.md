@@ -6,6 +6,25 @@ Design and implement a database-backed application demonstrating database design
 
 ---
 
+## Important Dates
+
+**November 26th - ERD Design Presentation**
+- Submit your ER diagram
+- Present and describe your ERD design (5 minutes)
+- Explain design choices and how your design is important/required for your project scope
+- Discuss 1-2 key design decisions
+
+**December 9th (EOD) - Final Project Submission**
+- GitHub repository URL with all deliverables
+- Complete documentation and code
+- See track-specific requirements
+
+**December 10th - Project Demo (In Class)**
+- Live demonstration of complete project
+- Be prepared to explain design decisions
+
+---
+
 ## Choose Your Track
 
 Select the track that matches your major and review the detailed requirements:
@@ -131,25 +150,6 @@ Choose one project: **5 core features + 5 additional features** (10 total).
 5. Hold requests and inter-branch transfers
 
 </details>
-
----
-
-## Important Dates
-
-**November 26th - ERD Design Presentation**
-- Submit your ER diagram
-- Present and describe your ERD design (5 minutes)
-- Explain design choices and how your design is important/required for your project scope
-- Discuss 1-2 key design decisions
-
-**December 9th (EOD) - Final Project Submission**
-- GitHub repository URL with all deliverables
-- Complete documentation and code
-- See track-specific requirements
-
-**December 10th - Project Demo (In Class)**
-- Live demonstration of complete project
-- Be prepared to explain design decisions
 
 ---
 

@@ -4,6 +4,26 @@ Database design and analytics queries. **No backend required.**
 
 ---
 
+## Important Dates
+
+**November 26th - ERD Design Presentation**
+- Submit ER diagram
+- Present and describe design (5 minutes)
+- Explain design choices and how your design is important/required for your project scope
+- Discuss 1-2 key design decisions
+
+**December 9th (EOD) - Final Submission**
+- GitHub repository URL
+- `docs/DATABASE_DESIGN.md` with ER diagram
+- SQL scripts in `sql/` folder
+- `docs/ANALYTICS_QUERIES.md` with demonstrations
+
+**December 10th - Project Demo (In Class)**
+- Live demonstration of SQL scripts and queries
+- Explain analytical insights and design decisions
+
+---
+
 ## Requirements
 
 ### 1. Database Design
@@ -48,22 +68,4 @@ Start with:
 2. **SQL Implementation (40%)** - Query complexity, analytics depth
 3. **Data Quality (15%)** - Representative sample data
 4. **Documentation (15%)** - Clear query explanations
-
-## Important Dates
-
-**November 26th - ERD Design Presentation**
-- Submit ER diagram
-- Present and describe design (5 minutes)
-- Explain design choices and how your design is important/required for your project scope
-- Discuss 1-2 key design decisions
-
-**December 9th (EOD) - Final Submission**
-- GitHub repository URL
-- `docs/DATABASE_DESIGN.md` with ER diagram
-- SQL scripts in `sql/` folder
-- `docs/ANALYTICS_QUERIES.md` with demonstrations
-
-**December 10th - Project Demo (In Class)**
-- Live demonstration of SQL scripts and queries
-- Explain analytical insights and design decisions
 

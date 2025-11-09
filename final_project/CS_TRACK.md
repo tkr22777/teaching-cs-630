@@ -4,6 +4,25 @@ Full-stack implementation with UI, backend, and database.
 
 ---
 
+## Important Dates
+
+**November 26th - ERD Design Presentation**
+- Submit ER diagram
+- Present and describe design (5 minutes)
+- Explain design choices and how your design is important/required for your project scope
+- Discuss 1-2 key design decisions
+
+**December 9th (EOD) - Final Submission**
+- GitHub repository URL
+- Complete `docs/` folder and `sql/` scripts
+- All code and documentation
+
+**December 10th - Project Demo (In Class)**
+- Live demonstration
+- Explain design decisions and architecture
+
+---
+
 ## Requirements
 
 ### 1. Database Design
@@ -69,21 +88,4 @@ Start with:
 3. **Code Quality & Architecture (20%)** - Layer separation, understanding
 4. **Features & Functionality (15%)** - All 10 features working
 5. **Documentation & Repository (10%)** - Complete docs, commits
-
-## Important Dates
-
-**November 26th - ERD Design Presentation**
-- Submit ER diagram
-- Present and describe design (5 minutes)
-- Explain design choices and how your design is important/required for your project scope
-- Discuss 1-2 key design decisions
-
-**December 9th (EOD) - Final Submission**
-- GitHub repository URL
-- Complete `docs/` folder and `sql/` scripts
-- All code and documentation
-
-**December 10th - Project Demo (In Class)**
-- Live demonstration
-- Explain design decisions and architecture
 
