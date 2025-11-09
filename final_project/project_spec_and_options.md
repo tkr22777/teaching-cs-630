@@ -25,6 +25,37 @@ Design and implement a database-backed application demonstrating database design
 
 ---
 
+## General Requirements (All Tracks)
+
+### Database Design
+- Complete ER Diagram (entities, relationships, cardinalities, PKs/FKs)
+- Normalized to 3NF minimum
+
+### GitHub Repository
+- Public repository with incremental commits (minimum 10)
+- Include repository link in submission
+
+### Database
+- **Oracle** (use provided credentials)
+
+### Required SQL Files
+- `sql/schema.sql` - DDL with CREATE TABLE statements, PKs/FKs/constraints
+- `sql/sample_data.sql` - INSERT statements with representative data
+- `sql/reset.sql` - DROP/TRUNCATE statements to reset database
+
+### Initial Focus
+Start with:
+1. ERD design
+2. DDL design (CREATE TABLE statements)
+3. Sample INSERT queries
+
+### Guidelines
+- Use AI assistants but understand all generated code
+- Must explain design decisions during demo
+- Choose one project from options below: **5 core features + 5 additional features** (10 total)
+
+---
+
 ## Choose Your Track
 
 Select the track that matches your major and review the detailed requirements:
@@ -37,9 +68,7 @@ Select the track that matches your major and review the detailed requirements:
 
 ---
 
-## Project Ideas (All Tracks)
-
-Choose one project: **5 core features + 5 additional features** (10 total).
+## Project Ideas
 
 <details>
 <summary><strong>1. Donation & Fundraising Platform</strong></summary>
@@ -151,9 +180,3 @@ Choose one project: **5 core features + 5 additional features** (10 total).
 
 </details>
 
----
-
-## General Guidelines
-
-- All tracks: Oracle database (use provided credentials), ER diagram (3NF minimum), GitHub repo (10+ commits)
-- See your track-specific file for detailed requirements and evaluation criteria
