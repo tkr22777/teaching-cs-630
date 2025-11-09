@@ -42,7 +42,7 @@ Required layers:
 ### 5. Technical Stack
 
 - **Backend**: Python (Flask/Django/FastAPI) OR TypeScript/JavaScript (Node.js/Express)
-- **Database**: Oracle, PostgreSQL, MySQL, or SQLite
+- **Database**: Oracle (use provided credentials)
 - **SQL**: Direct SQL queries - **NO ORMs**
 
 ### 6. AI Tools
@@ -61,9 +61,15 @@ Required layers:
 4. **Features & Functionality (15%)** - All 10 features working
 5. **Documentation & Repository (10%)** - Complete docs, commits
 
-## Submission
+## Important Dates
 
+**November 26th - ERD Design Presentation**
+- Submit ER diagram
+- Present and describe design (5 minutes)
+- Discuss 1-2 key design decisions
+
+**Final Class - Project Demo**
 - GitHub repository URL
 - Complete `docs/` folder and `sql/` scripts
-- Live demo during final class
+- Live demonstration
 

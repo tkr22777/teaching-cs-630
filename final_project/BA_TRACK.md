@@ -15,7 +15,11 @@ Database design and analytics queries. **No backend required.**
 
 - Public repository with incremental commits (minimum 10)
 
-### 3. SQL Implementation
+### 3. Database
+
+- **Database**: Oracle (use provided credentials)
+
+### 4. SQL Implementation
 
 Required files:
 - `sql/schema.sql` - CREATE TABLE statements with PKs/FKs/constraints
@@ -24,7 +28,7 @@ Required files:
   - Core operations (INSERT/UPDATE/DELETE)
   - Analytics: JOINs, GROUP BY, window functions, CTEs
   - Views for reusable analytics
-  - Indexing notes and one EXPLAIN ANALYZE example
+  - Indexing notes and one EXPLAIN PLAN example
 
 ---
 
@@ -35,11 +39,17 @@ Required files:
 3. **Data Quality (15%)** - Representative sample data
 4. **Documentation (15%)** - Clear query explanations
 
-## Submission
+## Important Dates
 
+**November 26th - ERD Design Presentation**
+- Submit ER diagram
+- Present and describe design (5 minutes)
+- Discuss 1-2 key design decisions
+
+**Final Class - Project Demo**
 - GitHub repository URL
 - `docs/DATABASE_DESIGN.md` with ER diagram
 - SQL scripts in `sql/` folder
 - `docs/ANALYTICS_QUERIES.md` with demonstrations
-- Live demo during final class
+- Live demonstration
 

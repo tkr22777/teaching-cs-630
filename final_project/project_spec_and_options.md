@@ -134,7 +134,21 @@ Choose one project: **5 core features + 5 additional features** (10 total).
 
 ---
 
+## Important Dates
+
+**November 26th - ERD Design Presentation**
+- Submit your ER diagram
+- Present and describe your ERD design (5 minutes)
+- Discuss 1-2 key design decisions
+- All tracks required
+
+**Final Class - Project Demo**
+- Live demonstration of complete project
+- See track-specific requirements
+
+---
+
 ## General Guidelines
 
-- All tracks: ER diagram (3NF minimum), GitHub repo (10+ commits), live demo
+- All tracks: Oracle database (use provided credentials), ER diagram (3NF minimum), GitHub repo (10+ commits)
 - See your track-specific file for detailed requirements and evaluation criteria
