@@ -33,16 +33,17 @@ Database design and analytics queries. **No backend required.**
 - **Quality bar:** Avoid trivial variants—each query must answer a distinct question.
 - **Technical:** Use advanced SQL (window functions, CTEs, subqueries); include 3+ views or materialized views (depending on privileges); include one `EXPLAIN PLAN` with optimization notes.
 
-**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing schema changes and top insights.
-
-**Note:** Visualization guidance will follow in upcoming weeks.
+**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing schema changes and top insights. Use DBeaver or Apache Superset to visualize and demo your analytics.
 
 ---
 
 ## Evaluation
 
-1. **Database Design (25%)** - ER diagram, normalization, 5 core features + 10 analytics enhancements
-2. **Business Questions (35%)** - Quality and relevance of 15 analytical queries
-3. **SQL Implementation (25%)** - Query complexity, advanced SQL features, optimization
-4. **Documentation (15%)** - Clear explanations, insights, and business context
+**To be updated, provided later.**
+
+Confirmed criteria:
+- **ERD and DB Design (30%)**
+- **DB Initialization and Population (20%)**
+
+Additional criteria will be added later.
 

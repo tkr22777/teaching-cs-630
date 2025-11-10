@@ -48,9 +48,11 @@ Required layers:
 
 ## Evaluation
 
-1. **Database Design (30%)** - ER diagram, normalization, data isolation
-2. **SQL Implementation (25%)** - JOINs, subqueries, transactions
-3. **Code Quality & Architecture (20%)** - Layer separation, understanding
-4. **Features & Functionality (15%)** - All 10 features working
-5. **Documentation & Repository (10%)** - Complete docs, commits
+**To be updated, provided later.**
+
+Confirmed criteria:
+- **ERD and DB Design (30%)**
+- **DB Initialization and Population (20%)**
+
+Additional criteria will be added later.
 

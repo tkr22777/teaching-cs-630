@@ -40,17 +40,17 @@ Database design with large-scale data population and analysis.
 - **Quality bar:** Avoid trivial variants—each query must answer a distinct question.
 - **Technical:** Use advanced SQL (window functions, CTEs) and statistical queries (distributions, correlations); include one `EXPLAIN PLAN` focused on optimization for large datasets.
 
-**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing schema changes, dataset generation, and key insights.
-
-**Note:** Visualization guidance will follow in upcoming weeks.
+**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing schema changes, dataset generation, and key insights. Use DBeaver or Apache Superset to visualize and demo your analytics.
 
 ---
 
 ## Evaluation
 
-1. **Database Design (20%)** - ER diagram, normalization, 5 core features + 10 data science enhancements
-2. **Data Population (25%)** - Script quality, data volume, realism, reproducibility
-3. **Business Questions (30%)** - Quality and relevance of 15 analytical queries with performance considerations
-4. **SQL & Analysis (15%)** - Statistical queries, advanced SQL features, optimization
-5. **Documentation (10%)** - Clear methodology, insights, and business context
+**To be updated, provided later.**
+
+Confirmed criteria:
+- **ERD and DB Design (30%)**
+- **DB Initialization and Population (20%)**
+
+Additional criteria will be added later.
 
