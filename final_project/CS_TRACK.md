@@ -6,6 +6,16 @@ Full-stack implementation with UI, backend, and database.
 
 ---
 
+## Deliverables
+- GitHub repository URL
+- Running application with setup instructions
+- `docs/` (DATABASE_DESIGN.md, SETUP.md, ARCHITECTURE.md, USER_GUIDE.md)
+- `sql/` (schema.sql, sample_data.sql, reset.sql)
+
+**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing architecture, key design decisions, and demo plan.
+
+---
+
 ## Track-Specific Requirements
 
 ### 1. Documentation

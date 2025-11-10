@@ -6,37 +6,36 @@ Database design and analytics queries. **No backend required.**
 
 ---
 
+## Deliverables
+- `sql/schema.sql` (5 core + 10 analytics enhancements)
+- `sql/sample_data.sql`, `sql/reset.sql`
+- `docs/ANALYTICS_QUERIES.md` (15 queries, 3+ views/materialized views, 1 EXPLAIN PLAN)
+
+---
+
 ## Track-Specific Requirements
 
-### 1. Schema Design
+### 1. Analytical Schema Design
 
-- Implement the **5 core features** from your chosen project
-- Add **10 analytics-focused enhancements** to support business analysis:
-  - Additional tables for dimensional analysis
-  - Aggregation tables or materialized views
-  - Time-series tracking tables
-  - Audit/history tables
-  - Derived metrics tables
-  - Category/classification lookups
+- **Goal:** Extend the core project schema to enable business intelligence and analytics.
+- **Task:** Implement the 5 core features and add **at least 10 enhancements** for analytics.
+- **Examples (illustrative, not prescriptive):**
+  - Dimensional tables (e.g., time, location)
+  - Pre-aggregated summary tables or materialized views
+  - History/audit tables for trends
+  - Lookup tables for categories/classifications
 
-### 2. Analytics Documentation
+### 2. Business Intelligence Queries
 
-Required file `docs/ANALYTICS_QUERIES.md` containing:
+- **Goal:** Answer meaningful business questions using your enhanced schema.
+- **Task:** In `docs/ANALYTICS_QUERIES.md`, provide **at least 15 analytical queries**.
+- **Each query includes:** business question, commented SQL, brief expected insight.
+- **Quality bar:** Avoid trivial variants—each query must answer a distinct question.
+- **Technical:** Use advanced SQL (window functions, CTEs, subqueries); include 3+ views or materialized views (depending on privileges); include one `EXPLAIN PLAN` with optimization notes.
 
-**Business Questions & Queries:**
-- Minimum **15 analytical queries** answering business/domain questions
-- Each query must include:
-  - Business question being answered
-  - SQL query with comments
-  - Sample output or expected insights
-  
-**Query Requirements:**
-- Demonstrate: JOINs, GROUP BY, window functions, CTEs, subqueries
-- Include at least 3 views for reusable analytics
-- Core operations (INSERT/UPDATE/DELETE examples)
-- One EXPLAIN PLAN analysis with optimization discussion
+**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing schema changes and top insights.
 
-**Note:** Visualization tools and additional requirements will be discussed in future weeks.
+**Note:** Visualization guidance will follow in upcoming weeks.
 
 ---
 

@@ -6,50 +6,43 @@ Database design with large-scale data population and analysis.
 
 ---
 
+## Deliverables
+- `sql/schema.sql` (5 core + 10 data science enhancements)
+- `sql/sample_data.sql`, `sql/reset.sql`
+- `scripts/` (reproducible data population)
+- `docs/ANALYSIS.md` (15 queries with performance notes, 1 EXPLAIN PLAN)
+
+---
+
 ## Track-Specific Requirements
 
-### 1. Schema Design
+### 1. Data Science Schema Design
 
-- Implement the **5 core features** from your chosen project
-- Add **10 data science enhancements** to support analysis:
-  - Time-series data tables
-  - Event/behavioral tracking tables
-  - Feature engineering tables
-  - Aggregated metrics tables
-  - Historical snapshot tables
-  - Statistical summary tables
+- **Goal:** Extend the core schema to support feature engineering and large-scale analysis.
+- **Task:** Implement the 5 core features and add **at least 10 enhancements** for data science.
+- **Examples (illustrative, not prescriptive):**
+  - Fine‑grained event/behavior tracking tables
+  - Tables to store engineered features
+  - Historical snapshot tables for model training
+  - Pre‑aggregated statistical summary tables
 
-### 2. Data Population Scripts
+### 2. Data Population at Scale
 
-Create scripts to populate database with large datasets:
-- Python, SQL, or other scripting languages
-- Generate or import substantial data volumes (design for scale)
-- Scripts must be reproducible and documented
-- Include realistic data distributions and patterns
+- **Goal:** Build reproducible scripts to populate a realistic, scalable dataset.
+- **Task:** Create documented, automated scripts (Python, SQL, etc.) with realistic patterns/distributions.
+- **Note on Scale:** You’re graded on script quality and scalability design, not raw data volume.
 
-### 3. Analysis Documentation
+### 3. Analytical & Statistical Queries
 
-Required file `docs/ANALYSIS.md` containing:
+- **Goal:** Answer complex questions and evaluate performance at scale.
+- **Task:** In `docs/ANALYSIS.md`, provide **at least 15 analytical queries**.
+- **Each query includes:** question, commented SQL, performance notes.
+- **Quality bar:** Avoid trivial variants—each query must answer a distinct question.
+- **Technical:** Use advanced SQL (window functions, CTEs) and statistical queries (distributions, correlations); include one `EXPLAIN PLAN` focused on optimization for large datasets.
 
-**Data Population Methodology:**
-- Description of data generation approach
-- Data volume and distribution strategy
-- Data quality considerations
+**Presentation:** Prepare 2–3 slides or a 1‑minute script summarizing schema changes, dataset generation, and key insights.
 
-**Business Questions & Queries:**
-- Minimum **15 analytical queries** answering business/domain questions
-- Each query must include:
-  - Business question being answered
-  - SQL query with comments
-  - Performance notes for large datasets
-
-**Query Requirements:**
-- Demonstrate: JOINs, GROUP BY, window functions, CTEs, subqueries
-- Include statistical analysis queries (percentiles, distributions, correlations)
-- Performance considerations and optimizations
-- One EXPLAIN PLAN analysis with optimization discussion
-
-**Note:** Data population scripts and visualization tools will be discussed in future weeks.
+**Note:** Visualization guidance will follow in upcoming weeks.
 
 ---
 
