@@ -11,6 +11,7 @@ Design and implement a database project demonstrating proper database design, SQ
 **November 26th - ERD Design Presentation (10 Minutes)**
 
 - Submit your ER diagram
+- Submit DDL (`sql/schema.sql`), sample data (`sql/sample_data.sql`), and reset script (`sql/reset.sql`)
 - Present and describe your ERD design
 - Explain design choices and how your design is important/required for your project scope
 
@@ -46,14 +47,6 @@ Design and implement a database project demonstrating proper database design, SQ
 - `sql/schema.sql` - DDL with CREATE TABLE statements, PKs/FKs/constraints
 - `sql/sample_data.sql` - INSERT statements with representative data
 - `sql/reset.sql` - DROP/TRUNCATE statements to reset database
-
-### Initial Focus
-
-Start with:
-
-1. ERD design
-2. DDL design (CREATE TABLE statements)
-3. Sample INSERT queries
 
 ### Guidelines
 
