@@ -19,6 +19,10 @@
 !week_07/*.md
 !week_08/
 !week_08/*.md
+!week_09/
+!week_09/*.md
+!week_10/
+!week_10/*.md
 
 # Keep these patterns ignored
 .cursorrules
