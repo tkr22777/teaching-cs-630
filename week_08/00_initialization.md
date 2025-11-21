@@ -114,10 +114,10 @@ COMMIT;
 ## Summary
 
 This script creates a complete university enrollment database with:
+
 - 5 students with GPA values (including one without a declared major)
 - 4 instructors across different departments
 - 6 courses (including one without an assigned instructor)
 - 8 enrollments with grade points (including one without a grade)
 
 The data includes various scenarios useful for demonstrating SQL functions (string, numeric, date, conversion, NULL handling) and set operators (UNION, INTERSECT, MINUS).
-

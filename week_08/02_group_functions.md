@@ -14,20 +14,21 @@
 
 ## Common Group Functions
 
-| Function | Description | NULL Handling |
-|----------|-------------|---------------|
-| **COUNT(*)** | Count all rows | Includes NULLs |
-| **COUNT(column)** | Count non-NULL values | Ignores NULLs |
-| **SUM(column)** | Total of values | Ignores NULLs |
-| **AVG(column)** | Average of values | Ignores NULLs |
-| **MAX(column)** | Maximum value | Ignores NULLs |
-| **MIN(column)** | Minimum value | Ignores NULLs |
+| Function                | Description           | NULL Handling  |
+| ----------------------- | --------------------- | -------------- |
+| **COUNT(*)**      | Count all rows        | Includes NULLs |
+| **COUNT(column)** | Count non-NULL values | Ignores NULLs  |
+| **SUM(column)**   | Total of values       | Ignores NULLs  |
+| **AVG(column)**   | Average of values     | Ignores NULLs  |
+| **MAX(column)**   | Maximum value         | Ignores NULLs  |
+| **MIN(column)**   | Minimum value         | Ignores NULLs  |
 
 ## COUNT Function
 
 **Purpose:** Count rows or non-NULL values.
 
 **Syntax:**
+
 - `COUNT(*)` - Count all rows (including NULLs)
 - `COUNT(column)` - Count non-NULL values in column
 - `COUNT(DISTINCT column)` - Count unique non-NULL values
@@ -43,9 +44,10 @@ FROM students;
 ```
 
 **Result:**
+
 | total_students | students_with_major | unique_majors |
-|----------------|---------------------|---------------|
-| 5 | 4 | 3 |
+| -------------- | ------------------- | ------------- |
+| 5              | 4                   | 3             |
 
 ---
 
@@ -63,9 +65,10 @@ FROM courses;
 ```
 
 **Result:**
+
 | total_credits_offered |
-|----------------------|
-| 21 |
+| --------------------- |
+| 21                    |
 
 ---
 
@@ -85,9 +88,10 @@ WHERE gpa IS NOT NULL;
 ```
 
 **Result:**
+
 | overall_avg_gpa | rounded_avg |
-|-----------------|-------------|
-| 3.48 | 3.48 |
+| --------------- | ----------- |
+| 3.48            | 3.48        |
 
 ---
 
@@ -112,9 +116,10 @@ WHERE gpa IS NOT NULL;
 ```
 
 **Result:**
+
 | highest_gpa | lowest_gpa | most_recent_enrollment | first_alphabetically |
-|-------------|------------|------------------------|----------------------|
-| 3.9 | 2.8 | 2024-09-01 | Brown |
+| ----------- | ---------- | ---------------------- | -------------------- |
+| 3.9         | 2.8        | 2024-09-01             | Brown                |
 
 ---
 
@@ -138,11 +143,12 @@ ORDER BY student_count DESC;
 ```
 
 **Result:**
-| major | student_count | avg_gpa |
-|-------|---------------|---------|
-| Computer Science | 2 | 3.5 |
-| Mathematics | 1 | 3.9 |
-| Physics | 1 | 3.7 |
+
+| major            | student_count | avg_gpa |
+| ---------------- | ------------- | ------- |
+| Computer Science | 2             | 3.5     |
+| Mathematics      | 1             | 3.9     |
+| Physics          | 1             | 3.7     |
 
 ---
 
@@ -165,28 +171,28 @@ ORDER BY avg_gpa DESC;
 ```
 
 **Result:**
-| major | student_count | avg_gpa |
-|-------|---------------|---------|
-| Mathematics | 1 | 3.9 |
-| Physics | 1 | 3.7 |
+
+| major       | student_count | avg_gpa |
+| ----------- | ------------- | ------- |
+| Mathematics | 1             | 3.9     |
+| Physics     | 1             | 3.7     |
 
 ---
 
 ## WHERE vs. HAVING
 
-| Aspect | WHERE | HAVING |
-|--------|-------|--------|
-| **Filters** | Rows (before grouping) | Groups (after grouping) |
-| **Can use aggregates** | No | Yes |
+| Aspect                       | WHERE                  | HAVING                  |
+| ---------------------------- | ---------------------- | ----------------------- |
+| **Filters**            | Rows (before grouping) | Groups (after grouping) |
+| **Can use aggregates** | No                     | Yes                     |
 
 **Explanation:**
+
 - WHERE removes ENG101 (NULL instructor)
 - GROUP BY creates groups
 - HAVING keeps only departments with 2+ courses
 
 ## Advanced Patterns
-
-### Pattern 1: Conditional Aggregation
 
 ### Pattern 1: Multiple Grouping Columns
 
@@ -206,18 +212,20 @@ ORDER BY semester, c.department;
 ```
 
 **Result:**
-| semester | department | enrollments | avg_grade |
-|----------|------------|-------------|-----------|
-| Fall 2023 | Computer Science | 2 | 3.85 |
-| Fall 2023 | Mathematics | 1 | 4.0 |
-| Spring 2024 | Computer Science | 2 | 3.15 |
-| Spring 2024 | Physics | 1 | 4.0 |
+
+| semester    | department       | enrollments | avg_grade |
+| ----------- | ---------------- | ----------- | --------- |
+| Fall 2023   | Computer Science | 2           | 3.85      |
+| Fall 2023   | Mathematics      | 1           | 4.0       |
+| Spring 2024 | Computer Science | 2           | 3.15      |
+| Spring 2024 | Physics          | 1           | 4.0       |
 
 ---
 
 ## Common Mistakes
 
 **Forgetting GROUP BY:**
+
 ```sql
 -- ERROR
 SELECT major, COUNT(*) FROM students;
@@ -227,6 +235,7 @@ SELECT major, COUNT(*) FROM students GROUP BY major;
 ```
 
 **Using WHERE with aggregates:**
+
 ```sql
 -- ERROR
 WHERE AVG(gpa) > 3.5
@@ -234,4 +243,3 @@ WHERE AVG(gpa) > 3.5
 -- Correct
 HAVING AVG(gpa) > 3.5
 ```
-

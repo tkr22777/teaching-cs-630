@@ -41,7 +41,7 @@ Step 1: Subquery returns multiple student IDs
         └─────────────┘
 
 Step 2: Check each student against this list
-        
+      
 students table              Subquery result
 ┌────┬───────┐             ┌────┐
 │ id │ name  │             │ id │
