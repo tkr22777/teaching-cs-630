@@ -10,16 +10,10 @@ Advanced join patterns, composite joins, and performance optimization techniques
 
 A **composite join** uses multiple columns in the join condition to uniquely identify matching rows.
 
-### When to Use Composite Joins
-
-- Junction tables with composite keys
-- Time-series data (date + time + location)
-- Multi-tenant systems (tenant_id + record_id)
-- Versioned data (id + version)
-
 ### Example 1: Course Sections with Composite Keys
 
 **Setup:**
+
 ```sql
 CREATE TABLE course_sections (
     course_id VARCHAR2(10),
@@ -79,53 +73,17 @@ ORDER BY se.year, se.semester, s.last_name;
 ```
 
 **Result:**
-| first_name | last_name | course_id | semester | year | section | room | instructor_name | grade |
-|------------|-----------|-----------|----------|------|---------|------|-----------------|-------|
-| Jane | Doe | CS101 | Fall | 2023 | B | Room 102 | Dr. Lee | A- |
-| John | Smith | CS101 | Fall | 2023 | A | Room 101 | Dr. Johnson | A |
-| John | Smith | CS201 | Spring | 2024 | A | Room 103 | Dr. Johnson | B+ |
-| Bob | Wilson | CS101 | Spring | 2024 | A | Room 101 | Dr. Johnson | B |
+
+| first_name | last_name | course_id | semester | year | section | room     | instructor_name | grade |
+| ---------- | --------- | --------- | -------- | ---- | ------- | -------- | --------------- | ----- |
+| Jane       | Doe       | CS101     | Fall     | 2023 | B       | Room 102 | Dr. Lee         | A-    |
+| John       | Smith     | CS101     | Fall     | 2023 | A       | Room 101 | Dr. Johnson     | A     |
+| John       | Smith     | CS201     | Spring   | 2024 | A       | Room 103 | Dr. Johnson     | B+    |
+| Bob        | Wilson    | CS101     | Spring   | 2024 | A       | Room 101 | Dr. Johnson     | B     |
 
 ## Common Join Patterns
 
-### Pattern 1: Master-Detail Relationship
-
-**Use Case:** One parent record with multiple child records.
-
-**Query:** Students with their enrollments and aggregate stats.
-
-```sql
-SELECT s.student_id,
-       s.first_name || ' ' || s.last_name AS student_name,
-       s.major,
-       COUNT(e.enrollment_id) AS course_count,
-       LISTAGG(c.course_name, ', ') WITHIN GROUP (ORDER BY c.course_name) AS courses,
-       ROUND(AVG(
-           CASE e.grade
-               WHEN 'A' THEN 4.0
-               WHEN 'A-' THEN 3.7
-               WHEN 'B+' THEN 3.3
-               WHEN 'B' THEN 3.0
-               ELSE NULL
-           END
-       ), 2) AS gpa
-FROM students s
-LEFT JOIN enrollments e ON s.student_id = e.student_id
-LEFT JOIN courses c ON e.course_id = c.course_id
-GROUP BY s.student_id, s.first_name, s.last_name, s.major
-ORDER BY gpa DESC NULLS LAST;
-```
-
-**Result:**
-| student_id | student_name | major | course_count | courses | gpa |
-|------------|--------------|-------|--------------|---------|-----|
-| 4 | Alice Brown | Physics | 1 | Physics I | 4.00 |
-| 2 | Jane Doe | Mathematics | 2 | Calculus I, Introduction to Programming | 3.85 |
-| 1 | John Smith | Computer Science | 3 | Data Structures, Database Systems, Introduction to Programming | 3.65 |
-| 3 | Bob Wilson | Computer Science | 2 | Data Structures, Introduction to Programming | 3.15 |
-| 5 | Charlie Davis | NULL | 0 | NULL | NULL |
-
-### Pattern 2: Many-to-Many Through Junction Table
+### Pattern 1: Many-to-Many Through Junction Table
 
 **Use Case:** Two entities connected via intermediate table.
 
@@ -146,97 +104,14 @@ ORDER BY total_enrollments DESC;
 ```
 
 **Result:**
-| major | students_in_major | courses_taken | total_enrollments | avg_credits |
-|-------|-------------------|---------------|-------------------|-------------|
-| Computer Science | 2 | 3 | 5 | 3.6 |
-| Mathematics | 1 | 2 | 2 | 3.5 |
-| Physics | 1 | 1 | 1 | 4.0 |
 
-### Pattern 3: Finding Unmatched Records
+| major            | students_in_major | courses_taken | total_enrollments | avg_credits |
+| ---------------- | ----------------- | ------------- | ----------------- | ----------- |
+| Computer Science | 2                 | 3             | 5                 | 3.6         |
+| Mathematics      | 1                 | 2             | 2                 | 3.5         |
+| Physics          | 1                 | 1             | 1                 | 4.0         |
 
-**Use Case:** Identify records in one table without corresponding records in another.
-
-**Query:** Find all orphan and missing records.
-
-```sql
--- Students without enrollments
-SELECT 'No Enrollments' AS issue_type,
-       s.student_id,
-       s.first_name || ' ' || s.last_name AS name,
-       s.enrollment_date,
-       NULL AS course_id
-FROM students s
-LEFT JOIN enrollments e ON s.student_id = e.student_id
-WHERE e.enrollment_id IS NULL
-
-UNION ALL
-
--- Courses without enrollments
-SELECT 'No Enrollments' AS issue_type,
-       NULL AS student_id,
-       c.course_name AS name,
-       NULL AS enrollment_date,
-       c.course_id
-FROM courses c
-LEFT JOIN enrollments e ON c.course_id = e.course_id
-WHERE e.enrollment_id IS NULL
-
-UNION ALL
-
--- Courses without instructors
-SELECT 'No Instructor' AS issue_type,
-       NULL AS student_id,
-       c.course_name AS name,
-       NULL AS enrollment_date,
-       c.course_id
-FROM courses c
-WHERE c.instructor_id IS NULL
-
-ORDER BY issue_type, student_id, course_id;
-```
-
-**Result:**
-| issue_type | student_id | name | enrollment_date | course_id |
-|------------|------------|------|-----------------|-----------|
-| No Enrollments | 5 | Charlie Davis | 2024-09-01 | NULL |
-| No Enrollments | NULL | English Composition | NULL | ENG101 |
-| No Instructor | NULL | English Composition | NULL | ENG101 |
-
-### Pattern 4: Latest Record Per Group
-
-**Use Case:** Get the most recent record for each entity.
-
-**Query:** Most recent enrollment for each student.
-
-```sql
-WITH ranked_enrollments AS (
-    SELECT e.*,
-           c.course_name,
-           ROW_NUMBER() OVER (PARTITION BY e.student_id ORDER BY e.enrollment_id DESC) AS rn
-    FROM enrollments e
-    JOIN courses c ON e.course_id = c.course_id
-)
-SELECT s.student_id,
-       s.first_name,
-       s.last_name,
-       re.course_name AS latest_course,
-       re.semester AS latest_semester,
-       re.grade
-FROM students s
-INNER JOIN ranked_enrollments re ON s.student_id = re.student_id
-WHERE re.rn = 1
-ORDER BY s.student_id;
-```
-
-**Result:**
-| student_id | first_name | last_name | latest_course | latest_semester | grade |
-|------------|------------|-----------|---------------|-----------------|-------|
-| 1 | John | Smith | Database Systems | Fall 2024 | NULL |
-| 2 | Jane | Doe | Introduction to Programming | Fall 2023 | A- |
-| 3 | Bob | Wilson | Data Structures | Spring 2024 | B+ |
-| 4 | Alice | Brown | Physics I | Spring 2024 | A |
-
-### Pattern 5: Filtered Joins (Semi-Join Pattern)
+### Pattern 2: Filtered Joins
 
 **Use Case:** Filter main table based on existence in related table.
 
@@ -254,48 +129,10 @@ WHERE c.department = 'Computer Science'
 ORDER BY s.last_name;
 ```
 
-**Alternative using EXISTS (often more efficient):**
-```sql
-SELECT s.student_id,
-       s.first_name,
-       s.last_name,
-       s.major
-FROM students s
-WHERE EXISTS (
-    SELECT 1
-    FROM enrollments e
-    JOIN courses c ON e.course_id = c.course_id
-    WHERE e.student_id = s.student_id
-      AND c.department = 'Computer Science'
-)
-ORDER BY s.last_name;
-```
-
 **Result:**
-| student_id | first_name | last_name | major |
-|------------|------------|-----------|-------|
-| Jane | Doe | Mathematics |
-| John | Smith | Computer Science |
-| Bob | Wilson | Computer Science |
 
-## Performance Tips
-
-```sql
--- Index join columns (foreign keys)
-CREATE INDEX idx_enrollments_student_id ON enrollments(student_id);
-CREATE INDEX idx_enrollments_course_id ON enrollments(course_id);
-
--- Example query (check plan using your database's tools if desired)
-SELECT s.first_name, c.course_name
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id;
-
--- Filter early with WHERE
-SELECT s.first_name, c.course_name
-FROM students s
-JOIN enrollments e ON s.student_id = e.student_id
-JOIN courses c ON e.course_id = c.course_id
-WHERE s.major = 'Computer Science';  -- Filter before joining when possible
-```
-
+| student_id | first_name | last_name | major            |
+| ---------- | ---------- | --------- | ---------------- |
+| 2          | Jane       | Doe       | Mathematics      |
+| 1          | John       | Smith     | Computer Science |
+| 3          | Bob        | Wilson    | Computer Science |
