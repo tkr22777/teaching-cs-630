@@ -70,6 +70,53 @@ These functions ignore NULL values (except COUNT(*) which counts all rows). For 
 
 **GROUP BY** groups rows that have the same values in specified columns, allowing you to calculate aggregates for each group.
 
+**Visual: How GROUP BY Works**
+
+```text
+Original Table (10 rows)
+┌────┬─────────┬────────────┬──────────┐
+│ id │ product │ category   │ quantity │
+├────┼─────────┼────────────┼──────────┤
+│ 1  │ Laptop  │ Electronics│ 5        │
+│ 2  │ Mouse   │ Electronics│ 20       │
+│ 3  │ Desk    │ Furniture  │ 3        │
+│ 4  │ Chair   │ Furniture  │ 10       │
+│ 5  │ Laptop  │ Electronics│ 3        │
+│ 6  │ Monitor │ Electronics│ 8        │
+│ 7  │ Desk    │ Furniture  │ 5        │
+│ 8  │ Laptop  │ Electronics│ 2        │
+│ 9  │ Mouse   │ Electronics│ 15       │
+│ 10 │ Chair   │ Furniture  │ 12       │
+└────┴─────────┴────────────┴──────────┘
+           ↓
+    GROUP BY category
+           ↓
+┌─────────────────────────────────────────┐
+│ Electronics Group (6 rows)              │
+│ ├─ Laptop:  5                           │
+│ ├─ Mouse:   20                          │
+│ ├─ Laptop:  3   → SUM = 53             │
+│ ├─ Monitor: 8   → COUNT = 6            │
+│ ├─ Laptop:  2                           │
+│ └─ Mouse:   15                          │
+└─────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ Furniture Group (4 rows)                │
+│ ├─ Desk:  3                             │
+│ ├─ Chair: 10    → SUM = 30             │
+│ ├─ Desk:  5     → COUNT = 4            │
+│ └─ Chair: 12                            │
+└─────────────────────────────────────────┘
+           ↓
+    Result (2 rows - one per group)
+┌────────────┬───────────────┬──────────────┐
+│ category   │ number_sales  │ total_qty    │
+├────────────┼───────────────┼──────────────┤
+│ Electronics│ 6             │ 53           │
+│ Furniture  │ 4             │ 30           │
+└────────────┴───────────────┴──────────────┘
+```
+
 ### Example 11: Sales by Category
 
 **SQL Statement:**
@@ -86,8 +133,8 @@ ORDER BY total_revenue DESC;
 **Result:**
 | category | number_of_sales | total_quantity | total_revenue |
 |----------|-----------------|----------------|---------------|
-| Electronics | 6 | 53 | 12299.18 |
-| Furniture | 4 | 30 | 6599.93 |
+| Electronics | 6 | 53 | 13292.32 |
+| Furniture | 4 | 30 | 7999.78 |
 
 Notice how GROUP BY splits the data into separate groups, and each aggregate function calculates for its group.
 
@@ -114,33 +161,5 @@ ORDER BY total_revenue DESC;
 | category | sales_count | total_revenue |
 |----------|-------------|---------------|
 | Electronics | 6 | 13292.32 |
-
-##
-
-<details>
-<summary>Advanced Statistical Aggregates</summary>
-
-## STDDEV and VARIANCE Functions
-
-Standard SQL includes statistical aggregate functions for analyzing data distribution.
-
-**SQL Statement:**
-```sql
-SELECT category,
-       ROUND(AVG(quantity), 2) AS avg_quantity,
-       ROUND(STDDEV(quantity), 2) AS stddev_quantity,
-       ROUND(VARIANCE(quantity), 2) AS variance_quantity
-FROM sales
-GROUP BY category;
-```
-
-**Result:**
-| category | avg_quantity | stddev_quantity | variance_quantity |
-|----------|--------------|-----------------|-------------------|
-| Electronics | 8.83 | 6.65 | 44.17 |
-| Furniture | 7.50 | 3.70 | 13.67 |
-
-*Note: Not all databases support these functions. Check your database documentation.*
-
-</details>
+| Furniture | 4 | 7999.78 |
 

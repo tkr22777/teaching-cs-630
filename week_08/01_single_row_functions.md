@@ -6,35 +6,16 @@
 
 ## Key Terms
 
-**Single-Row Function**: Function that processes one row and returns one value per row.
-
-**Character Function**: Manipulates text/string data.
-
-**Numeric Function**: Performs mathematical operations.
-
-**Date Function**: Works with date and time values.
-
-**Conversion Function**: Converts between data types.
-
-**NULL Handling Function**: Manages NULL values in expressions.
-
-**Function Nesting**: Using one function's output as another function's input.
-
-## Sample Database Schema
-
-University enrollment system. Setup: `00_initialization.md`
+**Single-Row Function**: Operates on one row, returns one result per row.
 
 ## Function Categories
 
-Single-row functions are organized into categories:
-
 | Category | Purpose | Examples |
 |----------|---------|----------|
-| **Character** | String manipulation | UPPER, LOWER, SUBSTR, CONCAT, TRIM |
-| **Numeric** | Mathematical operations | ROUND, TRUNC, MOD |
-| **Date** | Date/time operations | SYSDATE, ADD_MONTHS, MONTHS_BETWEEN |
-| **Conversion** | Data type conversion | TO_CHAR, TO_DATE |
-| **NULL Handling** | NULL value management | NVL, COALESCE |
+| **Character** | String manipulation | UPPER, LOWER, SUBSTR, CONCAT |
+| **Numeric** | Math operations | ROUND, TRUNC, MOD |
+| **Date** | Date/time operations | SYSDATE, ADD_MONTHS |
+| **NULL Handling** | Handle NULL values | NVL, COALESCE |
 
 ## Character Functions
 
@@ -89,49 +70,33 @@ WHERE course_id LIKE 'CS%';
 
 ### CONCAT and || Operator
 
-Joins strings together.
-
-**Syntax:**
-- `CONCAT(string1, string2)` - Joins two strings
-- `string1 || string2` - Concatenation operator (can chain multiple values)
-
-**Example:**
+**Syntax:** `string1 || string2`
 
 ```sql
-SELECT 
-    first_name || ' ' || last_name AS full_name,
-    CONCAT(first_name, last_name) AS no_space_name,
-    email || ' (' || major || ')' AS contact_info
+SELECT first_name || ' ' || last_name AS full_name,
+       first_name || ' (' || major || ')' AS name_with_major
 FROM students
 WHERE student_id <= 2;
 ```
 
 **Result:**
-| full_name | no_space_name | contact_info |
-|-----------|---------------|--------------|
-| John Smith | JohnSmith | john.smith@university.edu (Computer Science) |
-| Jane Doe | JaneDoe | jane.doe@university.edu (Mathematics) |
+| full_name | name_with_major |
+|-----------|-----------------|
+| John Smith | John (Computer Science) |
+| Jane Doe | Jane (Mathematics) |
 
-### TRIM, LTRIM, RTRIM
+---
 
-Removes spaces or characters.
+### TRIM
 
-**Syntax:** `TRIM(string)`, `LTRIM(string)`, `RTRIM(string)`
-
-**Example:**
+Removes spaces.
 
 ```sql
-SELECT 
-    TRIM('  Computer Science  ') AS trimmed,
-    LTRIM('  Left spaces') AS left_trimmed,
-    RTRIM('Right spaces  ') AS right_trimmed
+SELECT TRIM('  Computer Science  ') AS trimmed
 FROM DUAL;
 ```
 
-**Result:**
-| trimmed | left_trimmed | right_trimmed |
-|---------|--------------|---------------|
-| Computer Science | Left spaces | Right spaces |
+**Result:** `Computer Science`
 
 ## Numeric Functions
 
@@ -162,32 +127,17 @@ ORDER BY student_id;
 | Jane | 3.9 | 4 | 3.9 | 390 |
 | Bob | 3.2 | 3 | 3.2 | 320 |
 
+---
+
 ### TRUNC
 
 Truncates numbers without rounding.
 
-**Syntax:** `TRUNC(number, decimal_places)`
-
-**Example:**
-
 ```sql
-SELECT 
-    first_name,
-    gpa,
-    TRUNC(gpa) AS truncated,
-    TRUNC(gpa, 1) AS one_decimal,
-    gpa - TRUNC(gpa) AS decimal_part
+SELECT gpa, TRUNC(gpa) AS truncated
 FROM students
-WHERE gpa IS NOT NULL
-AND student_id <= 3;
+WHERE gpa IS NOT NULL;
 ```
-
-**Result:**
-| first_name | gpa | truncated | one_decimal | decimal_part |
-|------------|-----|-----------|-------------|--------------|
-| John | 3.8 | 3 | 3.8 | 0.8 |
-| Jane | 3.9 | 3 | 3.9 | 0.9 |
-| Bob | 3.2 | 3 | 3.2 | 0.2 |
 
 ### MOD
 
@@ -198,26 +148,21 @@ Calculates remainder after division.
 **Example:**
 
 ```sql
-SELECT 
-    student_id,
-    first_name,
-    MOD(student_id, 2) AS is_odd,
-    CASE 
-        WHEN MOD(student_id, 2) = 0 THEN 'Even'
-        ELSE 'Odd'
-    END AS parity
+SELECT student_id,
+       first_name,
+       MOD(student_id, 2) AS is_odd
 FROM students
 ORDER BY student_id;
 ```
 
 **Result:**
-| student_id | first_name | is_odd | parity |
-|------------|------------|--------|--------|
-| 1 | John | 1 | Odd |
-| 2 | Jane | 0 | Even |
-| 3 | Bob | 1 | Odd |
-| 4 | Alice | 0 | Even |
-| 5 | Charlie | 1 | Odd |
+| student_id | first_name | is_odd |
+|------------|------------|--------|
+| 1 | John | 1 |
+| 2 | Jane | 0 |
+| 3 | Bob | 1 |
+
+---
 
 ## Date Functions
 
@@ -225,60 +170,37 @@ ORDER BY student_id;
 
 Returns current date and time.
 
-**Syntax:** `SYSDATE`
-
-**Example:**
-
 ```sql
-SELECT 
-    SYSDATE AS current_datetime,
-    TRUNC(SYSDATE) AS current_date,
-    SYSDATE - TRUNC(SYSDATE) AS time_fraction
-FROM DUAL;
+SELECT SYSDATE AS current_datetime FROM DUAL;
 ```
+
+---
 
 ### ADD_MONTHS
 
 Adds or subtracts months from a date.
 
-**Syntax:** `ADD_MONTHS(date, number_of_months)`
+```sql
+SELECT enrollment_date,
+       ADD_MONTHS(enrollment_date, 12) AS one_year_later
+FROM students
+WHERE student_id = 1;
+```
 
-**Example:**
+---
+
+### MONTHS_BETWEEN
+
+Calculates months between two dates.
 
 ```sql
-SELECT 
-    first_name,
-    enrollment_date,
-    ADD_MONTHS(enrollment_date, 12) AS one_year_later,
-    ADD_MONTHS(enrollment_date, -6) AS six_months_before
+SELECT first_name,
+       ROUND(MONTHS_BETWEEN(SYSDATE, enrollment_date)) AS months_enrolled
 FROM students
 WHERE student_id <= 2;
 ```
 
-**Result:**
-| first_name | enrollment_date | one_year_later | six_months_before |
-|------------|-----------------|----------------|-------------------|
-| John | 2023-09-01 | 2024-09-01 | 2023-03-01 |
-| Jane | 2023-09-01 | 2024-09-01 | 2023-03-01 |
-
-### MONTHS_BETWEEN
-
-Calculates number of months between two dates.
-
-**Syntax:** `MONTHS_BETWEEN(date1, date2)`
-
-**Example:**
-
-```sql
-SELECT 
-    first_name,
-    enrollment_date,
-    ROUND(MONTHS_BETWEEN(SYSDATE, enrollment_date)) AS months_enrolled,
-    TRUNC(MONTHS_BETWEEN(SYSDATE, enrollment_date) / 12) AS years_enrolled
-FROM students
-WHERE enrollment_date IS NOT NULL
-ORDER BY enrollment_date;
-```
+---
 
 ## Conversion Functions
 
@@ -286,130 +208,70 @@ ORDER BY enrollment_date;
 
 Converts dates to formatted strings.
 
-**Syntax:** `TO_CHAR(date, format_mask)`
-
-**Common Format Masks:**
-| Mask | Description | Example |
-|------|-------------|---------|
-| `YYYY` | 4-digit year | 2024 |
-| `MM` | 2-digit month | 09 |
-| `DD` | 2-digit day | 15 |
-| `MON` | Abbreviated month | SEP |
-| `MONTH` | Full month name | SEPTEMBER |
-| `DY` | Abbreviated day | MON |
-| `DAY` | Full day name | MONDAY |
-
-**Example:**
+**Common formats:** `YYYY` (year), `MM` (month), `DD` (day), `MON` (Sep)
 
 ```sql
-SELECT 
-    first_name,
-    enrollment_date,
-    TO_CHAR(enrollment_date, 'MM/DD/YYYY') AS us_format,
-    TO_CHAR(enrollment_date, 'Month DD, YYYY') AS long_format,
-    TO_CHAR(enrollment_date, 'DY, MON DD') AS short_format
+SELECT enrollment_date,
+       TO_CHAR(enrollment_date, 'MM/DD/YYYY') AS us_format,
+       TO_CHAR(enrollment_date, 'Month DD, YYYY') AS long_format
 FROM students
-WHERE student_id <= 2;
+WHERE student_id = 1;
 ```
 
-**Result:**
-| first_name | enrollment_date | us_format | long_format | short_format |
-|------------|-----------------|-----------|-------------|--------------|
-| John | 2023-09-01 | 09/01/2023 | September 01, 2023 | FRI, SEP 01 |
-| Jane | 2023-09-01 | 09/01/2023 | September 01, 2023 | FRI, SEP 01 |
+---
 
 ### TO_DATE
 
 Converts strings to dates.
 
-**Syntax:** `TO_DATE(string, format_mask)`
-
-**Example:**
-
 ```sql
-SELECT 
-    TO_DATE('2024-12-25', 'YYYY-MM-DD') AS christmas,
-    TO_DATE('12/31/2024', 'MM/DD/YYYY') AS new_years_eve,
-    TO_DATE('January 1, 2025', 'Month DD, YYYY') AS new_year
+SELECT TO_DATE('2024-12-25', 'YYYY-MM-DD') AS christmas
 FROM DUAL;
 ```
+
+---
 
 ## NULL Handling Functions
 
 ### NVL
 
-Replaces NULL with a specified value.
-
-**Syntax:** `NVL(expression, replacement_value)`
-
-**Example:**
+Replaces NULL with a value.
 
 ```sql
-SELECT 
-    first_name,
-    last_name,
-    major,
-    NVL(major, 'Undeclared') AS major_status
-FROM students
-ORDER BY student_id;
+SELECT first_name,
+       major,
+       NVL(major, 'Undeclared') AS major_status
+FROM students;
 ```
 
 **Result:**
-| first_name | last_name | major | major_status |
-|------------|-----------|-------|--------------|
-| John | Smith | Computer Science | Computer Science |
-| Jane | Doe | Mathematics | Mathematics |
-| Bob | Wilson | Computer Science | Computer Science |
-| Alice | Brown | Physics | Physics |
-| Charlie | Davis | NULL | Undeclared |
+| first_name | major | major_status |
+|------------|-------|--------------|
+| Charlie | NULL | Undeclared |
+
+---
 
 ### COALESCE
 
 Returns first non-NULL value from a list.
 
-**Syntax:** `COALESCE(value1, value2, value3, ...)`
-
-**Example:**
-
 ```sql
-SELECT 
-    e.enrollment_id,
-    e.course_id,
-    e.grade,
-    e.grade_points,
-    COALESCE(e.grade, 'IP') AS grade_status,
-    COALESCE(e.grade_points, 0) AS points_earned
-FROM enrollments e
-WHERE e.student_id = 1
-ORDER BY e.enrollment_id;
+SELECT grade,
+       COALESCE(grade, 'IP') AS grade_status
+FROM enrollments
+WHERE student_id = 1;
 ```
 
-**Result:**
-| enrollment_id | course_id | grade | grade_points | grade_status | points_earned |
-|---------------|-----------|-------|--------------|--------------|---------------|
-| 101 | CS101 | A | 4.0 | A | 4.0 |
-| 102 | CS201 | B+ | 3.3 | B+ | 3.3 |
-| 108 | CS301 | NULL | NULL | IP | 0 |
+---
 
 ## Function Nesting
 
-Functions can be nested - the inner function executes first, and its result becomes input to the outer function.
-
-**Example: Formatted full name in uppercase**
+Functions can be nested (inner executes first).
 
 ```sql
-SELECT 
-    UPPER(first_name || ' ' || last_name) AS formatted_name,
-    TO_CHAR(enrollment_date, 'Month YYYY') AS enrollment_month,
-    ROUND(NVL(gpa, 0), 1) AS safe_gpa
+SELECT UPPER(first_name || ' ' || last_name) AS formatted_name,
+       ROUND(NVL(gpa, 0), 1) AS safe_gpa
 FROM students
-WHERE student_id <= 3;
+WHERE student_id = 1;
 ```
-
-**Result:**
-| formatted_name | enrollment_month | safe_gpa |
-|----------------|------------------|----------|
-| JOHN SMITH | September 2023 | 3.8 |
-| JANE DOE | September 2023 | 3.9 |
-| BOB WILSON | January 2024 | 3.2 |
 
