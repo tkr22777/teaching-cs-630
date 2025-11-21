@@ -2,11 +2,11 @@
 
 ## Overview
 
-This guide covers DROP and TRUNCATE commands for removing database objects and data using Oracle SQL. These are powerful commands that permanently delete data, so use them carefully.
+This guide covers DROP and TRUNCATE commands. **DROP removes the table itself; TRUNCATE empties the table but keeps it.** These are powerful commands that permanently delete data, so use them carefully.
 
 ## DROP Statement
 
-The `DROP` statement permanently removes database objects (tables, indexes, views, etc.) from the database.
+When you need to completely remove a table from your database - structure and all data - you'll use DROP. This is permanent and can't be undone, so you'll typically use this when removing test tables, obsolete tables, or during development when restructuring your database.
 
 ### DROP TABLE
 
@@ -16,8 +16,6 @@ The `DROP` statement permanently removes database objects (tables, indexes, view
 DROP TABLE table_name;
 DROP TABLE table_name CASCADE CONSTRAINTS;  -- Drops table and dependent constraints
 ```
-
-**Note:** Oracle does not support `IF EXISTS` in DROP TABLE. To avoid errors, use PL/SQL blocks or handle exceptions in your application code.
 
 ### Example Setup
 
@@ -80,6 +78,8 @@ SELECT * FROM temp_enrollments;
 
 ### Example 2: DROP TABLE with Dependencies (CASCADE CONSTRAINTS)
 
+When a table is referenced by foreign keys in other tables, you need `CASCADE CONSTRAINTS` to drop it. This automatically removes those dependent foreign key constraints.
+
 ```sql
 -- Drops table and all dependent constraints automatically
 DROP TABLE temp_students CASCADE CONSTRAINTS;
@@ -99,48 +99,42 @@ DROP TABLE temp_students;
 
 **Result:** All tables are dropped successfully when done in the correct dependency order.
 
-###
+The key is to drop child tables (those with foreign keys) before parent tables (those being referenced).
+
+---
 
 ## TRUNCATE Statement
 
-The `TRUNCATE` statement removes all rows from a table quickly, but keeps the table structure.
+When you want to keep a table but remove all its data quickly, use TRUNCATE. This is much faster than DELETE for clearing entire tables, and it's commonly used when refreshing data or clearing test data between runs.
 
 ### Basic Syntax
 
 ```sql
 TRUNCATE TABLE table_name;
-TRUNCATE TABLE table_name DROP STORAGE;      -- Deallocates freed space
-TRUNCATE TABLE table_name REUSE STORAGE;     -- Keeps allocated space (default)
 ```
-
-**Note:** Oracle does not have `RESTART IDENTITY` like PostgreSQL. To reset sequences, you must manually reset them after truncating.
 
 ### Sample Data for TRUNCATE Examples
 
+We'll use a simple products table with some sample data:
+
 ```sql
--- Create and populate sample table
 CREATE TABLE products (
     product_id INTEGER PRIMARY KEY,
     product_name VARCHAR2(100) NOT NULL,
-    price NUMBER(10, 2),
-    stock_quantity INTEGER DEFAULT 0
+    price NUMBER(10, 2)
 );
 
-INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (1, 'Laptop', 999.99, 15);
-INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (2, 'Mouse', 25.50, 100);
-INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (3, 'Keyboard', 75.00, 50);
-INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (4, 'Monitor', 299.99, 30);
-INSERT INTO products (product_id, product_name, price, stock_quantity) VALUES (5, 'Webcam', 89.99, 45);
+INSERT INTO products VALUES (1, 'Laptop', 999.99);
+INSERT INTO products VALUES (2, 'Mouse', 25.50);
+INSERT INTO products VALUES (3, 'Keyboard', 75.00);
 ```
 
 **Products Table (Before TRUNCATE):**
-| product_id | product_name | price | stock_quantity |
-|------------|--------------|--------|----------------|
-| 1 | Laptop | 999.99 | 15 |
-| 2 | Mouse | 25.50 | 100 |
-| 3 | Keyboard | 75.00 | 50 |
-| 4 | Monitor | 299.99 | 30 |
-| 5 | Webcam | 89.99 | 45 |
+| product_id | product_name | price |
+|------------|--------------|--------|
+| 1 | Laptop | 999.99 |
+| 2 | Mouse | 25.50 |
+| 3 | Keyboard | 75.00 |
 
 ### Example 1: Basic TRUNCATE
 
@@ -150,9 +144,9 @@ TRUNCATE TABLE products;
 ```
 
 **Products Table (After TRUNCATE):**
-| product_id | product_name | price | stock_quantity |
-|------------|--------------|--------|----------------|
-| *(no rows)* | | | |
+| product_id | product_name | price |
+|------------|--------------|--------|
+| *(no rows)* | | |
 
 **Verification:**
 ```sql
@@ -163,44 +157,9 @@ SELECT COUNT(*) FROM products;
 |-------|
 | 0 |
 
-**Table Structure Still Exists:** The table definition remains, only data is removed.
+**Table Structure Still Exists:** The table definition remains, only data is removed. You can immediately start inserting new data without recreating the table.
 
-###
-
-### Example 3: Resetting Sequences After TRUNCATE
-
-When using sequences for auto-incrementing keys, you must manually reset them after truncating:
-
-**Example with Sequence:**
-```sql
--- Create sequence for product_id
-CREATE SEQUENCE product_seq START WITH 1 INCREMENT BY 1;
-
--- Create table using sequence
-CREATE TABLE products_seq (
-    product_id INTEGER PRIMARY KEY,
-    product_name VARCHAR2(100),
-    price NUMBER(10, 2)
-);
-
--- Insert using sequence
-INSERT INTO products_seq VALUES (product_seq.NEXTVAL, 'Laptop', 999.99);
-INSERT INTO products_seq VALUES (product_seq.NEXTVAL, 'Mouse', 25.50);
-
--- Truncate table
-TRUNCATE TABLE products_seq;
-
--- Reset sequence to start from 1 again
-ALTER SEQUENCE product_seq RESTART START WITH 1;
-
--- Next insert will use product_id = 1
-INSERT INTO products_seq VALUES (product_seq.NEXTVAL, 'Keyboard', 75.00);
-```
-
-**Products_Seq Table After Reset:**
-| product_id | product_name | price |
-|------------|--------------|--------|
-| 1 | Keyboard | 75.00 |
+Foreign keys add a complication - you can't truncate a parent table if child tables reference it. Let's see how to handle this.
 
 ### Example 2: TRUNCATE with Foreign Keys
 
@@ -245,20 +204,7 @@ TRUNCATE TABLE categories;
 ORA-02266: unique/primary keys in table referenced by enabled foreign keys
 ```
 
-**Solution 1: Disable and Re-enable Constraints**
-```sql
--- Disable foreign key constraint
-ALTER TABLE items DISABLE CONSTRAINT items_category_fk;
-
--- Truncate both tables
-TRUNCATE TABLE categories;
-TRUNCATE TABLE items;
-
--- Re-enable foreign key constraint
-ALTER TABLE items ENABLE CONSTRAINT items_category_fk;
-```
-
-**Solution 2: Truncate in Correct Order**
+**Solution: Truncate in Correct Order**
 ```sql
 -- Truncate child table first
 TRUNCATE TABLE items;
@@ -278,92 +224,16 @@ TRUNCATE TABLE categories;
 |---------|-----------|-------------|
 | *(no rows)* | |
 
+---
+
 ## DELETE vs TRUNCATE vs DROP
 
-### Comparison Table
+| Command  | What It Does                  | Use When                                   |
+|----------|-------------------------------|--------------------------------------------|
+| DELETE   | Removes specific rows         | You need a WHERE clause to select rows     |
+| TRUNCATE | Removes all rows, keeps table | Clearing all data quickly                  |
+| DROP     | Removes entire table          | Table no longer needed                     |
 
-| Feature | DELETE | TRUNCATE | DROP |
-|---------|--------|----------|------|
-| Removes | Rows | All rows | Entire table |
-| Table structure | Kept | Kept | Removed |
-| WHERE clause | Supported | Not supported | N/A |
-| Speed | Slower | Faster | Fastest |
-| Rollback | Can rollback | Cannot rollback (DDL) | Cannot rollback (DDL) |
-| Triggers | Fires | Doesn't fire | N/A |
-| Sequences | Continues | Must manually reset | N/A |
-| Foreign keys | Checks constraints | Must disable or truncate child first | Use CASCADE CONSTRAINTS |
+## Summary
 
-### When to Use Each
-
-**Use DELETE when:**
-- You need to remove specific rows (with WHERE clause)
-- You need triggers to fire
-- You want transaction safety
-
-```sql
-DELETE FROM products WHERE price < 10;
-```
-
-**Use TRUNCATE when:**
-- You need to remove ALL rows quickly
-- Performance is important
-- You can manually reset sequences if needed
-
-```sql
-TRUNCATE TABLE products;
-```
-
-**Use DROP when:**
-- You want to completely remove the table
-- The table is no longer needed
-- You're restructuring the database
-
-```sql
-DROP TABLE products;
-```
-
-## Practical Examples
-
-### Example 1: Clean Up Test Data
-
-```sql
--- Remove all test data but keep tables (truncate in correct order)
-TRUNCATE TABLE test_enrollments;
-TRUNCATE TABLE test_students;
-TRUNCATE TABLE test_courses;
-```
-
-### Example 2: Remove Temporary Tables
-
-```sql
--- Remove tables created for one-time analysis
-DROP TABLE temp_staging_data;
-DROP TABLE temp_calculations;
-DROP TABLE temp_analysis_results;
-```
-
-### Example 3: Clear Log Table Daily
-
-```sql
--- Clear old logs (in a scheduled job)
-TRUNCATE TABLE application_logs;
-
--- Or delete old logs only
-DELETE FROM application_logs 
-WHERE log_date < SYSDATE - 30;
-```
-
-### Example 4: Database Reset for Development
-
-```sql
--- Complete database reset script (drop in correct order)
-DROP TABLE enrollments CASCADE CONSTRAINTS;
-DROP TABLE courses CASCADE CONSTRAINTS;
-DROP TABLE students CASCADE CONSTRAINTS;
-
--- Recreate fresh tables
-CREATE TABLE students (...);
-CREATE TABLE courses (...);
-CREATE TABLE enrollments (...);
-```
-
+**DROP** removes entire table structure and data permanently. **TRUNCATE** removes all data but keeps table structure. **DELETE** removes specific rows (covered in DML section).

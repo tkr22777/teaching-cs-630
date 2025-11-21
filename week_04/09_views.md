@@ -2,15 +2,7 @@
 
 ## Overview
 
-A view is a virtual table based on a SELECT query. It doesn't store data itself but provides a way to simplify complex queries, improve security, and create abstractions over base tables.
-
-## Why Use Views?
-
-1. **Simplify Complex Queries** - Hide complexity behind simple names
-2. **Security** - Restrict access to specific columns or rows
-3. **Data Abstraction** - Hide underlying table structure changes
-4. **Reusability** - Define query once, use many times
-5. **Consistency** - Ensure same logic used across applications
+A **view** is a saved query that acts like a virtual table. "Virtual" means the view doesn't store data - it runs the query each time you use it. Instead of writing the same complex query repeatedly, you create a view once and then query it like a regular table. Views simplify complex queries, restrict access to specific columns, and ensure consistency.
 
 ## Sample Data
 
@@ -136,7 +128,7 @@ ORDER BY net_salary DESC;
 | Jane Smith | Engineering | 72250.00 | 4 |
 | Bob Johnson | Sales | 63750.00 | 3 |
 
-###
+---
 
 **SQL Statement:**
 ```sql
@@ -196,8 +188,6 @@ ORDER BY total_payroll DESC;
 | Sales | 3 | 72333.33 | 70000 | 75000 | 217000 |
 | Marketing | 1 | 65000.00 | 65000 | 65000 | 65000 |
 | HR | 1 | 60000.00 | 60000 | 60000 | 60000 |
-
-###
 
 **SQL Statement:**
 ```sql
@@ -266,6 +256,8 @@ WHERE es.salary > ds.avg_salary;
 | John Doe | Engineering | 3 | 90000.00 |
 | Bob Johnson | Sales | 3 | 72333.33 |
 
+---
+
 ## Modifying Views
 
 ### CREATE OR REPLACE VIEW
@@ -310,12 +302,12 @@ DROP VIEW engineering_employees;
 DROP VIEW IF EXISTS engineering_employees;
 ```
 
-###
-
 **SQL Statement:**
 ```sql
 DROP VIEW IF EXISTS view1, view2, view3;
 ```
+
+---
 
 ## Updatable Views (brief)
 
@@ -362,8 +354,6 @@ WHERE employee_id = 5;
 |-------------|------------|-----------|------------|
 | 5 | Charlie | Brown | Engineering |
 
-###
-
 **SQL Statement:**
 ```sql
 INSERT INTO active_employees (first_name, last_name, email, department)
@@ -371,8 +361,6 @@ VALUES ('Grace', 'Lee', 'grace.l@company.com', 'HR');
 ```
 
 **Result:** New row is inserted into base `employees` table.
-
-###
 
 **SQL Statement:**
 ```sql
@@ -387,6 +375,8 @@ GROUP BY department;
 UPDATE dept_summary SET emp_count = 10 WHERE department = 'Sales';
 -- ERROR: cannot update view "dept_summary"
 ```
+
+---
 
 ## Materialized Views
 
@@ -480,25 +470,19 @@ SELECT customer_id AS id,
 FROM customers;
 ```
 
-###
+---
 
 ## Viewing View Definitions
 
-### Example 17: List All Views
-
-**SQL Statement:**
+**List All Views:**
 ```sql
--- Oracle: Query all views in current schema
-SELECT view_name, text_length
+SELECT view_name
 FROM user_views
 ORDER BY view_name;
 ```
 
-### Example 18: Get Specific View Definition
-
-**SQL Statement:**
+**Get View Definition:**
 ```sql
--- Oracle: Query view definition from USER_VIEWS
 SELECT text
 FROM user_views
 WHERE view_name = 'EMPLOYEE_SUMMARY';

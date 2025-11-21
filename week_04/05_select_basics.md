@@ -2,7 +2,7 @@
 
 ## Overview
 
-The SELECT statement is the most commonly used SQL command for retrieving data from database tables. This guide covers basic SELECT operations using Oracle SQL.
+SELECT is how you retrieve data from your database. Whether you need to display information to users, generate reports, or check what's in your tables, SELECT is your starting point. You'll use it more than any other SQL command.
 
 ## Sample Data
 
@@ -51,6 +51,8 @@ INSERT INTO books (book_id, title, author, genre, publication_year, price, stock
 
 ## Basic SELECT Statement
 
+Most of the time you don't need all columns from a table. Select only what you need to make queries faster and results clearer.
+
 ### Example 2: Select Specific Columns
 
 **SQL Statement:**
@@ -94,9 +96,11 @@ FROM books;
 | The Hobbit | 15.99 | 14.39 | 399.75 |
 | ... | ... | ... | ... |
 
+---
+
 ## WHERE Clause
 
-The WHERE clause filters rows based on conditions.
+The **WHERE clause** filters rows based on conditions - it lets you specify which rows you want to retrieve instead of getting all rows.
 
 ### Example 4: Simple WHERE Condition
 
@@ -129,8 +133,6 @@ WHERE genre = 'Fiction' AND rating > 4.5;
 |-------|-------|-------|--------|
 | To Kill a Mockingbird | Fiction | 14.99 | 4.8 |
 
-###
-
 ### Example 8: IN Operator
 
 **SQL Statement:**
@@ -148,44 +150,11 @@ WHERE author IN ('George Orwell', 'J.R.R. Tolkien');
 | Animal Farm | George Orwell | Fiction |
 | The Lord of the Rings | J.R.R. Tolkien | Fantasy |
 
-###
-
-### Example 10: Case-Insensitive Pattern Matching
-
-**SQL Statement:**
-```sql
-SELECT title, author
-FROM books
-WHERE UPPER(title) LIKE UPPER('%harry%');  -- Case-insensitive using standard SQL
-```
-
-**Result:**
-| title | author |
-|-------|--------|
-| Harry Potter | J.K. Rowling |
-
-### Example 11: IS NOT NULL
-
-**SQL Statement:**
-```sql
-SELECT title, genre
-FROM books
-WHERE genre IS NOT NULL
-  AND stock_quantity > 40;
-```
-
-**Result:**
-| title | genre |
-|-------|-------|
-| The Great Gatsby | Fiction |
-| 1984 | Science Fiction |
-| Harry Potter | Fantasy |
-
-###
+---
 
 ## ORDER BY Clause
 
-The ORDER BY clause sorts the result set.
+The **ORDER BY clause** sorts the result set. Use `ASC` for ascending order (smallest to largest) or `DESC` for descending order (largest to smallest).
 
 ### Example 15: Sort by Multiple Columns
 
@@ -210,11 +179,11 @@ ORDER BY genre ASC, rating DESC;
 | 1984 | Science Fiction | 4.7 |
 | Brave New World | Science Fiction | 4.3 |
 
-###
+---
 
 ## DISTINCT Keyword
 
-DISTINCT removes duplicate values from results.
+The **DISTINCT keyword** removes duplicate values from results - you'll only see each unique value once.
 
 ### Example 17: Select Distinct Values
 
@@ -233,13 +202,15 @@ ORDER BY genre;
 | Romance |
 | Science Fiction |
 
-###
+---
 
 ### Example 20: Pagination with OFFSET and FETCH
 
+**Pagination** means breaking large result sets into smaller "pages" for easier viewing (like showing 10 search results per page). Use `OFFSET` to skip rows and `FETCH FIRST` to limit how many rows to return.
+
 **SQL Statement:**
 ```sql
--- Page 1 (first 3 books) - Oracle 12c+ syntax
+-- Page 1 (first 3 books)
 SELECT title, price
 FROM books
 ORDER BY title
@@ -260,27 +231,6 @@ FROM books
 ORDER BY title
 OFFSET 3 ROWS FETCH FIRST 3 ROWS ONLY;
 ```
-
-<details>
-<summary>Alternative: ROWNUM for Oracle 11g and earlier</summary>
-
-For Oracle versions before 12c, use ROWNUM with a subquery:
-
-```sql
--- Get rows 4-6 (page 2, 3 rows per page)
-SELECT * FROM (
-    SELECT title, price, ROWNUM rnum
-    FROM (
-        SELECT title, price
-        FROM books
-        ORDER BY title
-    )
-    WHERE ROWNUM <= 6
-)
-WHERE rnum > 3;
-```
-
-</details>
 
 ## Combining WHERE, ORDER BY, and FETCH
 

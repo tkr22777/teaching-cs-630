@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aliases are temporary names assigned to tables or columns to make queries more readable and concise. This guide covers both column and table aliases using standard SQL.
+As queries get more complex, long column names and table names make them hard to read. Aliases let you use shorter, more meaningful names temporarily within a query. They're especially useful with calculations, joins, and when working with multiple tables.
 
 ## Sample Data
 
@@ -61,18 +61,7 @@ INSERT INTO orders (customer_id, order_date, total_amount, status) VALUES
 
 ## Column Aliases
 
-Column aliases give temporary names to columns in the SELECT statement.
-
-### Syntax
-
-```sql
-SELECT column_name AS alias_name
-FROM table_name;
-
--- AS keyword is optional
-SELECT column_name alias_name
-FROM table_name;
-```
+**Column aliases** give temporary names to columns in the SELECT statement. Use the `AS` keyword: `SELECT column_name AS alias_name`.
 
 ### Example 1: Simple Column Alias
 
@@ -110,22 +99,11 @@ FROM customers;
 | Bob Johnson | bob.j@email.com | Customer |
 | Alice Williams | alice.w@email.com | Customer |
 
-###
+---
 
 ## Table Aliases
 
-Table aliases provide shorter names for tables, making queries more readable.
-
-### Syntax
-
-```sql
-SELECT columns
-FROM table_name alias_name;
-
--- Or with AS keyword
-SELECT columns
-FROM table_name AS alias_name;
-```
+**Table aliases** provide shorter names for tables, making queries more readable. Simply write the alias after the table name: `FROM table_name alias_name`.
 
 ### Example 8: Table Aliases in Joins
 
@@ -148,44 +126,6 @@ ORDER BY c.last_name, o.order_date;
 | John | Doe | 1 | 2024-10-01 | 150.00 |
 | John | Doe | 2 | 2024-10-05 | 200.50 |
 | Jane | Smith | 3 | 2024-10-03 | 75.25 |
-
-###
-
-### Example 10: Self-Join with Aliases
-
-**Setup:**
-```sql
-CREATE TABLE employees (
-    employee_id INTEGER PRIMARY KEY,
-    employee_name VARCHAR2(100),
-    manager_id INTEGER
-);
-
-INSERT INTO employees (employee_name, manager_id) VALUES
-('Alice', NULL),
-('Bob', 1),
-('Charlie', 1),
-('David', 2);
-```
-
-**SQL Statement:**
-```sql
-SELECT e.employee_name AS employee,
-       m.employee_name AS manager
-FROM employees e
-LEFT JOIN employees m ON e.manager_id = m.employee_id
-ORDER BY e.employee_id;
-```
-
-**Result:**
-| employee | manager |
-|----------|---------|
-| Alice | NULL |
-| Bob | Alice |
-| Charlie | Alice |
-| David | Bob |
-
-**Explanation:** Table aliases (e and m) are REQUIRED for self-joins to distinguish between the two instances of the same table.
 
 ##
 

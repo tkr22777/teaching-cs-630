@@ -2,7 +2,7 @@
 
 ## Overview
 
-Aggregate functions perform calculations on multiple rows and return a single result. This guide covers aggregate functions, GROUP BY, and HAVING clauses using standard SQL.
+When you need summary information - totals, averages, counts - you'll use aggregate functions. Instead of returning every row, these functions calculate a single result from multiple rows. This is essential for reports, analytics, and understanding your data.
 
 ## Sample Data
 
@@ -50,61 +50,25 @@ INSERT INTO sales (sale_id, product_name, category, quantity, unit_price, sale_d
 
 ## Aggregate Functions
 
-### COUNT()
+**Aggregate functions** calculate a single result from multiple rows: `COUNT()` counts rows, `SUM()` adds values, `AVG()` calculates average, `MAX()` finds largest, `MIN()` finds smallest.
 
+**Example:**
 ```sql
-SELECT COUNT(*) AS total_sales
-FROM sales;
-```
-
-### SUM()
-
-```sql
-SELECT category,
+SELECT COUNT(*) AS total_sales,
        SUM(quantity) AS total_quantity,
-       SUM(quantity * unit_price) AS total_revenue
-FROM sales
-GROUP BY category;
-```
-
-**Result:**
-| category | total_quantity | total_revenue |
-|----------|----------------|---------------|
-| Electronics | 53 | 13292.32 |
-| Furniture | 30 | 7999.78 |
-
-### AVG()
-
-```sql
-SELECT category,
-       AVG(quantity) AS avg_quantity,
-       ROUND(AVG(unit_price), 2) AS avg_price
-FROM sales
-GROUP BY category;
-```
-
-**Result:**
-| category | avg_quantity | avg_price |
-|----------|--------------|-----------|
-| Electronics | 8.83 | 558.49 |
-| Furniture | 7.50 | 325.00 |
-
-### MAX() and MIN()
-
-```sql
-SELECT MIN(sale_date) AS first_sale,
-       MAX(sale_date) AS last_sale
+       AVG(unit_price) AS avg_price,
+       MAX(sale_date) AS last_sale,
+       MIN(sale_date) AS first_sale
 FROM sales;
 ```
 
-**Result:**
-| first_sale | last_sale |
-|------------|-----------|
-| 2024-10-01 | 2024-10-06 |
+These functions ignore NULL values (except COUNT(*) which counts all rows). For example, a SUM of 5 rows with 2 NULLs only adds 3 values.
+
+---
 
 ## GROUP BY Clause
 
-GROUP BY groups rows that have the same values in specified columns.
+**GROUP BY** groups rows that have the same values in specified columns, allowing you to calculate aggregates for each group.
 
 ### Example 11: Sales by Category
 
@@ -125,51 +89,13 @@ ORDER BY total_revenue DESC;
 | Electronics | 6 | 53 | 12299.18 |
 | Furniture | 4 | 30 | 6599.93 |
 
-###
+Notice how GROUP BY splits the data into separate groups, and each aggregate function calculates for its group.
 
-**Result:**
-| region | number_of_sales | revenue | avg_sale_value |
-|--------|-----------------|---------|----------------|
-| North | 3 | 7509.93 | 2503.31 |
-| East | 3 | 7799.77 | 2599.92 |
-| West | 2 | 2632.50 | 1316.25 |
-| South | 2 | 3349.90 | 1674.95 |
-
-###
-
-**Result:**
-| product_name | times_sold | total_quantity | total_revenue |
-|--------------|------------|----------------|---------------|
-| Laptop | 3 | 10 | 9999.90 |
-| Desk | 2 | 8 | 3600.00 |
-| Monitor | 1 | 8 | 2399.92 |
-| Chair | 2 | 22 | 4399.78 |
-| Mouse | 2 | 35 | 892.50 |
-
-###
-
-**Result:**
-| category | region | sales_count | revenue |
-|----------|--------|-------------|---------|
-| Electronics | North | 3 | 7509.93 |
-| Electronics | East | 2 | 5399.92 |
-| Electronics | West | 1 | 382.50 |
-| Electronics | South | 0 | 0.00 |
-| Furniture | East | 1 | 2399.88 |
-| Furniture | South | 2 | 3349.90 |
-| Furniture | West | 1 | 2250.00 |
-| Furniture | North | 0 | 0.00 |
-
-###
-
-**Result:**
-| year | month | sales_count | monthly_revenue |
-|------|-------|-------------|-----------------|
-| 2024 | 10 | 10 | 21292.10 |
+---
 
 ## HAVING Clause
 
-HAVING filters groups after GROUP BY (WHERE filters before grouping).
+**HAVING** filters groups after GROUP BY (WHERE filters rows before grouping).
 
 ### Example 16: Filter Groups
 
@@ -188,23 +114,6 @@ ORDER BY total_revenue DESC;
 | category | sales_count | total_revenue |
 |----------|-------------|---------------|
 | Electronics | 6 | 13292.32 |
-
-###
-
-**Result:**
-| region | number_of_sales | revenue |
-|--------|-----------------|---------|
-| North | 3 | 5509.93 |
-| East | 3 | 5399.85 |
-| South | 2 | 3356.80 |
-
-###
-
-**Result:**
-| category | sales_count | avg_quantity |
-|----------|-------------|--------------|
-| Electronics | 2 | 11.50 |
-| Furniture | 2 | 11.00 |
 
 ##
 
